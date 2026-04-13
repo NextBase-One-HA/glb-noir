@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en" class="notranslate" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>GLOBAL LANGUAGE BREAKER</title>
+    <style>
+        :root {
+            --gold: #ffe566;
+            --gold-deep: #e8b820;
+            --gold-glow: rgba(255, 230, 100, 0.95);
+            --gold-glow-mid: rgba(255, 200, 60, 0.55);
+            --gold-glow-soft: rgba(255, 210, 80, 0.28);
+            --bg: #0a0a0a;
+            --card: #1a1a1a;
+            --noir-red: #ff0000;
+        }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 0; padding-bottom: env(safe-area-inset-bottom, 0); text-align: center; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: rgba(255, 230, 100, 0.15); }
+        #noir-tv {
+            width: 100%;
+            min-height: 52px;
+            background: #000;
+            color: var(--noir-red);
+            font-weight: 700;
+            font-size: 13px;
+            padding: 12px 16px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid rgba(255,0,0,0.5);
+            box-shadow: 0 0 20px rgba(255,0,0,0.15);
+        }
+        #noir-tv::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 3px);
+            pointer-events: none;
+        }
+        #noir-tv::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,0,0,0.02);
+            animation: noir-flicker 2.5s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes noir-flicker {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.92; }
+        }
+        #noir-tv .live-tag { color: var(--noir-red); text-shadow: 0 0 8px var(--noir-red); margin-right: 8px; }
+        #noir-tv .typing-text { display: inline; }
+        #noir-tv .cursor { display: inline-block; width: 2px; height: 1em; background: var(--noir-red); animation: blink 0.8s step-end infinite; vertical-align: text-bottom; margin-left: 1px; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .cockpit { padding: 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(600px, 100%); margin: 0 auto; box-sizing: border-box; }
+        .header { margin-bottom: 22px; padding: 0 6px; }
+        .gold-text { color: var(--gold); letter-spacing: 4px; font-weight: bold; }
+        @keyframes glb-neon-title {
+            0%, 100% { text-shadow: 0 0 12px var(--gold-glow-soft), 0 0 28px var(--gold-glow-mid), 0 0 48px rgba(255, 180, 40, 0.22); filter: brightness(1.02); }
+            50% { text-shadow: 0 0 18px var(--gold-glow-soft), 0 0 40px var(--gold-glow-mid), 0 0 64px rgba(255, 200, 60, 0.32); filter: brightness(1.08); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            h1.gold-text.app-brand-title { animation: none; text-shadow: 0 0 14px var(--gold-glow-mid), 0 0 32px var(--gold-glow-soft); }
+        }
+        h1.gold-text.app-brand-title {
+            font-size: clamp(1.15rem, 4.8vw, 1.85rem);
+            letter-spacing: 0.1em;
+            line-height: 1.18;
+            font-weight: 800;
+            text-transform: uppercase;
+            max-width: 22em;
+            margin-left: auto;
+            margin-right: auto;
+            color: #fff8c8;
+            animation: glb-neon-title 3.2s ease-in-out infinite;
+        }
+        h1.gold-text.app-brand-title .brand-line {
+            display: block;
+            letter-spacing: 0.11em;
+        }
+        h1.gold-text.app-brand-title .brand-line + .brand-line {
+            margin-top: 0.08em;
+        }
+        .glb-billboard { width: 100%; max-width: min(560px, 100%); margin: 12px auto 18px; padding: 0; box-sizing: border-box; }
+        .glb-billboard-tools { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+        .glb-flip-btn {
+            background: var(--card);
+            color: #fff8c8;
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            text-shadow: 0 0 12px var(--gold-glow-mid);
+            box-shadow: 0 0 14px var(--gold-glow-soft), inset 0 0 12px rgba(255, 220, 100, 0.06);
+        }
+        .glb-flip-btn:active { opacity: 0.92; filter: brightness(1.05); }
+        #glb-result-stage {
+            min-height: min(52dvh, 420px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 18px;
+            background: radial-gradient(ellipse 120% 80% at 50% 40%, rgba(255, 210, 60, 0.07) 0%, #0d0d0d 55%);
+            border: 2px solid var(--gold);
+            border-radius: 16px;
+            box-sizing: border-box;
+            box-shadow:
+                0 0 20px var(--gold-glow-soft),
+                0 0 40px rgba(255, 190, 50, 0.12),
+                inset 0 0 32px rgba(255, 200, 60, 0.04);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+        #glb-result-stage #translate-measure-result {
+            min-height: 0;
+            width: 100%;
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            border: none;
+            font-size: clamp(26px, 8.5vw, 48px);
+            line-height: 1.35;
+            font-weight: 700;
+            text-align: center;
+            color: #f2f2f2;
+            word-break: break-word;
+            transition: transform 0.28s ease;
+            transform: rotate(0deg);
+        }
+        /* 相手がいるとき：Flip で 180°（向かい側から読める向き） */
+        #glb-result-stage.is-flipped #translate-measure-result {
+            transform: rotate(180deg);
+        }
+        .free-quota-line {
+            font-size: 11px;
+            color: #aaa;
+            text-align: center;
+            margin: 10px 8px 0;
+            line-height: 1.5;
+            max-width: 100%;
+            word-break: break-word;
+        }
+        .free-quota-line.is-warn { color: #ffe08a; text-shadow: 0 0 10px var(--gold-glow-mid); }
+        .flipped-mode {
+            transform: rotate(180deg) !important;
+            font-size: 5rem !important;
+            transition: transform 0.3s ease;
+        }
+        .glb-subscribe-btn {
+            min-height: 48px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+        input { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--gold); background: #111; color: #fff; font-size: 16px; margin-bottom: 12px; outline: none; box-sizing: border-box; box-shadow: 0 0 10px var(--gold-glow-soft); }
+        input:focus { box-shadow: 0 0 16px var(--gold-glow-mid); border-color: #fff4a8; }
+        #result-area { min-height: 72px; padding: 14px; background: var(--card); border-radius: 10px; margin-bottom: 24px; text-align: left; line-height: 1.5; font-size: 15px; border: 1px solid #2a2a2a; }
+        .btn {
+            background: linear-gradient(180deg, #fff6a8 0%, var(--gold) 45%, var(--gold-deep) 100%);
+            color: #0a0a06;
+            padding: 16px;
+            border-radius: 30px;
+            font-weight: bold;
+            text-decoration: none;
+            display: block;
+            margin: 10px 0;
+            font-size: 16px;
+            box-shadow: 0 0 22px var(--gold-glow-mid), 0 0 40px var(--gold-glow-soft);
+            border: 1px solid rgba(255, 245, 180, 0.65);
+        }
+        .btn:active { filter: brightness(1.05); }
+        .footer { margin-top: 32px; padding-top: 16px; font-size: 11px; color: #666; border-top: 1px solid #222; }
+        .footer a { color: #888; margin: 0 8px; text-decoration: none; }
+        .legal-footer { margin-top: 40px; padding: 20px 8px 8px; border-top: 1px solid #2a2a2a; font-size: 12px; color: #888; text-align: center; }
+        .legal-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; line-height: 1.6; }
+        .legal-links a { color: #aaa; margin: 0; text-decoration: underline; text-underline-offset: 3px; }
+        .legal-links a:hover { color: var(--gold); }
+        .legal-sep { color: #444; user-select: none; }
+        .footer-copy { margin-top: 12px; font-size: 11px; color: #666; }
+        select.lang-select {
+            width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--gold);
+            background: #111; color: #fff; font-size: 14px; margin-bottom: 12px; outline: none; box-sizing: border-box;
+            box-shadow: 0 0 10px var(--gold-glow-soft);
+        }
+        select.lang-select:focus { box-shadow: 0 0 16px var(--gold-glow-mid); border-color: #fff4a8; }
+        .lang-hint { font-size: 11px; color: #777; text-align: left; margin: 0 0 8px; line-height: 1.4; }
+        .travel-toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12px; color: #aaa; text-align: left; }
+        .travel-toggle-row input[type="checkbox"] { width: auto; margin: 0; accent-color: var(--gold); }
+        .model-badge { display: none; }
+        @media (max-width: 420px) {
+            .model-badge { max-width: none; width: 100%; text-align: left; padding-top: 6px; }
+        }
+        .model-badge strong { color: #8a8; font-weight: 600; display: block; }
+        .stripe-hint { font-size: 10px; color: #555; margin-top: 8px; line-height: 1.4; }
+        .pricing-box { text-align: left; font-size: 12px; color: #ccc; line-height: 1.55; margin: 0 0 14px; padding: 12px 14px; background: #141414; border-radius: 10px; border: 1px solid #2a2a2a; }
+        .pricing-box h2 {
+            font-size: 14px;
+            color: #fff8c8;
+            margin: 0 0 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 12px var(--gold-glow-mid), 0 0 24px var(--gold-glow-soft);
+        }
+        .pricing-box ul { margin: 0; padding-left: 1.1em; }
+        .pricing-box li { margin-bottom: 8px; }
+        .pricing-box .ja { font-size: 11px; color: #777; display: block; margin-top: 4px; line-height: 1.45; }
+        .pricing-box .note { font-size: 10px; color: #666; margin-top: 10px; }
+        .tr-run-wrap { text-align: center; margin-top: 10px; margin-bottom: 6px; }
+        #tr-run.glb-main-btn {
+            display: inline-block;
+            width: auto;
+            min-width: min(220px, 88vw);
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 18px 28px;
+            font-size: clamp(17px, 4.5vw, 20px);
+            font-weight: 800;
+            letter-spacing: 0.28em;
+            border-radius: 999px;
+            box-shadow: 0 0 26px var(--gold-glow), 0 0 52px var(--gold-glow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+        }
+        .trans-lang-grid { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
+        .trans-lang-grid > div { flex: 1 1 140px; min-width: 0; }
+        #lang-swap {
+            flex: 0 0 auto;
+            align-self: center;
+            background: var(--card);
+            color: #fff8c8;
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            text-shadow: 0 0 10px var(--gold-glow-mid);
+            box-shadow: 0 0 14px var(--gold-glow-soft);
+        }
+        #lang-swap:active { opacity: 0.92; }
+        .trans-section-head {
+            font-size: 12px;
+            color: #fff8c8;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 0 0 10px var(--gold-glow-mid);
+        }
+        @media (max-width: 480px) {
+            .cockpit { padding: 16px 14px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+            .glb-billboard { margin-top: 8px; }
+            h1.gold-text.app-brand-title {
+                font-size: clamp(1.05rem, 5.8vw, 1.55rem);
+                letter-spacing: 0.08em;
+            }
+            #glb-result-stage {
+                min-height: min(44dvh, 340px);
+                padding: 18px 14px;
+            }
+            #glb-result-stage #translate-measure-result {
+                font-size: clamp(22px, 7.2vw, 40px);
+            }
+            #tr-run.glb-main-btn {
+                min-width: min(200px, 92vw);
+                min-height: 48px;
+                padding: 16px 20px;
+                letter-spacing: 0.2em;
+            }
+            .free-quota-line {
+                font-size: 12px;
+                margin-top: 12px;
+                padding: 0 4px;
+            }
+            .tr-run-wrap { margin-bottom: 4px; }
+            .pricing-box { font-size: 13px; padding: 14px; }
+            .pricing-box h2 { font-size: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="noir-tv">
+        <span class="live-tag">[ LIVE ]</span><span class="typing-text" id="noir-typing"></span><span class="cursor" id="noir-cursor"></span>
+    </div>
+    <div class="cockpit">
+    <div class="header">
+        <h1 class="gold-text app-brand-title" id="app-brand-title"><span class="brand-line">GLOBAL LANGUAGE</span><span class="brand-line">BREAKER</span></h1>
+    </div>
+
+    <div class="glb-billboard">
+        <div class="glb-billboard-tools">
+            <button type="button" class="glb-flip-btn" id="glb-flip-btn">Flip</button>
+        </div>
+        <div id="glb-result-stage" class="glb-result-stage">
+            <div id="translate-measure-result" data-i18n-idle="idle" aria-live="polite">Idle</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #2a2a2a; text-align: left;">
+        <div class="trans-section-head" id="t-trans-head">Translation</div>
+        <label for="ui-lang" style="display:block; font-size: 11px; color: #888; margin-bottom: 6px;" id="label-ui-lang">Language</label>
+        <select id="ui-lang" class="lang-select" aria-label="App language">
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+            <option value="zh">中文</option>
+            <option value="ko">한국어</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="it">Italiano</option>
+            <option value="ru">Русский</option>
+            <option value="th">ไทย</option>
+            <option value="vi">Tiếng Việt</option>
+            <option value="hi">हिन्दी</option>
+            <option value="pt">Português</option>
+        </select>
+        <div class="trans-lang-grid">
+            <div>
+                <label for="lang-from" style="display:block; font-size: 11px; color: #888; margin-bottom: 6px;" id="label-lang-from">From</label>
+                <select id="lang-from" class="lang-select" aria-label="Translate from"></select>
+            </div>
+            <button type="button" id="lang-swap" title="Swap direction">⇄</button>
+            <div>
+                <label for="lang-to" style="display:block; font-size: 11px; color: #888; margin-bottom: 6px;" id="label-lang-to">To</label>
+                <select id="lang-to" class="lang-select" aria-label="Translate to"></select>
+            </div>
+        </div>
+        <p style="font-size: 10px; color: #666; margin: 0 0 10px; line-height: 1.45;" id="t-lang-flow-hint"></p>
+        <input type="text" id="tr-text" placeholder="Text to translate (e.g. hello)" autocomplete="off">
+        <input type="hidden" id="tr-src" value="ja">
+        <input type="hidden" id="tr-tgt" value="en">
+        <div style="display:none;" aria-hidden="true">
+            <label for="region-preset" id="label-region">Region</label>
+            <select id="region-preset" class="lang-select" aria-hidden="true">
+                <option value="US" selected>United States</option>
+                <option value="GB">United Kingdom</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="NZ">New Zealand</option>
+                <option value="IE">Ireland</option>
+                <option value="SG">Singapore</option>
+                <option value="IN">India</option>
+                <option value="PH">Philippines</option>
+                <option value="ZA">South Africa</option>
+                <option value="NG">Nigeria</option>
+                <option value="KE">Kenya</option>
+                <option value="GH">Ghana</option>
+                <option value="JM">Jamaica</option>
+                <option value="TT">Trinidad and Tobago</option>
+                <option value="PK">Pakistan</option>
+                <option value="MY">Malaysia</option>
+                <option value="HK">Hong Kong</option>
+                <option value="BB">Barbados</option>
+                <option value="BS">Bahamas</option>
+            </select>
+        </div>
+        <div class="tr-run-wrap">
+            <button type="button" id="tr-run" class="btn glb-main-btn">GLB</button>
+            <p class="free-quota-line" id="t-free-quota" role="status"></p>
+        </div>
+    </div>
+
+    <div id="gateway-pulse" style="display:none;" aria-hidden="true" data-i18n-placeholder="apiChecking"></div>
+
+    <div style="max-width: min(600px, 100%); margin: 0 auto 20px;">
+        <div class="pricing-box">
+            <h2 id="t-pricing-h2">$2.99 / month</h2>
+            <ul>
+                <li id="t-pricing-li1"><strong>$2.99/mo</strong> — Cloud translation. Fair-use limits may apply.</li>
+            </ul>
+            <p class="note" id="t-pricing-note"></p>
+        </div>
+        <!-- Stripe success URL can end with ?subscribed=1 to unlock unlimited in-app (localStorage). -->
+        <a href="https://buy.stripe.com/bJedRbefH5yogzZfuDasg09" class="btn glb-subscribe-btn" style="font-size:18px; padding:18px 20px; border-radius:999px; margin-top:4px;" id="t-btn-monthly">
+            Subscribe ($2.99/mo)
+        </a>
+        <p class="stripe-hint" id="t-stripe-hint">Secure checkout with Stripe.</p>
+        <!-- Ops: Stripe Dashboard → Payment Links must be Live (not test) or customers cannot pay. -->
+    </div>
+
+    <input type="text" id="q" placeholder="Search 150k dictionary…" autocomplete="off">
+    <div id="result-area" data-i18n-default="dictResult">Results appear here</div>
+
+    <footer class="footer legal-footer" id="glb-legal-footer" lang="en">
+        <div class="legal-links">
+            <a href="terms.html" id="link-terms">Terms of Service</a>
+            <span class="legal-sep" aria-hidden="true">|</span>
+            <a href="privacy.html" id="link-privacy">Privacy Policy</a>
+            <span class="legal-sep" aria-hidden="true">|</span>
+            <a href="legal.html" id="link-legal">Legal</a>
+            <span class="legal-sep" aria-hidden="true">|</span>
+            <a href="support.html" id="link-support">Support</a>
+        </div>
+        <p class="footer-copy" id="footer-copyright">&copy; 2026 NEXT BASE. All Rights Reserved.</p>
+    </footer>
+    </div>
+
+    <script>
+        /** 正本: NEXTBASE_ENDPOINT_MAP.md — nextbase-app（rev 00008 以降もこのオリジン） */
+        const NEXTBASE_APP_ORIGIN = (function () {
+            try {
+                var h = location.hostname || '';
+                if (h === 'localhost' || h === '127.0.0.1') {
+                    return 'http://127.0.0.1:8889';
+                }
+            } catch (e) { /* ignore */ }
+            return 'https://nextbase-app-125142687526.asia-northeast1.run.app';
+        })();
+        /** App UI + translation hub languages (English pivot). */
+        var GLB_UI_LANGS = ['en', 'ja', 'zh', 'ko', 'vi', 'th', 'hi', 'pt', 'fr', 'es', 'de', 'it', 'ru'];
+
+        var CURRENT_LANG = 'en';
+        var DICT_LOADED_OK = false;
+        var GLB_FREE_DAILY = 3;
+        var LS_GLB_QUOTA = 'glb_translate_quota_v1';
+
+        /** 150k.csv: source,target,from,to — exact-match local routes (0 API). */
+        var GLB_ROUTE_INDEX = new Map();
+        var GLB_ROUTE_READY = false;
+        var GLB_TX_CACHE_PREFIX = 'glb_tx_v1_';
+
+        function normalizeRouteKey(text, lang) {
+            var t = (text || '').trim();
+            if (!t || !lang) return t;
+            var lowerLangs = { en: 1, es: 1, fr: 1, de: 1, it: 1, pt: 1, vi: 1, th: 1, ru: 1, hi: 1, ko: 1 };
+            if (lowerLangs[lang]) return t.toLowerCase();
+            return t;
+        }
+
+        function routeMapKey(from, to, text) {
+            return from + '\x01' + to + '\x01' + normalizeRouteKey(text, from);
+        }
+
+        function parseCsvRow4(line) {
+            var p = line.split(',');
+            if (p.length < 4) return null;
+            if (p.length === 4) {
+                return { src: p[0].trim(), tgt: p[1].trim(), from: p[2].trim(), to: p[3].trim() };
+            }
+            var to = p[p.length - 1].trim();
+            var from = p[p.length - 2].trim();
+            var tgt = p[p.length - 3].trim();
+            var src = p.slice(0, p.length - 3).join(',').trim();
+            return { src: src, tgt: tgt, from: from, to: to };
+        }
+
+        function simpleHash(str) {
+            var h = 5381;
+            for (var i = 0; i < str.length; i++) {
+                h = ((h << 5) + h) + str.charCodeAt(i);
+            }
+            return (h >>> 0).toString(16);
+        }
+
+        function readTxCache(text, source, target) {
+            try {
+                var ck = source + '|' + target + '|' + text;
+                var id = GLB_TX_CACHE_PREFIX + simpleHash(ck);
+                var raw = sessionStorage.getItem(id);
+                if (!raw) return null;
+                var o = JSON.parse(raw);
+                if (o.k !== ck) return null;
+                return o.v;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function writeTxCache(text, source, target, result) {
+            try {
+                var ck = source + '|' + target + '|' + text;
+                var id = GLB_TX_CACHE_PREFIX + simpleHash(ck);
+                sessionStorage.setItem(id, JSON.stringify({ k: ck, v: result }));
+            } catch (e) { /* ignore quota */ }
+        }
+
+        function tryLocalRoute(text, source, target, depth) {
+            if (!GLB_ROUTE_READY || text == null || text === '') return null;
+            depth = depth || 0;
+            if (depth > 3) return null;
+            var direct = GLB_ROUTE_INDEX.get(routeMapKey(source, target, text));
+            if (direct) return direct;
+            if (source !== 'en' && target !== 'en') {
+                var mid = tryLocalRoute(text, source, 'en', depth + 1);
+                if (mid) {
+                    var out = tryLocalRoute(mid, 'en', target, depth + 1);
+                    if (out) return out;
+                }
+            }
+            return null;
+        }
+
+        (function glbSubscriberFromQuery() {
+            try {
+                var u = new URL(window.location.href);
+                if (u.searchParams.get('subscribed') === '1') {
+                    localStorage.setItem('glb_subscribed', '1');
+                    u.searchParams.delete('subscribed');
+                    history.replaceState({}, '', u.pathname + u.search + u.hash);
+                }
+            } catch (e) { /* ignore */ }
+        })();
+
+        var I18N = {
+            en: {
+                labelUiLang: 'Language',
+                labelRegion: 'Region settings',
+                labelLangFrom: 'From',
+                labelLangTo: 'To',
+                langFlowHint: 'English pivot: every pair routes through English (e.g. JA→EN→FR). Set app language, choose From → To, tap GLB.',
+                pricingH2: '$2.99 / month',
+                pricingLi1: '<strong>$2.99/mo</strong> — Unlimited when subscribed. Free tier: <strong>3 translations per day</strong>; subscribe to remove the cap.',
+                pricingNote: 'Designed for phones — three free tries per day, then unlock unlimited below.',
+                linkTerms: 'Terms of Service',
+                linkPrivacy: 'Privacy Policy',
+                linkLegal: 'Legal',
+                linkSupport: 'Support',
+                footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
+                btnMonthly: 'Subscribe ($2.99/mo)',
+                stripeHint: 'Secure checkout with Stripe.',
+                dictPlaceholder: 'Search 150k dictionary…',
+                dictResult: 'Results appear here',
+                dictLoaded: '150k entries loaded.',
+                dictFail: 'Dictionary failed to load. Check path.',
+                noMatch: 'No match',
+                transHead: 'Translation',
+                phNormal: 'Text to translate (e.g. hello)',
+                sendBtn: 'GLB',
+                idle: 'Idle',
+                modelBadge: '',
+                apiChecking: 'NextBase API: checking…',
+                apiOk: 'NextBase API:',
+                apiNoResponse: 'NextBase API: no response (CORS or network)',
+                sending: 'Translating…',
+                sendingPivot: 'Via English…',
+                failHttp: 'Failed HTTP',
+                netErr: 'Network error:',
+                title: 'GLOBAL LANGUAGE BREAKER',
+                btnFlip: 'Flip',
+                flipTitle: 'Rotate the result 180° for the person across from you. Tap again to restore.',
+                freeQuotaUnlimited: 'Unlimited (subscriber)',
+                freeLeft: '{{n}} free left today (max 3/day) · $2.99/mo unlimited',
+                freeLimitExceeded: 'Free limit: 3/day. Tap Subscribe below — $2.99/mo unlimited.'
+            },
+            ja: {
+                labelUiLang: '言語',
+                labelRegion: '地域設定',
+                labelLangFrom: '原文',
+                labelLangTo: '訳文',
+                langFlowHint: '英語ピボット固定：必ず英語を経由（例：日→英→仏）。アプリ言語を選び、原文→訳文を選んで GLB。',
+                pricingH2: '月額 $2.99',
+                pricingLi1: '<strong>$2.99/月</strong> — 購読でクラウド翻訳は無制限。無料は<strong>1日3回まで</strong>（お試し）。',
+                pricingNote: 'スマホ前提で見やすく。毎日3回まで無料 → 続けたら月額で無制限。',
+                linkTerms: '利用規約',
+                linkPrivacy: 'プライバシーポリシー',
+                linkLegal: '法的情報',
+                linkSupport: 'サポート',
+                footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
+                btnMonthly: '購読（$2.99/月）',
+                stripeHint: 'Stripe で安全に決済',
+                dictPlaceholder: '15万語辞書を検索…',
+                dictResult: '結果がここに表示されます',
+                dictLoaded: '15万語 読み込み完了',
+                dictFail: '辞書を読み込めませんでした。パスを確認してください。',
+                noMatch: '見つかりません',
+                transHead: '翻訳',
+                phNormal: '翻訳したい文（例: hello）',
+                sendBtn: 'GLB',
+                idle: '待機中',
+                modelBadge: '',
+                apiChecking: 'NextBase API: 確認中…',
+                apiOk: 'NextBase API:',
+                apiNoResponse: 'NextBase API: 応答なし（CORS またはネットワーク）',
+                sending: '翻訳中…',
+                sendingPivot: '英語経由…',
+                failHttp: '失敗 HTTP',
+                netErr: 'ネットワークエラー:',
+                title: 'GLOBAL LANGUAGE BREAKER',
+                btnFlip: '反転',
+                flipTitle: '向かいに相手がいるとき、結果を180°回転。もう一度押すと元に戻ります。',
+                freeQuotaUnlimited: '購読中（無制限）',
+                freeLeft: '本日の無料 残り{{n}}回（1日3回まで）· $2.99/月で無制限',
+                freeLimitExceeded: '無料は本日おしまい（1日3回）。下の購読で無制限にできます。'
+            },
+            zh: {
+                labelUiLang: '界面语言', labelRegion: '地区', labelLangFrom: '原文', labelLangTo: '译文',
+                langFlowHint: '英语中转：所有翻译经英语（例：日→英→法）。选择语言后点 GLB。',
+                pricingH2: '$2.99 / 月', pricingLi1: '<strong>$2.99/月</strong> — 订阅后云端翻译无限制。免费每日最多 3 次（试用）。', pricingNote: '为手机优化；每日 3 次免费，需要无限制可订阅。',
+                linkTerms: '服务条款', linkPrivacy: '隐私政策', linkLegal: '法律信息', linkSupport: '支持',
+                footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
+                btnMonthly: '订阅（$2.99/月）', stripeHint: 'Stripe 安全支付',
+                dictPlaceholder: '词典搜索…', dictResult: '结果', dictLoaded: '已加载', dictFail: '加载失败', noMatch: '无',
+                transHead: '翻译', phNormal: '输入要翻译的文字', sendBtn: 'GLB', idle: '就绪',
+                apiChecking: '', apiOk: '', apiNoResponse: '', sending: '翻译中…', sendingPivot: '经英语…',
+                failHttp: '失败', netErr: '网络错误', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: '镜像',
+                flipTitle: '对面有人时把结果旋转180°；再按恢复。',
+                freeQuotaUnlimited: '订阅用户（无限制）',
+                freeLeft: '今日剩余免费 {{n}} 次（每日最多 3 次）· $2.99/月 无限制',
+                freeLimitExceeded: '今日免费已用完（每日 3 次）。下方订阅即可无限制。'
+            },
+            ko: {
+                labelUiLang: '앱 언어', labelRegion: '지역', labelLangFrom: '출발', labelLangTo: '도착',
+                langFlowHint: '영어 피벗: 모든 경로는 영어 경유(예: 일→영→프). 언어 선택 후 GLB.',
+                pricingH2: '$2.99 / 월', pricingLi1: '<strong>$2.99/월</strong> — 구독 시 클라우드 번역 무제한. 무료는 하루 최대 3회.', pricingNote: '모바일 화면에 맞춤. 매일 3회 무료 → 무제한은 구독.',
+                linkTerms: '이용약관', linkPrivacy: '개인정보 처리방침', linkLegal: '법적 고지', linkSupport: '지원',
+                footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
+                btnMonthly: '구독 ($2.99/월)', stripeHint: 'Stripe 결제',
+                dictPlaceholder: '사전 검색…', dictResult: '결과', dictLoaded: '로드됨', dictFail: '실패', noMatch: '없음',
+                transHead: '번역', phNormal: '번역할 문장', sendBtn: 'GLB', idle: '대기',
+                apiChecking: '', apiOk: '', apiNoResponse: '', sending: '번역 중…', sendingPivot: '영어 경유…',
+                failHttp: '실패', netErr: '네트워크', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: '반전',
+                flipTitle: '맞은편에 있을 때 결과를 180° 회전. 다시 누르면 복원.',
+                freeQuotaUnlimited: '구독 중(무제한)',
+                freeLeft: '오늘 무료 남은 {{n}}회(하루 최대 3회) · $2.99/월 무제한',
+                freeLimitExceeded: '오늘 무료는 끝났습니다(하루 3회). 아래 구독으로 무제한.'
+            },
+            es: {
+                labelUiLang: 'Idioma', labelRegion: 'Región', labelLangFrom: 'De', labelLangTo: 'A',
+                langFlowHint: 'Pivote inglés: todo pasa por inglés (ej. JA→EN→FR). Elige idiomas y GLB.',
+                pricingH2: '$2.99 / mes', pricingLi1: '<strong>$2.99/mes</strong> — Ilimitado con suscripción. Gratis: hasta 3/día.', pricingNote: 'Pensado para móvil: 3 pruebas/día, luego $2.99/mes ilimitado.',
+                linkTerms: 'Términos', linkPrivacy: 'Privacidad', linkLegal: 'Legal', linkSupport: 'Soporte',
+                footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
+                btnMonthly: 'Suscribirse ($2.99/mes)', stripeHint: 'Pago con Stripe',
+                dictPlaceholder: 'Buscar…', dictResult: 'Resultados', dictLoaded: 'Listo', dictFail: 'Error', noMatch: 'Nada',
+                transHead: 'Traducción', phNormal: 'Texto a traducir', sendBtn: 'GLB', idle: 'Listo',
+                apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Traduciendo…', sendingPivot: 'Vía inglés…',
+                failHttp: 'Error', netErr: 'Red', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Espejo',
+                flipTitle: 'Gira el resultado 180° para quien está enfrente. Pulsa otra vez para volver.',
+                freeQuotaUnlimited: 'Ilimitado (suscriptor)',
+                freeLeft: '{{n}} gratis hoy (máx. 3/día) · $2.99/mes ilimitado',
+                freeLimitExceeded: 'Gratis: 3/día. Suscríbete abajo — ilimitado.'
+            },
+            fr: {
+                labelUiLang: 'Langue', labelRegion: 'Région', labelLangFrom: 'De', labelLangTo: 'Vers',
+                langFlowHint: 'Pivot anglais : tout passe par l’anglais (ex. JA→EN→FR). Puis GLB.',
+                pricingH2: '$2.99 / mois', pricingLi1: '<strong>$2.99/mois</strong> — Illimité avec abonnement. Gratuit : jusqu’à 3/jour.', pricingNote: 'Mobile : 3 essais/jour, puis abonnement illimité.',
+                linkTerms: 'Conditions', linkPrivacy: 'Confidentialité', linkLegal: 'Mentions légales', linkSupport: 'Assistance',
+                footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
+                btnMonthly: 'S’abonner ($2.99/mois)', stripeHint: 'Paiement Stripe',
+                dictPlaceholder: 'Recherche…', dictResult: 'Résultats', dictLoaded: 'Chargé', dictFail: 'Échec', noMatch: 'Rien',
+                transHead: 'Traduction', phNormal: 'Texte à traduire', sendBtn: 'GLB', idle: 'Prêt',
+                apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Traduction…', sendingPivot: 'Via anglais…',
+                failHttp: 'Échec', netErr: 'Réseau', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Miroir',
+                flipTitle: 'Tourne le résultat à 180° pour la personne en face. Re-tape pour revenir.',
+                freeQuotaUnlimited: 'Illimité (abonné)',
+                freeLeft: '{{n}} gratuits aujourd’hui (max 3/j) · $2.99/mois illimité',
+                freeLimitExceeded: 'Gratuit : 3/jour max. Abonnez-vous ci-dessous pour l’illimité.'
+            },
+            de: {
+                labelUiLang: 'Sprache', labelRegion: 'Region', labelLangFrom: 'Von', labelLangTo: 'Nach',
+                langFlowHint: 'Englisch-Pivot: alles über Englisch (z. B. JA→EN→FR). Sprachen wählen, GLB.',
+                pricingH2: '$2.99 / Monat', pricingLi1: '<strong>$2.99/Monat</strong> — Mit Abo unbegrenzt. Kostenlos: bis zu 3× pro Tag.', pricingNote: 'Fürs Handy: 3 Tests/Tag, dann Abo.',
+                linkTerms: 'AGB', linkPrivacy: 'Datenschutz', linkLegal: 'Impressum', linkSupport: 'Support',
+                footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
+                btnMonthly: 'Abonnieren ($2.99/Monat)', stripeHint: 'Stripe-Zahlung',
+                dictPlaceholder: 'Suche…', dictResult: 'Ergebnis', dictLoaded: 'Geladen', dictFail: 'Fehler', noMatch: 'Kein Treffer',
+                transHead: 'Übersetzung', phNormal: 'Text eingeben', sendBtn: 'GLB', idle: 'Bereit',
+                apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Übersetzen…', sendingPivot: 'Über Englisch…',
+                failHttp: 'Fehler', netErr: 'Netz', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Spiegeln',
+                flipTitle: 'Ergebnis um 180° drehen für die Person gegenüber. Erneut tippen zum Zurück.',
+                freeQuotaUnlimited: 'Unbegrenzt (Abonnent)',
+                freeLeft: 'Heute noch {{n}} gratis (max. 3/Tag) · $2.99/Monat unbegrenzt',
+                freeLimitExceeded: 'Gratis: 3/Tag max. Unten abonnieren — unbegrenzt.'
+            },
+            th: {
+                labelUiLang: 'ภาษา', labelRegion: 'ภูมิภาค', labelLangFrom: 'จาก', labelLangTo: 'เป็น',
+                langFlowHint: 'ใช้อังกฤษเป็นฮับ: ทุกคู่ผ่าน EN (เช่น JA→EN→FR) แล้วกด GLB',
+                pricingH2: '$2.99 / เดือน', pricingLi1: '<strong>$2.99/เดือน</strong> — สมาชิกแปลไม่จำกัด ฟรีวันละสูงสุด 3 ครั้ง', pricingNote: 'ออกแบบให้มือถือ — ฟรี 3 ครั้ง/วัน แล้วสมัครได้',
+                linkTerms: 'ข้อกำหนด', linkPrivacy: 'ความเป็นส่วนตัว', linkLegal: 'กฎหมาย', linkSupport: 'ช่วยเหลือ',
+                footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
+                btnMonthly: 'สมัคร ($2.99/เดือน)', stripeHint: 'ชำระด้วย Stripe',
+                dictPlaceholder: 'ค้นหา…', dictResult: 'ผลลัพธ์', dictLoaded: 'โหลดแล้ว', dictFail: 'ล้มเหลว', noMatch: 'ไม่พบ',
+                transHead: 'แปล', phNormal: 'ข้อความที่จะแปล', sendBtn: 'GLB', idle: 'พร้อม',
+                apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'กำลังแปล…', sendingPivot: 'ผ่านอังกฤษ…',
+                failHttp: 'ล้มเหลว', netErr: 'เครือข่าย', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'พลิก',
+                flipTitle: 'หมุนผลลัพธ์ 180° ให้คนที่นั่งตรงข้าม — กดอีกครั้งเพื่อกลับ',
+                freeQuotaUnlimited: 'ไม่จำกัด (สมาชิก)',
+                freeLeft: 'เหลือฟรีวันนี้ {{n}} ครั้ง (วันละสูงสุด 3) · $2.99/เดือน ไม่จำกัด',
+                freeLimitExceeded: 'ฟรีวันละ 3 ครั้ง — ใช้ครบแล้ว สมัครด้านล่างเพื่อไม่จำกัด'
+            },
+            vi: {
+                labelUiLang: 'Ngôn ngữ', labelRegion: 'Khu vực', labelLangFrom: 'Từ', labelLangTo: 'Sang',
+                langFlowHint: 'Trục tiếng Anh: mọi cặp đi qua EN (vd: JA→EN→FR). Chọn ngôn ngữ rồi GLB.',
+                pricingH2: '$2.99 / tháng', pricingLi1: '<strong>$2.99/tháng</strong> — Thuê bao thì không giới hạn. Miễn phí tối đa 3 lần/ngày.', pricingNote: 'Tối ưu cho điện thoại — 3 lần miễn phí/ngày, sau đó đăng ký.',
+                linkTerms: 'Điều khoản', linkPrivacy: 'Riêng tư', linkLegal: 'Pháp lý', linkSupport: 'Hỗ trợ',
+                footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
+                btnMonthly: 'Đăng ký ($2.99/tháng)', stripeHint: 'Thanh toán Stripe',
+                dictPlaceholder: 'Tìm…', dictResult: 'Kết quả', dictLoaded: 'Đã tải', dictFail: 'Lỗi', noMatch: 'Không có',
+                transHead: 'Dịch', phNormal: 'Nhập văn bản', sendBtn: 'GLB', idle: 'Sẵn sàng',
+                apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Đang dịch…', sendingPivot: 'Qua tiếng Anh…',
+                failHttp: 'Lỗi', netErr: 'Mạng', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Lật',
+                flipTitle: 'Xoay kết quả 180° cho người đối diện. Bấm lại để trở về.',
+                freeQuotaUnlimited: 'Không giới hạn (đã đăng ký)',
+                freeLeft: 'Còn {{n}} lượt miễn phí hôm nay (tối đa 3/ngày) · $2.99/tháng không giới hạn',
+                freeLimitExceeded: 'Miễn phí 3/ngày — đã hết. Đăng ký bên dưới để không giới hạn.'
+            },
+            hi: {},
+            pt: {},
+            it: {},
+            ru: {}
+        };
+
+        var GLB_UI_LANG_KEY = 'glb_ui_lang_v2';
+
+        function getStoredUiLang() {
+            var allowed = { en: 1, ja: 1, zh: 1, ko: 1, vi: 1, th: 1, hi: 1, pt: 1, fr: 1, es: 1, de: 1, it: 1, ru: 1 };
+            try {
+                var s = localStorage.getItem(GLB_UI_LANG_KEY);
+                if (s && allowed[s]) return s;
+            } catch (e) { /* ignore */ }
+            /* English default. Ignore legacy glb_ui_lang (navigator-based ja) so upgrades are not stuck in JA. */
+            return 'en';
+        }
+
+        function T(k) {
+            var loc = I18N[CURRENT_LANG];
+            if (loc && Object.prototype.hasOwnProperty.call(loc, k)) return loc[k];
+            return I18N.en[k];
+        }
+
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function setBrandTitleHtml(rawTitle) {
+            var t = (rawTitle || '').trim();
+            var w = t.split(/\s+/).filter(Boolean);
+            if (w.length >= 2) {
+                var line1 = w.slice(0, -1).join(' ');
+                var line2 = w[w.length - 1];
+                return '<span class="brand-line">' + escapeHtml(line1) + '</span><span class="brand-line">' + escapeHtml(line2) + '</span>';
+            }
+            return '<span class="brand-line">' + escapeHtml(t) + '</span>';
+        }
+
+        function glbTodayKey() {
+            var d = new Date();
+            return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        }
+
+        function getGlbQuotaState() {
+            try {
+                var raw = localStorage.getItem(LS_GLB_QUOTA);
+                if (!raw) return { day: glbTodayKey(), count: 0 };
+                var j = JSON.parse(raw);
+                if (j.day !== glbTodayKey()) return { day: glbTodayKey(), count: 0 };
+                return { day: j.day, count: j.count | 0 };
+            } catch (e) {
+                return { day: glbTodayKey(), count: 0 };
+            }
+        }
+
+        function isGlbUnlimited() {
+            try {
+                return localStorage.getItem('glb_subscribed') === '1';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function canGlbTranslate() {
+            if (isGlbUnlimited()) return true;
+            var q = getGlbQuotaState();
+            return q.count < GLB_FREE_DAILY;
+        }
+
+        function recordGlbTranslateUse() {
+            if (isGlbUnlimited()) return;
+            var tk = glbTodayKey();
+            var q = getGlbQuotaState();
+            if (q.day !== tk) q = { day: tk, count: 0 };
+            q.count = (q.count | 0) + 1;
+            try {
+                localStorage.setItem(LS_GLB_QUOTA, JSON.stringify(q));
+            } catch (e) { /* ignore */ }
+        }
+
+        function refreshFreeQuotaDisplay() {
+            var el = document.getElementById('t-free-quota');
+            if (!el) return;
+            if (isGlbUnlimited()) {
+                el.textContent = T('freeQuotaUnlimited');
+                el.classList.remove('is-warn');
+                return;
+            }
+            var q = getGlbQuotaState();
+            var left = Math.max(0, GLB_FREE_DAILY - q.count);
+            el.textContent = T('freeLeft').replace(/\{\{n\}\}/g, String(left));
+            el.classList.toggle('is-warn', left === 0);
+        }
+
+        function setResultText(line, color, busy) {
+            var el = document.getElementById('translate-measure-result');
+            if (!el) return;
+            el.textContent = line;
+            if (color) el.style.color = color;
+            if (busy !== undefined) el.dataset.busy = busy;
+        }
+
+        function applyUiLang() {
+            var sel = document.getElementById('ui-lang');
+            CURRENT_LANG = (sel && sel.value) ? sel.value : getStoredUiLang();
+            try { localStorage.setItem(GLB_UI_LANG_KEY, CURRENT_LANG); } catch (e) { /* ignore */ }
+            document.documentElement.lang = CURRENT_LANG;
+            document.title = T('title');
+            var brandH = document.getElementById('app-brand-title');
+            if (brandH) brandH.innerHTML = setBrandTitleHtml(T('title'));
+            var flipB = document.getElementById('glb-flip-btn');
+            if (flipB) {
+                flipB.textContent = T('btnFlip');
+                flipB.title = T('flipTitle');
+            }
+
+            var lu = document.getElementById('label-ui-lang');
+            var lr = document.getElementById('label-region');
+            var lf = document.getElementById('label-lang-from');
+            var lt = document.getElementById('label-lang-to');
+            var lfh = document.getElementById('t-lang-flow-hint');
+            if (lu) lu.textContent = T('labelUiLang');
+            if (lr) lr.textContent = T('labelRegion');
+            if (lf) lf.textContent = T('labelLangFrom');
+            if (lt) lt.textContent = T('labelLangTo');
+            if (lfh) lfh.textContent = T('langFlowHint');
+
+            var h2 = document.getElementById('t-pricing-h2');
+            var li1 = document.getElementById('t-pricing-li1');
+            var note = document.getElementById('t-pricing-note');
+            if (h2) h2.textContent = T('pricingH2');
+            if (li1) li1.innerHTML = T('pricingLi1');
+            if (note) {
+                note.textContent = T('pricingNote') || '';
+                note.style.display = T('pricingNote') ? 'block' : 'none';
+            }
+
+            var bm = document.getElementById('t-btn-monthly');
+            var sh = document.getElementById('t-stripe-hint');
+            if (bm) bm.textContent = T('btnMonthly');
+            if (sh) sh.textContent = T('stripeHint');
+
+            var q = document.getElementById('q');
+            var ra = document.getElementById('result-area');
+            if (q) q.placeholder = T('dictPlaceholder');
+            if (ra) {
+                if (DICT_LOADED_OK) ra.innerText = T('dictLoaded');
+                else if (!ra.dataset.userTouched) ra.textContent = T('dictResult');
+            }
+
+            var th = document.getElementById('t-trans-head');
+            var trt = document.getElementById('tr-text');
+            var trb = document.getElementById('tr-run');
+            if (th) th.textContent = T('transHead');
+            if (trt) trt.placeholder = T('phNormal');
+            if (trb) trb.textContent = T('sendBtn');
+
+            var gp = document.getElementById('gateway-pulse');
+            if (gp && !gp.dataset.healthDone && T('apiChecking')) gp.textContent = T('apiChecking');
+
+            var idleEl = document.getElementById('translate-measure-result');
+            if (idleEl && (!idleEl.dataset.busy || idleEl.dataset.busy === '0')) {
+                setResultText(T('idle'), '#eaeaea', '0');
+            }
+
+            var lt = document.getElementById('link-terms');
+            var lpriv = document.getElementById('link-privacy');
+            var llg = document.getElementById('link-legal');
+            var lsup = document.getElementById('link-support');
+            var fcp = document.getElementById('footer-copyright');
+            var flf = document.getElementById('glb-legal-footer');
+            if (lt) lt.textContent = T('linkTerms');
+            if (lpriv) lpriv.textContent = T('linkPrivacy');
+            if (llg) llg.textContent = T('linkLegal');
+            if (lsup) lsup.textContent = T('linkSupport');
+            if (fcp) fcp.textContent = T('footerCopyright');
+            if (flf) flf.setAttribute('lang', CURRENT_LANG);
+
+            refreshFreeQuotaDisplay();
+        }
+
+        (function syncUiLangSelect() {
+            var u = document.getElementById('ui-lang');
+            if (u) u.value = getStoredUiLang();
+        })();
+        applyUiLang();
+
+        (function bindUiLang() {
+            var u = document.getElementById('ui-lang');
+            if (!u) return;
+            u.addEventListener('change', function () {
+                applyUiLang();
+                runGatewayPulse();
+            });
+        })();
+
+        const STELLA_BUS = {
+            dict: new Map(),
+            async init() {
+                var ra = document.getElementById('result-area');
+                try {
+                    const res = await fetch('dictionary/150k.csv');
+                    const text = await res.text();
+                    const lines = text.split('\n');
+                    GLB_ROUTE_INDEX = new Map();
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i];
+                        if (i === 0 || !line.trim()) continue;
+                        const row = parseCsvRow4(line);
+                        if (!row || !row.src || !row.from || !row.to || !row.tgt) continue;
+                        GLB_ROUTE_INDEX.set(routeMapKey(row.from, row.to, row.src), row.tgt);
+                        if (row.from === 'en' && row.to === 'ja') {
+                            this.dict.set(row.src.toLowerCase(), row.tgt);
+                        }
+                    }
+                    GLB_ROUTE_READY = true;
+                    DICT_LOADED_OK = true;
+                    if (ra) ra.innerText = T('dictLoaded');
+                } catch (e) {
+                    GLB_ROUTE_READY = false;
+                    if (ra) ra.innerText = T('dictFail');
+                }
+            },
+            search(q) {
+                var ra = document.getElementById('result-area');
+                if (ra) ra.dataset.userTouched = '1';
+                const res = this.dict.get(q.toLowerCase().trim());
+                if (!ra) return;
+                ra.innerHTML = res
+                    ? `<strong>${res}</strong>`
+                    : `<span style="color:#666;">${T('noMatch')}</span>`;
+            }
+        };
+
+        const input = document.getElementById('q');
+        input.addEventListener('input', (e) => STELLA_BUS.search(e.target.value));
+
+        STELLA_BUS.init();
+
+        function runGatewayPulse() {
+            const el = document.getElementById('gateway-pulse');
+            if (!el) return;
+            var chk = T('apiChecking');
+            if (!chk) {
+                el.style.display = 'none';
+                el.dataset.healthDone = '1';
+                return;
+            }
+            el.style.display = '';
+            el.textContent = chk;
+            el.dataset.healthDone = '';
+            fetch(NEXTBASE_APP_ORIGIN + '/health', { method: 'GET', cache: 'no-store' })
+                .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+                .then(function (j) {
+                    if (!el) return;
+                    el.dataset.healthDone = '1';
+                    var ok = (j.ok === true) || (j.check === 'OK');
+                    el.style.color = ok ? '#7a9e7a' : '#888';
+                    var line = j.ts ? String(j.ts) : (j.status || '') + ' · ' + (j.layer || '');
+                    var prefix = T('apiOk');
+                    if (!prefix) {
+                        el.style.display = 'none';
+                        return;
+                    }
+                    el.textContent = prefix + ' ' + (ok ? 'OK' : '?') + (line ? ' · ' + line : '');
+                })
+                .catch(function () {
+                    if (!el) return;
+                    el.dataset.healthDone = '1';
+                    var msg = T('apiNoResponse');
+                    if (!msg) {
+                        el.style.display = 'none';
+                        return;
+                    }
+                    el.style.color = '#966';
+                    el.textContent = msg;
+                });
+        }
+        runGatewayPulse();
+
+        (function glbResultFlip() {
+            var btn = document.getElementById('glb-flip-btn');
+            var stage = document.getElementById('glb-result-stage');
+            if (!btn || !stage) return;
+            btn.setAttribute('aria-pressed', 'false');
+            btn.addEventListener('click', function () {
+                var result = document.getElementById('translate-measure-result');
+                stage.classList.toggle('is-flipped');
+                if (result) result.classList.toggle('flipped-mode', stage.classList.contains('is-flipped'));
+                btn.setAttribute('aria-pressed', stage.classList.contains('is-flipped') ? 'true' : 'false');
+            });
+        })();
+
+        (function glbLangFlow() {
+            var LANG_OPTS = [
+                { c: 'en', l: 'English' },
+                { c: 'ja', l: '日本語' },
+                { c: 'zh', l: '中文' },
+                { c: 'ko', l: '한국어' },
+                { c: 'es', l: 'Español' },
+                { c: 'fr', l: 'Français' },
+                { c: 'de', l: 'Deutsch' },
+                { c: 'it', l: 'Italiano' },
+                { c: 'ru', l: 'Русский' },
+                { c: 'th', l: 'ไทย' },
+                { c: 'vi', l: 'Tiếng Việt' },
+                { c: 'hi', l: 'हिन्दी' },
+                { c: 'pt', l: 'Português' }
+            ];
+            var fromEl = document.getElementById('lang-from');
+            var toEl = document.getElementById('lang-to');
+            var uiEl = document.getElementById('ui-lang');
+            var swapBtn = document.getElementById('lang-swap');
+            var hs = document.getElementById('tr-src');
+            var ht = document.getElementById('tr-tgt');
+            if (!fromEl || !toEl || !uiEl || !hs || !ht) return;
+
+            function fillSelect(sel) {
+                sel.innerHTML = '';
+                for (var i = 0; i < LANG_OPTS.length; i++) {
+                    var o = LANG_OPTS[i];
+                    var opt = document.createElement('option');
+                    opt.value = o.c;
+                    opt.textContent = o.l;
+                    sel.appendChild(opt);
+                }
+            }
+            fillSelect(fromEl);
+            fillSelect(toEl);
+
+            function defaultOther(code) {
+                return code === 'en' ? 'ja' : 'en';
+            }
+
+            function syncHidden() {
+                var a = (fromEl.value || '').trim();
+                var b = (toEl.value || '').trim();
+                if (a === b) {
+                    toEl.value = defaultOther(a);
+                    b = toEl.value;
+                }
+                hs.value = a;
+                ht.value = b;
+            }
+
+            function syncFromUiLang() {
+                fromEl.value = uiEl.value;
+                if (toEl.value === fromEl.value) toEl.value = defaultOther(fromEl.value);
+                syncHidden();
+            }
+
+            fromEl.addEventListener('change', function () {
+                syncHidden();
+                try { localStorage.setItem('glb_lang_to', toEl.value); } catch (e) { /* ignore */ }
+            });
+            toEl.addEventListener('change', function () {
+                syncHidden();
+                try { localStorage.setItem('glb_lang_to', toEl.value); } catch (e) { /* ignore */ }
+            });
+
+            uiEl.addEventListener('change', function () {
+                syncFromUiLang();
+            });
+
+            if (swapBtn) {
+                swapBtn.addEventListener('click', function () {
+                    var x = fromEl.value;
+                    fromEl.value = toEl.value;
+                    toEl.value = x;
+                    syncHidden();
+                    try { localStorage.setItem('glb_lang_to', toEl.value); } catch (e) { /* ignore */ }
+                });
+            }
+
+            try {
+                var savedTo = localStorage.getItem('glb_lang_to');
+                if (savedTo && toEl.querySelector('option[value="' + savedTo + '"]')) toEl.value = savedTo;
+            } catch (e) { /* ignore */ }
+            syncFromUiLang();
+        })();
+
+        (function regionPreset() {
+            var sel = document.getElementById('region-preset');
+            if (!sel) return;
+            var KEY = 'glb_region_en';
+            function applyFromNavigator() {
+                var n = (navigator.language || '').toLowerCase();
+                var map = { 'en-gb': 'GB', 'en-au': 'AU', 'en-ca': 'CA', 'en-nz': 'NZ', 'en-in': 'IN', 'en-sg': 'SG', 'en-ph': 'PH', 'en-za': 'ZA', 'en-ng': 'NG', 'en-ie': 'IE' };
+                if (map[n]) return map[n];
+                return null;
+            }
+            try {
+                var saved = localStorage.getItem(KEY);
+                if (saved && sel.querySelector('option[value="' + saved + '"]')) sel.value = saved;
+                else {
+                    var guess = applyFromNavigator();
+                    if (guess) sel.value = guess;
+                }
+            } catch (e) { /* ignore */ }
+            sel.addEventListener('change', function () {
+                try { localStorage.setItem(KEY, sel.value); } catch (e) { /* ignore */ }
+            });
+        })();
+
+        (function translateMeasure() {
+            var out = document.getElementById('translate-measure-result');
+            var btn = document.getElementById('tr-run');
+            if (!btn || !out) return;
+
+            function parseResponse(x) {
+                if (x.status >= 200 && x.status < 300) {
+                    try {
+                        var j = JSON.parse(x.body);
+                        var line = j.translatedText != null ? String(j.translatedText) : x.body;
+                        return { ok: true, text: line };
+                    } catch (e) {
+                        return { ok: true, text: x.body };
+                    }
+                }
+                return { ok: false, status: x.status, body: x.body };
+            }
+
+            function fetchTranslate(text, source, target) {
+                var payload = { text: text, source: source, target: target };
+                return fetch(NEXTBASE_APP_ORIGIN + '/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    cache: 'no-store'
+                }).then(function (r) {
+                    return r.text().then(function (t) {
+                        return { status: r.status, body: t };
+                    });
+                });
+            }
+
+            function applyError(x) {
+                setResultText(T('failHttp') + ' ' + x.status + ' · ' + (x.body || ''), '#c99', '0');
+            }
+
+            btn.addEventListener('click', function () {
+                var lf = document.getElementById('lang-from');
+                var lt = document.getElementById('lang-to');
+                var hs = document.getElementById('tr-src');
+                var ht = document.getElementById('tr-tgt');
+                if (lf && lt && hs && ht) {
+                    hs.value = lf.value.trim();
+                    ht.value = lt.value.trim();
+                }
+                var text = (document.getElementById('tr-text') && document.getElementById('tr-text').value) || '';
+                text = text.trim();
+                var source = ((document.getElementById('tr-src') && document.getElementById('tr-src').value) || 'en').trim();
+                var target = ((document.getElementById('tr-tgt') && document.getElementById('tr-tgt').value) || 'ja').trim();
+
+                if (!text) {
+                    setResultText(T('idle'), '#eaeaea', '0');
+                    return;
+                }
+
+                if (source === target) {
+                    setResultText(text, '#eaeaea', '0');
+                    recordGlbTranslateUse();
+                    refreshFreeQuotaDisplay();
+                    return;
+                }
+
+                var cached = readTxCache(text, source, target);
+                if (cached != null && cached !== '') {
+                    setResultText(cached, '#eaeaea', '0');
+                    refreshFreeQuotaDisplay();
+                    return;
+                }
+
+                var localOut = tryLocalRoute(text, source, target);
+                if (localOut != null && localOut !== '') {
+                    setResultText(localOut, '#eaeaea', '0');
+                    writeTxCache(text, source, target, localOut);
+                    refreshFreeQuotaDisplay();
+                    return;
+                }
+
+                if (!canGlbTranslate()) {
+                    setResultText(T('freeLimitExceeded'), '#c99', '0');
+                    refreshFreeQuotaDisplay();
+                    return;
+                }
+
+                var pivot = (source !== 'en' && target !== 'en');
+
+                function finishOk(line) {
+                    setResultText(line, '#eaeaea', '0');
+                    writeTxCache(text, source, target, line);
+                    recordGlbTranslateUse();
+                    refreshFreeQuotaDisplay();
+                }
+
+                setResultText(T('sending'), '#eaeaea', '1');
+
+                if (!pivot) {
+                    fetchTranslate(text, source, target)
+                        .then(function (x) {
+                            var p = parseResponse(x);
+                            if (p.ok) finishOk(p.text);
+                            else applyError(x);
+                        })
+                        .catch(function (err) {
+                            console.error('[translate] network', err);
+                            setResultText(T('netErr') + ' ' + (err && err.message ? err.message : String(err)), '#c99', '0');
+                        });
+                    return;
+                }
+
+                fetchTranslate(text, source, 'en')
+                    .then(function (x1) {
+                        var p1 = parseResponse(x1);
+                        if (!p1.ok) {
+                            applyError(x1);
+                            return null;
+                        }
+                        setResultText(T('sendingPivot'), '#eaeaea', '1');
+                        return fetchTranslate(p1.text, 'en', target);
+                    })
+                    .then(function (x2) {
+                        if (x2 == null) return;
+                        var p2 = parseResponse(x2);
+                        if (p2.ok) finishOk(p2.text);
+                        else applyError(x2);
+                    })
+                    .catch(function (err) {
+                        console.error('[translate] network', err);
+                        setResultText(T('netErr') + ' ' + (err && err.message ? err.message : String(err)), '#c99', '0');
+                    });
+            });
+        })();
+
+        (function initNoirTV() {
+            const typingEl = document.getElementById('noir-typing');
+            const cursorEl = document.getElementById('noir-cursor');
+            const DEFAULT_PHRASE = 'NOIR TV — on air.';
+            let phrases = [DEFAULT_PHRASE];
+            let phraseIndex = 0;
+            let typingIndex = 0;
+            let currentText = '';
+            let timer = null;
+
+            function typeNext() {
+                if (!typingEl) return;
+                currentText = phrases[phraseIndex % phrases.length] || DEFAULT_PHRASE;
+                if (typingIndex >= currentText.length) {
+                    typingIndex = 0;
+                    phraseIndex++;
+                    setTimeout(typeNext, 2200);
+                    return;
+                }
+                typingEl.textContent = currentText.slice(0, typingIndex + 1);
+                typingIndex++;
+                timer = setTimeout(typeNext, 80 + Math.random() * 40);
+            }
+
+            function start() {
+                typingIndex = 0;
+                if (timer) clearTimeout(timer);
+                typeNext();
+            }
+
+            fetch('data/phrases.json', { cache: 'no-store' })
+                .then(r => r.ok ? r.json() : Promise.reject())
+                .then(json => {
+                    if (Array.isArray(json) && json.length) {
+                        phrases = json.filter(x => typeof x === 'string' && x.trim().length > 0);
+                        if (phrases.length === 0) phrases = [DEFAULT_PHRASE];
+                    }
+                    start();
+                })
+                .catch(() => { start(); });
+        })();
+    </script>
+</body>
+</html>
