@@ -329,7 +329,7 @@
         </div>
         <p style="font-size: 10px; color: #666; margin: 0 0 10px; line-height: 1.45;" id="t-lang-flow-hint"></p>
         <input type="text" id="tr-text" placeholder="Text to translate (e.g. hello)" autocomplete="off">
-        <input type="hidden" id="tr-src" value="ja">
+        <input type="hidden" id="tr-src" value="en">
         <input type="hidden" id="tr-tgt" value="en">
         <div style="display:none;" aria-hidden="true">
             <label for="region-preset" id="label-region">Region</label>
@@ -368,7 +368,7 @@
         <div class="pricing-box">
             <h2 id="t-pricing-h2">$2.99 / month</h2>
             <ul>
-                <li id="t-pricing-li1"><strong>$2.99/mo</strong> — Unlimited when subscribed. Free tier: <strong>10 translations per day</strong>; subscribe to remove the cap.</li>
+                <li id="t-pricing-li1"><strong>$2.99/mo</strong> — Unlimited when subscribed. Free tier: <strong>3 translations per day</strong>; subscribe to remove the cap.</li>
             </ul>
             <p class="note" id="t-pricing-note"></p>
         </div>
@@ -393,7 +393,7 @@
             <span class="legal-sep" aria-hidden="true">|</span>
             <a href="support.html" id="link-support">Support</a>
         </div>
-        <p class="footer-copy" id="footer-copyright">&copy; 2026 NEXT BASE / Void Layer. Powered by NEXT BASE CleanCopy-AI. Core: Void Layer Logic (Proprietary &amp; Encrypted).</p>
+        <p class="footer-copy" id="footer-copyright">&copy; 2026 NEXT BASE. All Rights Reserved.</p>
     </footer>
     </div>
 
@@ -405,7 +405,7 @@
 
         var CURRENT_LANG = 'en';
         var DICT_LOADED_OK = false;
-        var GLB_FREE_DAILY = 10;
+        var GLB_FREE_DAILY = 3;
         var LS_GLB_QUOTA = 'glb_translate_quota_v1';
 
         /** 150k.csv: source,target,from,to — exact-match local routes (0 API). */
@@ -503,7 +503,7 @@
                 labelLangTo: 'To',
                 langFlowHint: 'English pivot: every pair routes through English (e.g. JA→EN→FR). Set app language, choose From → To, tap GLB.',
                 pricingH2: '$2.99 / month',
-                pricingLi1: '<strong>$2.99/mo</strong> — Unlimited when subscribed. Free tier: <strong>10 translations per day</strong>; subscribe to remove the cap.',
+                pricingLi1: '<strong>$2.99/mo</strong> — Unlimited when subscribed. Free tier: <strong>3 translations per day</strong>; subscribe to remove the cap.',
                 pricingNote: 'Designed for phones — three free tries per day, then unlock unlimited below.',
                 linkTerms: 'Terms of Service',
                 linkPrivacy: 'Privacy Policy',
@@ -533,8 +533,8 @@
                 btnFlip: 'Flip',
                 flipTitle: 'Rotate the result 180° for the person across from you. Tap again to restore.',
                 freeQuotaUnlimited: 'Unlimited (subscriber)',
-                freeLeft: '{{n}} free left today (max 10/day) · $2.99/mo unlimited',
-                freeLimitExceeded: 'Free limit: 10/day. Tap Subscribe below — $2.99/mo unlimited.'
+                freeLeft: '{{n}} free left today (max 3/day) · $2.99/mo unlimited',
+                freeLimitExceeded: 'Free limit: 3/day. Tap Subscribe below — $2.99/mo unlimited.'
             },
             ja: {
                 labelUiLang: '言語',
@@ -543,7 +543,7 @@
                 labelLangTo: '訳文',
                 langFlowHint: '英語ピボット固定：必ず英語を経由（例：日→英→仏）。アプリ言語を選び、原文→訳文を選んで GLB。',
                 pricingH2: '月額 $2.99',
-                pricingLi1: '<strong>$2.99/月</strong> — 購読でクラウド翻訳は無制限。無料は<strong>1日10回まで</strong>（お試し）。',
+                pricingLi1: '<strong>$2.99/月</strong> — 購読でクラウド翻訳は無制限。無料は<strong>1日3回まで</strong>（お試し）。',
                 pricingNote: 'スマホ前提で見やすく。毎日3回まで無料 → 続けたら月額で無制限。',
                 linkTerms: '利用規約',
                 linkPrivacy: 'プライバシーポリシー',
@@ -573,13 +573,13 @@
                 btnFlip: '反転',
                 flipTitle: '向かいに相手がいるとき、結果を180°回転。もう一度押すと元に戻ります。',
                 freeQuotaUnlimited: '購読中（無制限）',
-                freeLeft: '本日の無料 残り{{n}}回（1日10回まで）· $2.99/月で無制限',
-                freeLimitExceeded: '無料は本日おしまい（1日10回）。下の購読で無制限にできます。'
+                freeLeft: '本日の無料 残り{{n}}回（1日3回まで）· $2.99/月で無制限',
+                freeLimitExceeded: '無料は本日おしまい（1日3回）。下の購読で無制限にできます。'
             },
             zh: {
                 labelUiLang: '界面语言', labelRegion: '地区', labelLangFrom: '原文', labelLangTo: '译文',
                 langFlowHint: '英语中转：所有翻译经英语（例：日→英→法）。选择语言后点 GLB。',
-                pricingH2: '$2.99 / 月', pricingLi1: '<strong>$2.99/月</strong> — 订阅后云端翻译无限制。免费每日最多 10 次（试用）。', pricingNote: '为手机优化；每日 10 次免费，需要无限制可订阅。',
+                pricingH2: '$2.99 / 月', pricingLi1: '<strong>$2.99/月</strong> — 订阅后云端翻译无限制。免费每日最多 3 次（试用）。', pricingNote: '为手机优化；每日 3 次免费，需要无限制可订阅。',
                 linkTerms: '服务条款', linkPrivacy: '隐私政策', linkLegal: '法律信息', linkSupport: '支持',
                 footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
                 btnMonthly: '订阅（$2.99/月）', stripeHint: 'Stripe 安全支付',
@@ -589,13 +589,13 @@
                 failHttp: '失败', netErr: '网络错误', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: '镜像',
                 flipTitle: '对面有人时把结果旋转180°；再按恢复。',
                 freeQuotaUnlimited: '订阅用户（无限制）',
-                freeLeft: '今日剩余免费 {{n}} 次（每日最多 10 次）· $2.99/月 无限制',
-                freeLimitExceeded: '今日免费已用完（每日 10 次）。下方订阅即可无限制。'
+                freeLeft: '今日剩余免费 {{n}} 次（每日最多 3 次）· $2.99/月 无限制',
+                freeLimitExceeded: '今日免费已用完（每日 3 次）。下方订阅即可无限制。'
             },
             ko: {
                 labelUiLang: '앱 언어', labelRegion: '지역', labelLangFrom: '출발', labelLangTo: '도착',
                 langFlowHint: '영어 피벗: 모든 경로는 영어 경유(예: 일→영→프). 언어 선택 후 GLB.',
-                pricingH2: '$2.99 / 월', pricingLi1: '<strong>$2.99/월</strong> — 구독 시 클라우드 번역 무제한. 무료는 하루 최대 10회.', pricingNote: '모바일 화면에 맞춤. 매일 3회 무료 → 무제한은 구독.',
+                pricingH2: '$2.99 / 월', pricingLi1: '<strong>$2.99/월</strong> — 구독 시 클라우드 번역 무제한. 무료는 하루 최대 3회.', pricingNote: '모바일 화면에 맞춤. 매일 3회 무료 → 무제한은 구독.',
                 linkTerms: '이용약관', linkPrivacy: '개인정보 처리방침', linkLegal: '법적 고지', linkSupport: '지원',
                 footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
                 btnMonthly: '구독 ($2.99/월)', stripeHint: 'Stripe 결제',
@@ -605,13 +605,13 @@
                 failHttp: '실패', netErr: '네트워크', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: '반전',
                 flipTitle: '맞은편에 있을 때 결과를 180° 회전. 다시 누르면 복원.',
                 freeQuotaUnlimited: '구독 중(무제한)',
-                freeLeft: '오늘 무료 남은 {{n}}회(하루 최대 10회) · $2.99/월 무제한',
-                freeLimitExceeded: '오늘 무료는 끝났습니다(하루 10회). 아래 구독으로 무제한.'
+                freeLeft: '오늘 무료 남은 {{n}}회(하루 최대 3회) · $2.99/월 무제한',
+                freeLimitExceeded: '오늘 무료는 끝났습니다(하루 3회). 아래 구독으로 무제한.'
             },
             es: {
                 labelUiLang: 'Idioma', labelRegion: 'Región', labelLangFrom: 'De', labelLangTo: 'A',
                 langFlowHint: 'Pivote inglés: todo pasa por inglés (ej. JA→EN→FR). Elige idiomas y GLB.',
-                pricingH2: '$2.99 / mes', pricingLi1: '<strong>$2.99/mes</strong> — Ilimitado con suscripción. Gratis: hasta 10/día.', pricingNote: 'Pensado para móvil: 3 pruebas/día, luego $2.99/mes ilimitado.',
+                pricingH2: '$2.99 / mes', pricingLi1: '<strong>$2.99/mes</strong> — Ilimitado con suscripción. Gratis: hasta 3/día.', pricingNote: 'Pensado para móvil: 3 pruebas/día, luego $2.99/mes ilimitado.',
                 linkTerms: 'Términos', linkPrivacy: 'Privacidad', linkLegal: 'Legal', linkSupport: 'Soporte',
                 footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
                 btnMonthly: 'Suscribirse ($2.99/mes)', stripeHint: 'Pago con Stripe',
@@ -621,13 +621,13 @@
                 failHttp: 'Error', netErr: 'Red', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Espejo',
                 flipTitle: 'Gira el resultado 180° para quien está enfrente. Pulsa otra vez para volver.',
                 freeQuotaUnlimited: 'Ilimitado (suscriptor)',
-                freeLeft: '{{n}} gratis hoy (máx. 10/día) · $2.99/mes ilimitado',
-                freeLimitExceeded: 'Gratis: 10/día. Suscríbete abajo — ilimitado.'
+                freeLeft: '{{n}} gratis hoy (máx. 3/día) · $2.99/mes ilimitado',
+                freeLimitExceeded: 'Gratis: 3/día. Suscríbete abajo — ilimitado.'
             },
             fr: {
                 labelUiLang: 'Langue', labelRegion: 'Région', labelLangFrom: 'De', labelLangTo: 'Vers',
                 langFlowHint: 'Pivot anglais : tout passe par l’anglais (ex. JA→EN→FR). Puis GLB.',
-                pricingH2: '$2.99 / mois', pricingLi1: '<strong>$2.99/mois</strong> — Illimité avec abonnement. Gratuit : jusqu’à 10/jour.', pricingNote: 'Mobile : 3 essais/jour, puis abonnement illimité.',
+                pricingH2: '$2.99 / mois', pricingLi1: '<strong>$2.99/mois</strong> — Illimité avec abonnement. Gratuit : jusqu’à 3/jour.', pricingNote: 'Mobile : 3 essais/jour, puis abonnement illimité.',
                 linkTerms: 'Conditions', linkPrivacy: 'Confidentialité', linkLegal: 'Mentions légales', linkSupport: 'Assistance',
                 footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
                 btnMonthly: 'S’abonner ($2.99/mois)', stripeHint: 'Paiement Stripe',
@@ -637,8 +637,8 @@
                 failHttp: 'Échec', netErr: 'Réseau', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Miroir',
                 flipTitle: 'Tourne le résultat à 180° pour la personne en face. Re-tape pour revenir.',
                 freeQuotaUnlimited: 'Illimité (abonné)',
-                freeLeft: '{{n}} gratuits aujourd’hui (max 10/j) · $2.99/mois illimité',
-                freeLimitExceeded: 'Gratuit : 10/jour max. Abonnez-vous ci-dessous pour l’illimité.'
+                freeLeft: '{{n}} gratuits aujourd’hui (max 3/j) · $2.99/mois illimité',
+                freeLimitExceeded: 'Gratuit : 3/jour max. Abonnez-vous ci-dessous pour l’illimité.'
             },
             de: {
                 labelUiLang: 'Sprache', labelRegion: 'Region', labelLangFrom: 'Von', labelLangTo: 'Nach',
@@ -653,13 +653,13 @@
                 failHttp: 'Fehler', netErr: 'Netz', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Spiegeln',
                 flipTitle: 'Ergebnis um 180° drehen für die Person gegenüber. Erneut tippen zum Zurück.',
                 freeQuotaUnlimited: 'Unbegrenzt (Abonnent)',
-                freeLeft: 'Heute noch {{n}} gratis (max. 10/Tag) · $2.99/Monat unbegrenzt',
-                freeLimitExceeded: 'Gratis: 10/Tag max. Unten abonnieren — unbegrenzt.'
+                freeLeft: 'Heute noch {{n}} gratis (max. 3/Tag) · $2.99/Monat unbegrenzt',
+                freeLimitExceeded: 'Gratis: 3/Tag max. Unten abonnieren — unbegrenzt.'
             },
             th: {
                 labelUiLang: 'ภาษา', labelRegion: 'ภูมิภาค', labelLangFrom: 'จาก', labelLangTo: 'เป็น',
                 langFlowHint: 'ใช้อังกฤษเป็นฮับ: ทุกคู่ผ่าน EN (เช่น JA→EN→FR) แล้วกด GLB',
-                pricingH2: '$2.99 / เดือน', pricingLi1: '<strong>$2.99/เดือน</strong> — สมาชิกแปลไม่จำกัด ฟรีวันละสูงสุด 10 ครั้ง', pricingNote: 'ออกแบบให้มือถือ — ฟรี 3 ครั้ง/วัน แล้วสมัครได้',
+                pricingH2: '$2.99 / เดือน', pricingLi1: '<strong>$2.99/เดือน</strong> — สมาชิกแปลไม่จำกัด ฟรีวันละสูงสุด 3 ครั้ง', pricingNote: 'ออกแบบให้มือถือ — ฟรี 3 ครั้ง/วัน แล้วสมัครได้',
                 linkTerms: 'ข้อกำหนด', linkPrivacy: 'ความเป็นส่วนตัว', linkLegal: 'กฎหมาย', linkSupport: 'ช่วยเหลือ',
                 footerCopyright: '© 2026 NEXT BASE. All Rights Reserved.',
                 btnMonthly: 'สมัคร ($2.99/เดือน)', stripeHint: 'ชำระด้วย Stripe',
@@ -669,8 +669,8 @@
                 failHttp: 'ล้มเหลว', netErr: 'เครือข่าย', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'พลิก',
                 flipTitle: 'หมุนผลลัพธ์ 180° ให้คนที่นั่งตรงข้าม — กดอีกครั้งเพื่อกลับ',
                 freeQuotaUnlimited: 'ไม่จำกัด (สมาชิก)',
-                freeLeft: 'เหลือฟรีวันนี้ {{n}} ครั้ง (วันละสูงสุด 10) · $2.99/เดือน ไม่จำกัด',
-                freeLimitExceeded: 'ฟรีวันละ 10 ครั้ง — ใช้ครบแล้ว สมัครด้านล่างเพื่อไม่จำกัด'
+                freeLeft: 'เหลือฟรีวันนี้ {{n}} ครั้ง (วันละสูงสุด 3) · $2.99/เดือน ไม่จำกัด',
+                freeLimitExceeded: 'ฟรีวันละ 3 ครั้ง — ใช้ครบแล้ว สมัครด้านล่างเพื่อไม่จำกัด'
             },
             vi: {
                 labelUiLang: 'Ngôn ngữ', labelRegion: 'Khu vực', labelLangFrom: 'Từ', labelLangTo: 'Sang',
@@ -685,8 +685,8 @@
                 failHttp: 'Lỗi', netErr: 'Mạng', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Lật',
                 flipTitle: 'Xoay kết quả 180° cho người đối diện. Bấm lại để trở về.',
                 freeQuotaUnlimited: 'Không giới hạn (đã đăng ký)',
-                freeLeft: 'Còn {{n}} lượt miễn phí hôm nay (tối đa 10/ngày) · $2.99/tháng không giới hạn',
-                freeLimitExceeded: 'Miễn phí 10/ngày — đã hết. Đăng ký bên dưới để không giới hạn.'
+                freeLeft: 'Còn {{n}} lượt miễn phí hôm nay (tối đa 3/ngày) · $2.99/tháng không giới hạn',
+                freeLimitExceeded: 'Miễn phí 3/ngày — đã hết. Đăng ký bên dưới để không giới hạn.'
             },
             hi: {},
             pt: {},
@@ -697,12 +697,6 @@
         var GLB_UI_LANG_KEY = 'glb_ui_lang_v2';
 
         function getStoredUiLang() {
-            var allowed = { en: 1, ja: 1, zh: 1, ko: 1, vi: 1, th: 1, hi: 1, pt: 1, fr: 1, es: 1, de: 1, it: 1, ru: 1 };
-            try {
-                var s = localStorage.getItem(GLB_UI_LANG_KEY);
-                if (s && allowed[s]) return s;
-            } catch (e) { /* ignore */ }
-            /* English default. Ignore legacy glb_ui_lang (navigator-based ja) so upgrades are not stuck in JA. */
             return 'en';
         }
 
@@ -798,6 +792,7 @@
         function applyUiLang() {
             var sel = document.getElementById('ui-lang');
             CURRENT_LANG = (sel && sel.value) ? sel.value : getStoredUiLang();
+            if (sel) sel.value = CURRENT_LANG;
             try { localStorage.setItem(GLB_UI_LANG_KEY, CURRENT_LANG); } catch (e) { /* ignore */ }
             document.documentElement.lang = CURRENT_LANG;
             document.title = T('title');
