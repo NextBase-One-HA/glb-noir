@@ -1,11 +1,13 @@
 <!DOCTYPE html>
+<!-- glb-noir: index.premium.html — ORE_LAYER 3 (travel). $14.99 success landing; entitlements sync same as LIFE. -->
 <html lang="en" class="notranslate" translate="no">
 <head>
     <meta charset="UTF-8">
+    <script>window.__GLB_PAGE_LAYER = 'premium';</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
-    <title>GLOBAL LANGUAGE BREAKER</title>
+    <title>GLB-Noir — Smile Friend travel</title>
     <style>
         :root {
             --gold: #ffe566;
@@ -17,7 +19,8 @@
             --card: #1a1a1a;
             --noir-red: #ff0000;
         }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 0; padding-bottom: env(safe-area-inset-bottom, 0); text-align: center; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: rgba(255, 230, 100, 0.15); }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 0; padding-bottom: env(safe-area-inset-bottom, 0); text-align: center; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: rgba(255, 230, 100, 0.15); transition: opacity 0.35s ease; }
+        .hidden { display: none !important; }
         .cockpit { padding: 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(600px, 100%); margin: 0 auto; box-sizing: border-box; }
         .header { margin-bottom: 22px; padding: 0 6px; }
         .gold-text { color: var(--gold); letter-spacing: 4px; font-weight: bold; }
@@ -341,6 +344,7 @@
     <p id="travel-status" style="display:none; margin: 0 0 12px; color:#f5e6b8; font-size:12px; text-align:center;"></p>
     <p id="core-access-active" style="display:none; margin: 0 0 12px; color:#f5e6b8; font-size:12px; text-align:center; font-weight:700;">Core Access Active</p>
     <p id="travel-remaining-line" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
+    <p id="travel-expiry-display" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
 
     <div class="glb-billboard">
         <div class="glb-billboard-tools">
@@ -418,22 +422,24 @@
     <div id="gateway-pulse" style="display:none;" aria-hidden="true" data-i18n-placeholder="apiChecking"></div>
 
     <div id="subscribe-area" style="max-width: min(600px, 100%); margin: 0 auto 20px;">
-        <div id="glb-core-subscribe-block">
-            <div class="pricing-box">
-                <h2 id="t-pricing-h2">$2.99 / month</h2>
-                <ul>
-                    <li id="t-pricing-li1"><strong>$2.99/mo</strong> — Unlimited when subscribed. Free tier: <strong>10 translations per day</strong>; subscribe to remove the cap.</li>
-                </ul>
-                <p class="note" id="t-pricing-note"></p>
-            </div>
-            <!-- ORE_LAYER Entry → LIFE: Stripe Payment Link success URL must land on index.coreflow.html?session_id={CHECKOUT_SESSION_ID} -->
-            <a href="https://buy.stripe.com/bJedRbefH5yogzZfuDasg09" class="btn glb-subscribe-btn" style="font-size:18px; padding:18px 20px; border-radius:999px; margin-top:4px;" id="t-btn-monthly">
-                Subscribe ($2.99/mo)
-            </a>
-            <p class="stripe-hint" id="t-stripe-hint">Secure checkout with Stripe.</p>
+        <!-- ORE_LAYER LIFE: no $2.99 here — purchase starts at index.html (Entry). -->
+        <div id="glb-coreflow-entry-cta" style="display:none;">
+            <p class="note" id="t-entry-cta-text" style="text-align:left; line-height:1.5; margin:0 0 12px;"></p>
+            <a href="https://nextbase-one-ha.github.io/glb-noir/index.html" class="btn glb-subscribe-btn" style="font-size:16px; padding:14px 18px; border-radius:999px;" id="t-btn-back-entry">Open Entry (subscribe LIFE)</a>
         </div>
-        <!-- Entry layer: no $14.99 here — travel upsell lives on index.coreflow.html (LIFE) after Core purchase. -->
-        <!-- Ops: Stripe Dashboard → Payment Links must be Live (not test) or customers cannot pay. -->
+        <div id="glb-life-subscribed-block" style="display:none;">
+            <p class="note" id="t-premium-travel-blurb" style="text-align:left; line-height:1.5; margin:0 0 14px;"></p>
+            <div class="pricing-box" style="margin-bottom:12px; display:none;" aria-hidden="true">
+                <h3 id="t-travel-layer-h3" style="font-size:1rem; margin:0 0 8px; color:#f5e6b8; text-align:left;">Smile Friend travel</h3>
+                <p id="t-travel-layer-body" style="font-size:12px; color:#aaa; text-align:left; margin:0 0 12px; line-height:1.45;"></p>
+            </div>
+            <!-- Travel Payment Link: set Stripe success URL → https://nextbase-one-ha.github.io/glb-noir/index.premium.html?session_id={CHECKOUT_SESSION_ID} -->
+            <div id="glb-travel-mini-row" class="glb-travel-mini-row" style="display:none;">
+                <a href="https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v" class="glb-travel-mini-link" id="t-btn-travel-mini" style="font-size:12px;">$14.99</a>
+                <span class="glb-travel-mini-hint" id="t-travel-mini-hint"></span>
+            </div>
+        </div>
+        <!-- Ops: Stripe Dashboard → Payment Links Live. LIFE checkout success → index.coreflow.html ; travel → index.premium.html -->
     </div>
     <div id="manage-subscription-wrap" style="display:none; max-width:min(600px, 100%); margin: 0 auto 20px;">
         <button type="button" class="btn" id="manage-subscription-btn" style="font-size:16px; padding:14px 18px; border-radius:999px;">
@@ -460,9 +466,17 @@
     </div>
 
     <script>
+        if (typeof window.__GLB_PAGE_LAYER === 'undefined') window.__GLB_PAGE_LAYER = 'coreflow';
         /** Translate /health: smile-friend-engine (us-central1) */
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
-        const APP_VERSION = '2026.04.16.entry.1';
+        const APP_VERSION = '2026.04.16.premium.1';
+        /** 事務長ステラ CONFIG（API_BASE / STRIPE / LS_KEY は正本と一致） */
+        var GLB_COREFLOW_CONFIG = {
+            API_BASE: 'https://smile-friend-engine-125142687526.us-central1.run.app',
+            STRIPE_CORE: 'https://buy.stripe.com/bJedRbefH5yogzZfuDasg09',
+            STRIPE_TRAVEL: 'https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v',
+            LS_KEY: 'GLB_CUSTOMER_ID'
+        };
         const MAINTENANCE_DEFAULT = 'We are currently enhancing the system for a better experience. Please check back shortly.';
         const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
         const LS_TRAVEL_PENDING = 'glb_travel_pending';
@@ -563,25 +577,44 @@
         }
 
         function updateEntitlementState(data) {
-            var localSub = false;
-            try { localSub = localStorage.getItem('glb_subscribed') === '1'; } catch (e) { /* ignore */ }
-            GLB_CORE_SUBSCRIBED = !!(data && data.ok && data.core_subscribed === true) || localSub;
-            GLB_TRAVEL_ACTIVE = !!(data && data.ok && data.travel_active === true);
-            GLB_TRAVEL_EXPIRES_AT = (data && data.ok && data.travel_pass_expires_at) ? String(data.travel_pass_expires_at) : null;
+            if (data && data.ok) {
+                GLB_CORE_SUBSCRIBED = !!data.core_subscribed;
+                GLB_TRAVEL_ACTIVE = !!data.travel_active;
+                GLB_TRAVEL_EXPIRES_AT = data.travel_pass_expires_at ? String(data.travel_pass_expires_at) : null;
+            }
             if (typeof refreshTravelRemainingLine === 'function') refreshTravelRemainingLine();
+        }
+
+        /** Webhook 遅延・ネットワーク失敗時: フリーズ回避のため未購読相当 UI（次回成功で復帰） */
+        function applySafeFallbackUi() {
+            GLB_CORE_SUBSCRIBED = false;
+            GLB_TRAVEL_ACTIVE = false;
+            GLB_TRAVEL_EXPIRES_AT = null;
+            if (typeof refreshTravelRemainingLine === 'function') refreshTravelRemainingLine();
+            if (typeof refreshSubscriptionUi === 'function') refreshSubscriptionUi();
+            if (typeof refreshFreeQuotaDisplay === 'function') refreshFreeQuotaDisplay();
         }
 
         function refreshTravelRemainingLine() {
             var el = document.getElementById('travel-remaining-line');
+            var expDisp = document.getElementById('travel-expiry-display');
             if (!el) return;
             if (!GLB_TRAVEL_ACTIVE || !GLB_TRAVEL_EXPIRES_AT) {
                 el.style.display = 'none';
                 el.textContent = '';
+                if (expDisp) {
+                    expDisp.style.display = 'none';
+                    expDisp.textContent = '';
+                }
                 return;
             }
             var exp = new Date(GLB_TRAVEL_EXPIRES_AT);
             if (isNaN(exp.getTime())) {
                 el.style.display = 'none';
+                if (expDisp) {
+                    expDisp.style.display = 'none';
+                    expDisp.textContent = '';
+                }
                 return;
             }
             var msLeft = exp.getTime() - Date.now();
@@ -590,6 +623,10 @@
             var dateStr = exp.toLocaleDateString(loc, { year: 'numeric', month: 'short', day: 'numeric' });
             el.textContent = T('travelDaysLeft').replace(/\{\{n\}\}/g, String(days)).replace(/\{\{date\}\}/g, dateStr);
             el.style.display = '';
+            if (expDisp) {
+                expDisp.textContent = 'Travel Pass active until ' + dateStr + ' (' + GLB_TRAVEL_EXPIRES_AT + ')';
+                expDisp.style.display = '';
+            }
         }
 
         async function syncEntitlements() {
@@ -611,17 +648,52 @@
                 return null;
             }
 
-            var res = await fetch(apiUrl, { cache: 'no-store' });
-            var data = await res.json();
-            if (data && data.ok && data.customer_id) {
-                localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
-                localStorage.setItem('glb_subscribed', data.core_subscribed ? '1' : '0');
-                try { localStorage.removeItem(LS_PENDING_SESSION_ID); } catch (e) { /* ignore */ }
+            var data;
+            try {
+                var res = await fetch(apiUrl, { cache: 'no-store' });
+                data = await res.json();
+            } catch (err) {
+                return null;
+            }
+            if (data && data.ok) {
+                if (data.customer_id) {
+                    localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
+                    localStorage.setItem('glb_subscribed', data.core_subscribed ? '1' : '0');
+                    try { localStorage.removeItem(LS_PENDING_SESSION_ID); } catch (e) { /* ignore */ }
+                }
                 updateEntitlementState(data);
                 if (typeof refreshFreeQuotaDisplay === 'function') refreshFreeQuotaDisplay();
                 if (typeof refreshSubscriptionUi === 'function') refreshSubscriptionUi();
             }
             return data;
+        }
+
+        /**
+         * 決済直後（URL に session_id）: Webhook 遅延を吸収し、Core または Travel のどちらかが立つまで最大 5 回リトライ。
+         */
+        async function syncEntitlementsWithCheckoutRetry() {
+            var loc = new URL(window.location.href);
+            var hasSessionInUrl = !!(loc.searchParams.get('session_id') || '').trim();
+            var maxTry = 5;
+            var delayMs = 1200;
+            var last = null;
+            for (var i = 0; i < maxTry; i++) {
+                try {
+                    last = await syncEntitlements();
+                } catch (e) {
+                    last = null;
+                }
+                if (last && last.ok && (last.core_subscribed || last.travel_active)) {
+                    return last;
+                }
+                if (!hasSessionInUrl) {
+                    return last;
+                }
+                if (i < maxTry - 1) {
+                    await new Promise(function (r) { setTimeout(r, delayMs); });
+                }
+            }
+            return last;
         }
 
         async function handleTravelActivationFlow() {
@@ -634,7 +706,14 @@
             }
 
             if (!isTravelRedirect && !isCoreRedirect) {
-                try { await syncEntitlements(); } catch (e) { /* ignore */ }
+                try {
+                    var ent0 = await syncEntitlements();
+                    if (ent0 === null && (localStorage.getItem(LS_CUSTOMER_ID) || '').trim()) {
+                        applySafeFallbackUi();
+                    }
+                } catch (e) {
+                    applySafeFallbackUi();
+                }
                 return;
             }
 
@@ -654,7 +733,7 @@
             }, 60000);
 
             try {
-                var ent = await syncEntitlements();
+                var ent = await syncEntitlementsWithCheckoutRetry();
                 if (ent && ent.ok && isCoreRedirect && ent.core_subscribed) {
                     localStorage.removeItem(LS_TRAVEL_PENDING);
                     showTravelStatus('Core Access Active');
@@ -665,7 +744,7 @@
                     cleanupUrlParams();
                 }
             } catch (e) {
-                /* ignore */
+                applySafeFallbackUi();
             } finally {
                 clearTimeout(timeoutId);
                 if ((localStorage.getItem(LS_CUSTOMER_ID) || '').trim()) {
@@ -776,20 +855,26 @@
                 labelLangFrom: 'From',
                 labelLangTo: 'To',
                 langFlowHint: 'English pivot: every pair routes through English (e.g. JA→EN→FR). Set app language, choose From → To, tap GLB.',
-                pricingH2: 'Smile Friend LIFE — $2.99 / month',
-                pricingLi1: '<strong>Entry (free)</strong>: <strong>10 translations per day</strong> using the <strong>built-in dictionary</strong> (no cloud API). <strong>LIFE</strong> ($2.99/mo): cloud API fair use <strong>30 / month · max 1 / day</strong> (ORE_LAYER).',
-                pricingNote: 'Start here. After checkout you are sent to the LIFE layer (index.coreflow.html).',
+                pricingH2: 'LIFE layer',
+                pricingLi1: '',
+                pricingNote: '',
+                entryCtaText: 'Purchase Smile Friend LIFE ($2.99/mo) from the Entry page first. This LIFE app layer is for subscribers.',
+                btnBackEntry: 'Open Entry (subscribe LIFE)',
+                lifeLayerBlurb: '<strong>Smile Friend LIFE</strong> — Cloud API fair use: <strong>30 uses / calendar month</strong>, <strong>max 1 / day</strong> (ORE_LAYER).',
+                travelLayerH3: 'Smile Friend travel',
+                travelLayerBody: 'Higher <strong>travel API</strong> tier: <strong>10 uses / day</strong>, <strong>300 / month</strong> (ORE_LAYER). One-time purchase — success returns to <strong>index.premium.html</strong>.',
+                premiumTravelBlurb: '<strong>Smile Friend travel</strong> — You are on the <strong>travel API</strong> tier: <strong>10 / day · 300 / month</strong> (ORE_LAYER).',
                 linkTerms: 'Terms of Service',
                 linkPrivacy: 'Privacy Policy',
                 linkLegal: 'Legal',
                 linkSupport: 'Support',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
-                btnMonthly: 'Subscribe — LIFE ($2.99/mo)',
-                travelMiniLink: 'Travel · $14.99',
-                travelMiniHint: 'Travel tier is offered from the LIFE page after Core purchase.',
+                btnMonthly: '',
+                travelMiniLink: '$14.99',
+                travelMiniHint: 'One-time travel tier. Requires active LIFE subscription.',
                 travelExtendLink: 'Extend +30 days',
                 travelExtendHint: 'Adds 30 days from your current expiry (stacking).',
-                travelDaysLeft: 'Travel add-on: {{n}} days left (through {{date}})',
+                travelDaysLeft: 'Travel Pass active through {{date}} ({{n}} days left)',
                 stripeHint: 'Secure checkout with Stripe.',
                 dictPlaceholder: 'Search 150k dictionary…',
                 dictResult: 'Results appear here',
@@ -811,9 +896,9 @@
                 title: 'GLOBAL LANGUAGE BREAKER',
                 btnFlip: 'Flip',
                 flipTitle: 'Rotate the result 180° for the person across from you. Tap again to restore.',
-                freeQuotaUnlimited: 'LIFE API active (fair use limits apply)',
-                freeLeft: '{{n}} free left today (max 10/day, dictionary · no API) · LIFE $2.99/mo below',
-                freeLimitExceeded: 'Free limit: 10/day (dictionary). Subscribe below for LIFE cloud API.'
+                freeQuotaUnlimited: 'LIFE API (fair use: 30/mo · 1/day)',
+                freeLeft: 'Trial: {{n}} left today (max 10/day) · subscribe LIFE from Entry',
+                freeLimitExceeded: 'Open Entry (index.html) to purchase LIFE ($2.99/mo).'
             },
             ja: {
                 labelUiLang: '言語',
@@ -821,20 +906,26 @@
                 labelLangFrom: '原文',
                 labelLangTo: '訳文',
                 langFlowHint: '英語ピボット固定：必ず英語を経由（例：日→英→仏）。アプリ言語を選び、原文→訳文を選んで GLB。',
-                pricingH2: 'Smile Friend LIFE — 月額 $2.99',
-                pricingLi1: '<strong>Entry（無料）</strong>：<strong>1日10回</strong>・<strong>内蔵辞書のみ</strong>（クラウドAPIなし）。<strong>LIFE</strong>（$2.99/月）：API <strong>月30回・1日最大1回</strong>（ORE_LAYER）。',
-                pricingNote: '起点はここ。決済後は LIFE 層（index.coreflow.html）へ遷移します。',
+                pricingH2: 'LIFE 層',
+                pricingLi1: '',
+                pricingNote: '',
+                entryCtaText: 'LIFE（$2.99/月）は Entry（index.html）から購入してください。いまは未購読のため Entry に戻れます。',
+                btnBackEntry: 'Entry を開く（LIFE を購入）',
+                lifeLayerBlurb: '<strong>Smile Friend LIFE</strong> — クラウドAPI：フェアユース <strong>月30回・1日最大1回</strong>（ORE_LAYER）。',
+                travelLayerH3: 'Smile Friend travel',
+                travelLayerBody: '上位の <strong>travel API</strong>：<strong>1日10回・月300回</strong>（ORE_LAYER）。買い切り。成功時は <strong>index.premium.html</strong> へ。',
+                premiumTravelBlurb: '<strong>Smile Friend travel</strong> — <strong>トラベルAPI</strong>層（<strong>1日10回・月300回</strong>、ORE_LAYER）で利用中です。',
                 linkTerms: '利用規約',
                 linkPrivacy: 'プライバシーポリシー',
                 linkLegal: '法的情報',
                 linkSupport: 'サポート',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
-                btnMonthly: '購読 — LIFE（$2.99/月）',
-                travelMiniLink: 'トラベル · $14.99',
-                travelMiniHint: 'トラベル層はコア購入後、LIFEページから案内します。',
+                btnMonthly: '',
+                travelMiniLink: '$14.99',
+                travelMiniHint: 'トラベル層は買い切り。有効な LIFE 購読が必要です。',
                 travelExtendLink: '延長 +30日',
                 travelExtendHint: '現在の期限から30日追加（累積延長）。',
-                travelDaysLeft: 'トラベル: 残り{{n}}日（{{date}}まで）',
+                travelDaysLeft: 'Travel Pass 有効：{{date}}まで（残り{{n}}日）',
                 stripeHint: 'Stripe で安全に決済',
                 dictPlaceholder: '15万語辞書を検索…',
                 dictResult: '結果がここに表示されます',
@@ -856,9 +947,9 @@
                 title: 'GLOBAL LANGUAGE BREAKER',
                 btnFlip: '反転',
                 flipTitle: '向かいに相手がいるとき、結果を180°回転。もう一度押すと元に戻ります。',
-                freeQuotaUnlimited: 'LIFE API 利用中（フェアユース上限あり）',
-                freeLeft: '本日の無料 残り{{n}}回（1日10回・辞書のみ／APIなし）· LIFE $2.99/月は下へ',
-                freeLimitExceeded: '無料上限（1日10回・辞書）。LIFE でクラウドAPIへ。'
+                freeQuotaUnlimited: 'LIFE API（月30・1日1まで）',
+                freeLeft: 'お試し 残り{{n}}回（1日10回まで）· LIFE は Entry から購入',
+                freeLimitExceeded: 'index.html（Entry）から LIFE（$2.99/月）を購入してください。'
             },
             zh: {
                 labelUiLang: '界面语言', labelRegion: '地区', labelLangFrom: '原文', labelLangTo: '译文',
@@ -1042,24 +1133,52 @@
             if (tth) tth.textContent = travelActive ? T('travelExtendHint') : T('travelMiniHint');
         }
 
+        /** UI branch: only GLB_CORE_SUBSCRIBED / GLB_TRAVEL_ACTIVE (from /entitlements). Do not use query params for layout. */
         function refreshSubscriptionUi() {
             var subscribeArea = document.getElementById('subscribe-area');
             var manageWrap = document.getElementById('manage-subscription-wrap');
-            var coreBlk = document.getElementById('glb-core-subscribe-block');
+            var entryCta = document.getElementById('glb-coreflow-entry-cta');
+            var lifeBlk = document.getElementById('glb-life-subscribed-block');
             var travelMini = document.getElementById('glb-travel-mini-row');
             var coreBadge = document.getElementById('core-access-active');
-            var coreSubscribed = GLB_CORE_SUBSCRIBED || isGlbUnlimited();
+            var coreSubscribed = GLB_CORE_SUBSCRIBED;
             var travelActive = GLB_TRAVEL_ACTIVE;
-            var pending = localStorage.getItem(LS_TRAVEL_PENDING) === 'true';
-            var showCoreOffer = !coreSubscribed;
-            if (pending && !coreSubscribed) showCoreOffer = false;
 
-            if (coreBlk) coreBlk.style.display = showCoreOffer ? '' : 'none';
-            if (travelMini) travelMini.style.display = coreSubscribed ? '' : 'none';
-            if (subscribeArea) subscribeArea.style.display = (showCoreOffer || coreSubscribed) ? '' : 'none';
-            if (manageWrap) manageWrap.style.display = coreSubscribed ? '' : 'none';
-            if (coreBadge) coreBadge.style.display = coreSubscribed ? '' : 'none';
+            if (window.__GLB_PAGE_LAYER === 'premium') {
+                if (subscribeArea) subscribeArea.style.display = '';
+                if (entryCta) entryCta.style.display = 'none';
+                if (lifeBlk) lifeBlk.style.display = '';
+                if (travelMini) travelMini.style.display = 'none';
+                if (coreBadge) coreBadge.style.display = coreSubscribed ? 'none' : 'none';
+                if (manageWrap) manageWrap.style.display = coreSubscribed ? '' : 'none';
+                updateTravelOfferLabels();
+                if (typeof refreshTravelRemainingLine === 'function') refreshTravelRemainingLine();
+                return;
+            }
+
+            if (subscribeArea) subscribeArea.style.display = '';
+
+            if (!coreSubscribed) {
+                if (entryCta) entryCta.style.display = '';
+                if (lifeBlk) lifeBlk.style.display = 'none';
+                if (travelMini) travelMini.style.display = 'none';
+                if (coreBadge) coreBadge.style.display = 'none';
+                if (manageWrap) manageWrap.style.display = 'none';
+            } else if (coreSubscribed && !travelActive) {
+                if (entryCta) entryCta.style.display = 'none';
+                if (lifeBlk) lifeBlk.style.display = '';
+                if (coreBadge) coreBadge.style.display = '';
+                if (manageWrap) manageWrap.style.display = '';
+                if (travelMini) travelMini.style.display = '';
+            } else {
+                if (entryCta) entryCta.style.display = 'none';
+                if (lifeBlk) lifeBlk.style.display = '';
+                if (coreBadge) coreBadge.style.display = 'none';
+                if (manageWrap) manageWrap.style.display = '';
+                if (travelMini) travelMini.style.display = '';
+            }
             updateTravelOfferLabels();
+            if (typeof refreshTravelRemainingLine === 'function') refreshTravelRemainingLine();
         }
 
         async function openManageSubscription() {
@@ -1088,13 +1207,13 @@
         }
 
         function canGlbTranslate() {
-            if (isGlbUnlimited()) return true;
+            if (GLB_CORE_SUBSCRIBED || isGlbUnlimited()) return true;
             var q = getGlbQuotaState();
             return q.count < GLB_FREE_DAILY;
         }
 
         function recordGlbTranslateUse() {
-            if (isGlbUnlimited()) return;
+            if (GLB_CORE_SUBSCRIBED || isGlbUnlimited()) return;
             var tk = glbTodayKey();
             var q = getGlbQuotaState();
             if (q.day !== tk) q = { day: tk, count: 0 };
@@ -1107,7 +1226,7 @@
         function refreshFreeQuotaDisplay() {
             var el = document.getElementById('t-free-quota');
             if (!el) return;
-            if (isGlbUnlimited()) {
+            if (GLB_CORE_SUBSCRIBED || isGlbUnlimited()) {
                 el.textContent = T('freeQuotaUnlimited');
                 el.classList.remove('is-warn');
                 return;
@@ -1152,20 +1271,18 @@
             if (lt) lt.textContent = T('labelLangTo');
             if (lfh) lfh.textContent = T('langFlowHint');
 
-            var h2 = document.getElementById('t-pricing-h2');
-            var li1 = document.getElementById('t-pricing-li1');
-            var note = document.getElementById('t-pricing-note');
-            if (h2) h2.textContent = T('pricingH2');
-            if (li1) li1.innerHTML = T('pricingLi1');
-            if (note) {
-                note.textContent = T('pricingNote') || '';
-                note.style.display = T('pricingNote') ? 'block' : 'none';
-            }
-
-            var bm = document.getElementById('t-btn-monthly');
-            var sh = document.getElementById('t-stripe-hint');
-            if (bm) bm.textContent = T('btnMonthly');
-            if (sh) sh.textContent = T('stripeHint');
+            var ect = document.getElementById('t-entry-cta-text');
+            var ebtn = document.getElementById('t-btn-back-entry');
+            var lb = document.getElementById('t-life-layer-blurb');
+            var th3 = document.getElementById('t-travel-layer-h3');
+            var tbody = document.getElementById('t-travel-layer-body');
+            if (ect) ect.textContent = T('entryCtaText');
+            if (ebtn) ebtn.textContent = T('btnBackEntry');
+            if (lb) lb.innerHTML = T('lifeLayerBlurb');
+            var prb = document.getElementById('t-premium-travel-blurb');
+            if (prb) prb.innerHTML = T('premiumTravelBlurb');
+            if (th3) th3.textContent = T('travelLayerH3');
+            if (tbody) tbody.innerHTML = T('travelLayerBody');
             updateTravelOfferLabels();
 
             var q = document.getElementById('q');
@@ -1571,6 +1688,59 @@
                     });
             });
         })();
+    </script>
+    <script>
+/**
+ * APP_VERSION: 2026.04.16.coreflow.3.1 (STABLE)
+ * 事務長ステラ・三層防壁: CONFIG / 補助 API（権利の正本は直上メイン: syncEntitlements / syncEntitlementsWithCheckoutRetry）
+ */
+(function () {
+    var CONFIG = window.GLB_COREFLOW_CONFIG || {
+        API_BASE: 'https://smile-friend-engine-125142687526.us-central1.run.app',
+        STRIPE_CORE: 'https://buy.stripe.com/bJedRbefH5yogzZfuDasg09',
+        STRIPE_TRAVEL: 'https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v',
+        LS_KEY: 'GLB_CUSTOMER_ID'
+    };
+    var showElements = function (selector) {
+        document.querySelectorAll(selector).forEach(function (el) { el.classList.remove('hidden'); });
+    };
+    var hideElements = function (selector) {
+        document.querySelectorAll(selector).forEach(function (el) { el.classList.add('hidden'); });
+    };
+    function applyCoreflowUI(ent) {
+        if (!ent || ent.ok === false) return;
+        if (!ent.core_subscribed) {
+            showElements('.ui-unsubscribed');
+            hideElements('.ui-core-active, .ui-travel-active');
+        } else if (ent.core_subscribed && !ent.travel_active) {
+            showElements('.ui-core-active');
+            hideElements('.ui-unsubscribed, .ui-travel-active');
+        } else if (ent.core_subscribed && ent.travel_active) {
+            showElements('.ui-travel-active');
+            hideElements('.ui-unsubscribed, .ui-core-active');
+            var expiryEl = document.getElementById('travel-expiry-display');
+            if (expiryEl && ent.travel_pass_expires_at) expiryEl.innerText = String(ent.travel_pass_expires_at);
+        }
+    }
+    window.__GLB_COREFLOW331__ = { CONFIG: CONFIG, showElements: showElements, hideElements: hideElements, applyCoreflowUI: applyCoreflowUI };
+    document.documentElement.setAttribute('data-glb-coreflow', '3.1');
+})();
+(function () {
+    document.body.style.opacity = '0.96';
+    setTimeout(function () {
+        try {
+            if (window.__GLB_COREFLOW331__ && typeof GLB_CORE_SUBSCRIBED !== 'undefined') {
+                window.__GLB_COREFLOW331__.applyCoreflowUI({
+                    ok: true,
+                    core_subscribed: !!GLB_CORE_SUBSCRIBED,
+                    travel_active: !!GLB_TRAVEL_ACTIVE,
+                    travel_pass_expires_at: typeof GLB_TRAVEL_EXPIRES_AT !== 'undefined' ? GLB_TRAVEL_EXPIRES_AT : null
+                });
+            }
+        } catch (e) { /* ignore */ }
+        document.body.style.opacity = '1';
+    }, 0);
+})();
     </script>
 </body>
 </html>
