@@ -8,6 +8,7 @@
 このディレクトリ（公開してよい範囲）
 --------------
 dart/          … 上記 Dart 核のコピー（参照用）
+trust_boundary.dart … クライアントに載せる層の型（秘密・大表は載せない前提）
 glb_tomori_web.js … ブラウザ用。core_pipeline の normalize/post と揃えた薄い層
 
 Web（index.next / index.coreflow）では API の前に glbTomoriNormalize を通し、

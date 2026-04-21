@@ -1,0 +1,12 @@
+---
+description: NextBase / GLB — クライアントに秘密を載せない（パクり対策の設計境界）
+globs: "**/*.{html,dart,js}"
+alwaysApply: false
+---
+
+# クライアント信頼境界
+
+- **API キー・Stripe 秘密・主力辞書の正本**はクライアントに埋め込まない。Smile Friend（Cloud Run）と Secret Manager を正とする。
+- **大規模ルート表（例: 150k.csv）**は既定でブラウザに `fetch` しない。`GLB_CLIENT_DICTIONARY_PUBLIC` はデフォルト false。サーバ `ROUTES_CSV_PATH` で照合。
+- **オフライン Dart**は `core_pipeline.dart` の薄いパイプラインまで。追加する場合は `trust_boundary.dart` の層に合わせ、プロプライエタリな表はバンドルに含めない。
+- 公開リポジトリに置く README・コメントは、未検証の「完成」や誇張マーケ文を書かない（内部 HOLD 文書に従う）。

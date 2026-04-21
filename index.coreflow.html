@@ -887,6 +887,15 @@
         var GLB_FREE_DAILY = 10;
         var LS_GLB_QUOTA = 'glb_translate_quota_v1';
 
+        /** false = ブラウザに 150k 辞書を配らない（サーバ ROUTES_CSV_PATH で照合）。パクり対策。開発時のみ localStorage glb_dev_csv=1 で従来のクライアント読込。 */
+        var GLB_CLIENT_DICTIONARY_PUBLIC = (function () {
+            try {
+                return localStorage.getItem('glb_dev_csv') === '1';
+            } catch (e) {
+                return false;
+            }
+        })();
+
         /** 150k.csv: source,target,from,to — exact-match local routes (0 API). */
         var GLB_ROUTE_INDEX = new Map();
         var GLB_ROUTE_READY = false;
@@ -1573,6 +1582,10 @@
         })();
 
         (function glbLoadRouteIndexFromCsv() {
+            if (!GLB_CLIENT_DICTIONARY_PUBLIC) {
+                GLB_ROUTE_READY = false;
+                return;
+            }
             async function load() {
                 try {
                     var res = await fetch('dictionary/150k.csv');
