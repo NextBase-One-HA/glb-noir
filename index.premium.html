@@ -484,6 +484,36 @@
         var GLB_SYSTEM_STATUS_TTL = 30000;
         var GLB_MAINTENANCE_ON = false;
 
+        function glbIsPaidFlag() {
+            try {
+                var v = localStorage.getItem('glb_subscribed');
+                return v === '1' || v === 'true';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        (function primePaidLockFromUrl() {
+            try {
+                var u = new URL(window.location.href);
+                var sid = (u.searchParams.get('session_id') || '').trim();
+                if (sid) {
+                    localStorage.setItem('glb_subscribed', 'true');
+                    localStorage.setItem(LS_BILLING_LOCK, '1');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+
+        (function prehideLimitedUiWhenPaid() {
+            try {
+                if (!glbIsPaidFlag() && localStorage.getItem(LS_BILLING_LOCK) !== '1') return;
+                var st = document.createElement('style');
+                st.id = 'glb-paid-mode-style';
+                st.textContent = '#t-free-quota,#subscribe-area,#glb-coreflow-entry-cta{display:none !important;}';
+                document.head.appendChild(st);
+            } catch (e) { /* ignore */ }
+        })();
+
         function compareVersion(a, b) {
             var aa = String(a || '').split('.');
             var bb = String(b || '').split('.');
@@ -1141,7 +1171,7 @@
 
         function isGlbUnlimited() {
             try {
-                return localStorage.getItem('glb_subscribed') === '1' || localStorage.getItem(LS_BILLING_LOCK) === '1';
+                return glbIsPaidFlag() || localStorage.getItem(LS_BILLING_LOCK) === '1';
             } catch (e) {
                 return false;
             }
