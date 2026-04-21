@@ -1,0 +1,13 @@
+# --- Proprietary / Desktop mirrors: never push to public GitHub Pages ---
+# アルゴリズム系・主力データ相当のメモ・仕様ダンプはクライアント／公開リポジトリに載せない。
+offline-glb/memos_ondevice/
+offline-glb/memos_translation_app/
+
+# Desktop から複製した内部仕様テキスト（API・サーバ側またはローカルのみ）
+offline-glb/ロジックオフライン*.txt
+offline-glb/備考.txt
+offline-glb/指示.txt
+
+# 誤ってコピーした Desktop ツリー全体を足さない
+offline-glb/アルゴリズム系/
+offline-glb/主力データ/
