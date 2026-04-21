@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- nextbase-world · index.next.html — 無料＝翻訳1日10回 / $2.99月額後は entitlements 確認→index.coreflow.html へ。Travel: ?travel=1&session_id=… -->
 <html lang="en" class="notranslate" translate="no">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +6,6 @@
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <title>GLOBAL LANGUAGE BREAKER</title>
-    <script src="offline-glb/glb_tomori_web.js"></script>
     <style>
         :root {
             --gold: #ffe566;
@@ -49,46 +47,8 @@
         h1.gold-text.app-brand-title .brand-line + .brand-line {
             margin-top: 0.08em;
         }
-        .glb-billboard { width: 100%; max-width: min(560px, 100%); margin: 12px auto 14px; padding: 0; box-sizing: border-box; }
+        .glb-billboard { width: 100%; max-width: min(560px, 100%); margin: 12px auto 18px; padding: 0; box-sizing: border-box; }
         .glb-billboard-tools { display: flex; justify-content: flex-end; margin-bottom: 8px; }
-        .glb-lang-details {
-            margin: 0 0 12px;
-            border: 1px solid #333;
-            border-radius: 10px;
-            background: #111;
-            text-align: left;
-        }
-        .glb-lang-details > summary {
-            list-style: none;
-            cursor: pointer;
-            padding: 10px 12px;
-            font-size: 12px;
-            color: #bbb;
-            line-height: 1.4;
-            user-select: none;
-        }
-        .glb-lang-details > summary::-webkit-details-marker { display: none; }
-        .glb-lang-details-body { padding: 0 12px 12px; }
-        .glb-result-inner {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            justify-content: flex-start;
-            width: 100%;
-            min-height: 0;
-            flex: 1 1 auto;
-        }
-        .glb-result-lang-caption {
-            font-size: 11px;
-            color: #888;
-            margin-top: auto;
-            flex-shrink: 0;
-            padding-top: 10px;
-            text-align: center;
-            line-height: 1.45;
-            max-width: 100%;
-            padding: 0 8px;
-        }
         .glb-flip-btn {
             background: var(--card);
             color: #fff8c8;
@@ -106,9 +66,8 @@
         #glb-result-stage {
             min-height: min(52dvh, 420px);
             display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            justify-content: stretch;
+            align-items: center;
+            justify-content: center;
             padding: 24px 18px;
             background: radial-gradient(ellipse 120% 80% at 50% 40%, rgba(255, 210, 60, 0.07) 0%, #0d0d0d 55%);
             border: 2px solid var(--gold);
@@ -122,22 +81,19 @@
             backface-visibility: hidden;
         }
         #glb-result-stage #translate-measure-result {
-            flex: 1 1 auto;
-            min-height: 72px;
+            min-height: 0;
             width: 100%;
             max-width: 100%;
-            padding: 4px 2px;
+            padding: 0;
             margin: 0;
             background: transparent;
             border: none;
-            font-size: 40px;
-            line-height: 1.3;
+            font-size: clamp(26px, 8.5vw, 48px);
+            line-height: 1.35;
             font-weight: 700;
             text-align: center;
             color: #f2f2f2;
             word-break: break-word;
-            overflow: hidden;
-            box-sizing: border-box;
             transition: transform 0.28s ease;
             transform: rotate(0deg);
         }
@@ -157,6 +113,7 @@
         .free-quota-line.is-warn { color: #ffe08a; text-shadow: 0 0 10px var(--gold-glow-mid); }
         .flipped-mode {
             transform: rotate(180deg) !important;
+            font-size: 5rem !important;
             transition: transform 0.3s ease;
         }
         .glb-subscribe-btn {
@@ -205,6 +162,42 @@
         }
         .model-badge strong { color: #8a8; font-weight: 600; display: block; }
         .stripe-hint { font-size: 10px; color: #555; margin-top: 8px; line-height: 1.4; }
+        .glb-travel-mini-row {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 230, 100, 0.12);
+            text-align: center;
+        }
+        .glb-travel-mini-link {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #c9b87a;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 230, 100, 0.25);
+            background: rgba(20, 20, 20, 0.9);
+        }
+        .glb-travel-mini-link:active { opacity: 0.9; filter: brightness(1.06); }
+        .glb-travel-mini-hint {
+            display: block;
+            font-size: 9px;
+            color: #666;
+            margin-top: 6px;
+            line-height: 1.35;
+            max-width: 28em;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .glb-travel-remaining {
+            margin: 0 0 10px;
+            font-size: 11px;
+            color: #a89860;
+            text-align: center;
+            line-height: 1.4;
+        }
         .pricing-box { text-align: left; font-size: 12px; color: #ccc; line-height: 1.55; margin: 0 0 14px; padding: 12px 14px; background: #141414; border-radius: 10px; border: 1px solid #2a2a2a; }
         .pricing-box h2 {
             font-size: 14px;
@@ -308,12 +301,12 @@
                 font-size: clamp(1.05rem, 5.8vw, 1.55rem);
                 letter-spacing: 0.08em;
             }
-            /* 対面表示は維持しつつ、入力・マイクが折りたたみで消えないよう高さを抑える */
             #glb-result-stage {
-                min-height: min(26dvh, 200px);
-                max-height: min(40dvh, 320px);
-                padding: 14px 12px;
-                overflow: hidden;
+                min-height: min(44dvh, 340px);
+                padding: 18px 14px;
+            }
+            #glb-result-stage #translate-measure-result {
+                font-size: clamp(22px, 7.2vw, 40px);
             }
             #tr-run.glb-main-btn {
                 min-width: min(200px, 92vw);
@@ -330,66 +323,6 @@
             .pricing-box { font-size: 13px; padding: 14px; }
             .pricing-box h2 { font-size: 15px; }
         }
-        .glb-tool-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-            margin: 8px 0 10px;
-        }
-        .glb-tool-bar .glb-icon-btn {
-            flex: 1 1 auto;
-            min-width: min(140px, 46%);
-            padding: 10px 12px;
-            font-size: 12px;
-            font-weight: 700;
-            border-radius: 10px;
-            border: 1px solid var(--gold);
-            background: var(--card);
-            color: #fff8c8;
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--gold-glow-soft);
-        }
-        .glb-tool-bar .glb-icon-btn:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-        }
-        .glb-mic-hint { text-align: left; margin: 0 0 8px; }
-        .readalong-panel {
-            margin-top: 12px;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid #2a2a2a;
-            background: #111;
-            text-align: left;
-        }
-        .readalong-row {
-            display: grid;
-            grid-template-columns: 52px 1fr 40px;
-            gap: 8px;
-            align-items: start;
-            margin-bottom: 10px;
-            font-size: 13px;
-        }
-        .readalong-row:last-child { margin-bottom: 0; }
-        .readalong-label { color: #a89860; font-size: 11px; font-weight: 700; padding-top: 4px; }
-        .readalong-text {
-            color: #e8e8e8;
-            line-height: 1.4;
-            word-break: break-word;
-            font-size: 14px;
-        }
-        .readalong-rom { color: #aaa; font-size: 13px; }
-        .readalong-play {
-            border: 1px solid rgba(255, 230, 100, 0.35);
-            background: #1a1a1a;
-            color: #ffe566;
-            border-radius: 8px;
-            padding: 6px 0;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .readalong-play:disabled { opacity: 0.35; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -405,39 +338,35 @@
         <h1 class="gold-text app-brand-title" id="app-brand-title"><span class="brand-line">GLOBAL LANGUAGE</span><span class="brand-line">BREAKER</span></h1>
     </div>
     <p id="travel-status" style="display:none; margin: 0 0 12px; color:#f5e6b8; font-size:12px; text-align:center;"></p>
+    <p id="core-access-active" style="display:none; margin: 0 0 12px; color:#f5e6b8; font-size:12px; text-align:center; font-weight:700;">Core Access Active</p>
+    <p id="travel-remaining-line" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
 
     <div class="glb-billboard">
         <div class="glb-billboard-tools">
             <button type="button" class="glb-flip-btn" id="glb-flip-btn">Flip</button>
         </div>
         <div id="glb-result-stage" class="glb-result-stage">
-            <div class="glb-result-inner">
-                <div id="translate-measure-result" data-i18n-idle="idle" aria-live="polite">Idle</div>
-                <p id="glb-result-lang-caption" class="glb-result-lang-caption" aria-live="polite"></p>
-            </div>
+            <div id="translate-measure-result" data-i18n-idle="idle" aria-live="polite">Idle</div>
         </div>
     </div>
 
     <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #2a2a2a; text-align: left;">
         <div class="trans-section-head" id="t-trans-head">Translation</div>
-        <details id="glb-lang-details" class="glb-lang-details">
-        <summary id="glb-lang-details-summary" class="glb-lang-details-sum"></summary>
-        <div class="glb-lang-details-body">
         <label for="ui-lang" style="display:block; font-size: 11px; color: #888; margin-bottom: 6px;" id="label-ui-lang">Language</label>
         <select id="ui-lang" class="lang-select" aria-label="App language">
             <option value="en">English</option>
             <option value="ja">日本語</option>
-            <option value="fa">فارسی</option>
             <option value="zh">中文</option>
+            <option value="ko">한국어</option>
             <option value="es">Español</option>
             <option value="fr">Français</option>
             <option value="de">Deutsch</option>
-            <option value="pt">Português</option>
-            <option value="ar">العربية</option>
+            <option value="it">Italiano</option>
             <option value="ru">Русский</option>
-            <option value="ko">한국어</option>
+            <option value="th">ไทย</option>
+            <option value="vi">Tiếng Việt</option>
             <option value="hi">हिन्दी</option>
-            <option value="tr">Türkçe</option>
+            <option value="pt">Português</option>
         </select>
         <div class="trans-lang-grid">
             <div>
@@ -451,12 +380,7 @@
             </div>
         </div>
         <p style="font-size: 10px; color: #666; margin: 0 0 10px; line-height: 1.45;" id="t-lang-flow-hint"></p>
-        </div>
-        </details>
         <input type="text" id="tr-text" placeholder="Text to translate (e.g. hello)" autocomplete="off">
-        <div class="glb-tool-bar" id="glb-tool-bar" aria-label="Input tools">
-            <button type="button" class="glb-icon-btn" id="glb-clear-btn">Clear</button>
-        </div>
         <input type="hidden" id="tr-src" value="en">
         <input type="hidden" id="tr-tgt" value="en">
         <div style="display:none;" aria-hidden="true">
@@ -497,26 +421,15 @@
             <div class="pricing-box">
                 <h2 id="t-pricing-h2">$2.99 / month</h2>
                 <ul>
-                    <li id="t-pricing-li1"><strong>This page is text-only</strong> (no mic or read-aloud buttons). <strong>$2.99/mo</strong> adds unlimited cloud translation plus <strong>listen &amp; read-aloud</strong>. Free: <strong>10 text translations per day</strong>.</li>
+                    <li id="t-pricing-li1"><strong>$2.99/mo</strong> — Unlimited when subscribed. Free tier: <strong>10 translations per day</strong>; subscribe to remove the cap.</li>
                 </ul>
                 <p class="note" id="t-pricing-note"></p>
             </div>
-            <!-- Core $2.99: Stripe success URL → index.next.html?subscribed=1&session_id={CHECKOUT_SESSION_ID}（認証後に index.coreflow.html へ自動遷移）。index.next.html?stay=1 で無料画面に留まる -->
             <a href="https://buy.stripe.com/bJedRbefH5yogzZfuDasg09" class="btn glb-subscribe-btn" style="font-size:18px; padding:18px 20px; border-radius:999px; margin-top:4px;" id="t-btn-monthly">
                 Subscribe ($2.99/mo)
             </a>
             <p class="stripe-hint" id="t-stripe-hint">Secure checkout with Stripe.</p>
         </div>
-        <div id="glb-travel-subscribe-block" style="margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,230,100,0.22);">
-            <div class="pricing-box" style="margin-top:0;">
-                <h3 id="t-travel-h3" style="font-size:1.1rem; margin:0 0 8px; color:#f5e6b8;">Travel Pass — $14.99 / 30 days</h3>
-                <p id="t-travel-li" style="font-size:13px; color:#ccc; margin:0 0 12px; text-align:left;">Adds a 30-day Travel add-on (stackable). Requires Core for full activation; see Terms.</p>
-            </div>
-            <!-- Travel: success URL https://nextbase-one-ha.github.io/nextbase-world/index.next.html?travel=1&session_id={CHECKOUT_SESSION_ID} -->
-            <a href="https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v" class="btn glb-subscribe-btn" style="font-size:17px; padding:16px 18px; border-radius:999px;" id="t-btn-travel">Travel Pass ($14.99)</a>
-            <p class="stripe-hint" id="t-travel-stripe-hint">Secure checkout with Stripe.</p>
-        </div>
-        <!-- Ops: Stripe Dashboard → Payment Links must be Live (not test) or customers cannot pay. -->
     </div>
     <div id="manage-subscription-wrap" style="display:none; max-width:min(600px, 100%); margin: 0 auto 20px;">
         <button type="button" class="btn" id="manage-subscription-btn" style="font-size:16px; padding:14px 18px; border-radius:999px;">
@@ -545,60 +458,15 @@
         /** Translate /health: smile-friend-engine (us-central1) */
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
         var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-        const APP_VERSION = '2026.04.21.10';
+        const APP_VERSION = '2026.04.21.entry.2';
         const MAINTENANCE_DEFAULT = 'We are currently enhancing the system for a better experience. Please check back shortly.';
         const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
-        let EXECUTION_ALLOWED = false;
-        const HOLD_FIXED = {
-            STATE: 'HOLD',
-            REASON: '',
-            FIX_TARGET: '',
-            OWNER: 'system',
-            RECHECK_METHOD: '',
-            NEXT_ACTION: ''
-        };
-        function holdPayload(reason, fixTarget, recheckMethod, nextAction) {
-            return {
-                STATE: 'HOLD',
-                REASON: reason,
-                FIX_TARGET: fixTarget,
-                OWNER: 'system',
-                RECHECK_METHOD: recheckMethod,
-                NEXT_ACTION: nextAction
-            };
-        }
-        function assertExecutionAllowed() {
-            if (!EXECUTION_ALLOWED) {
-                throw holdPayload('NO_NORI_APPROVAL', 'execution_gate', 'wait_for_manual_approval', 'do_nothing');
-            }
-        }
-        function safeOutput(text) {
-            return text;
-        }
-        function renderHold(payload) {
-            var h = payload || HOLD_FIXED;
-            return [
-                'STATE: HOLD',
-                'REASON: ' + (h.REASON || ''),
-                'FIX_TARGET: ' + (h.FIX_TARGET || ''),
-                'OWNER: ' + (h.OWNER || 'system'),
-                'RECHECK_METHOD: ' + (h.RECHECK_METHOD || ''),
-                'NEXT_ACTION: ' + (h.NEXT_ACTION || '')
-            ].join('\n');
-        }
-        function grantExecution(manualToken) {
-            var expected = localStorage.getItem('GLB_MANUAL_APPROVAL_TOKEN') || '';
-            if (!expected || String(manualToken || '') !== expected) {
-                throw holdPayload('NO_NORI_APPROVAL', 'execution_gate', 'wait_for_manual_approval', 'do_nothing');
-            }
-            EXECUTION_ALLOWED = true;
-        }
-        function revokeExecution() {
-            EXECUTION_ALLOWED = false;
-        }
         const LS_TRAVEL_PENDING = 'glb_travel_pending';
+        const LS_BILLING_LOCK = 'glb_paid_lock_v1';
+        const LS_PENDING_SESSION_ID = 'GLB_PENDING_SESSION_ID';
         var GLB_CORE_SUBSCRIBED = false;
         var GLB_TRAVEL_ACTIVE = false;
+        var GLB_TRAVEL_EXPIRES_AT = null;
         var GLB_SYSTEM_STATUS_CACHE = null;
         var GLB_SYSTEM_STATUS_AT = 0;
         var GLB_SYSTEM_STATUS_TTL = 30000;
@@ -692,80 +560,85 @@
             el.style.display = '';
         }
 
+        function updateEntitlementState(data) {
+            var localSub = false;
+            try { localSub = localStorage.getItem('glb_subscribed') === '1'; } catch (e) { /* ignore */ }
+            GLB_CORE_SUBSCRIBED = !!(data && data.ok && data.core_subscribed === true) || localSub;
+            GLB_TRAVEL_ACTIVE = !!(data && data.ok && data.travel_active === true);
+            GLB_TRAVEL_EXPIRES_AT = (data && data.ok && data.travel_pass_expires_at) ? String(data.travel_pass_expires_at) : null;
+            if (typeof refreshTravelRemainingLine === 'function') refreshTravelRemainingLine();
+        }
+
+        function refreshTravelRemainingLine() {
+            var el = document.getElementById('travel-remaining-line');
+            if (!el) return;
+            if (!GLB_TRAVEL_ACTIVE || !GLB_TRAVEL_EXPIRES_AT) {
+                el.style.display = 'none';
+                el.textContent = '';
+                return;
+            }
+            var exp = new Date(GLB_TRAVEL_EXPIRES_AT);
+            if (isNaN(exp.getTime())) {
+                el.style.display = 'none';
+                return;
+            }
+            var msLeft = exp.getTime() - Date.now();
+            var days = Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
+            var loc = (CURRENT_LANG === 'ja') ? 'ja-JP' : (CURRENT_LANG === 'zh' ? 'zh-CN' : 'en-US');
+            var dateStr = exp.toLocaleDateString(loc, { year: 'numeric', month: 'short', day: 'numeric' });
+            el.textContent = T('travelDaysLeft').replace(/\{\{n\}\}/g, String(days)).replace(/\{\{date\}\}/g, dateStr);
+            el.style.display = '';
+        }
+
         async function syncEntitlements() {
             var url = new URL(window.location.href);
             var sessionId = (url.searchParams.get('session_id') || '').trim();
             var customerId = (localStorage.getItem(LS_CUSTOMER_ID) || '').trim();
+            var pendingSessionId = (localStorage.getItem(LS_PENDING_SESSION_ID) || '').trim();
             var apiUrl = '';
+            if (sessionId) {
+                try { localStorage.setItem(LS_PENDING_SESSION_ID, sessionId); } catch (e) { /* ignore */ }
+            }
             if (customerId) {
                 apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?customer_id=' + encodeURIComponent(customerId);
             } else if (sessionId) {
                 apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?session_id=' + encodeURIComponent(sessionId);
+            } else if (pendingSessionId) {
+                apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?session_id=' + encodeURIComponent(pendingSessionId);
             } else {
                 return null;
             }
 
             var res = await fetch(apiUrl, { cache: 'no-store' });
             var data = await res.json();
-            if (data && data.ok) {
-                if (data.customer_id) localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
-                localStorage.setItem('glb_subscribed', data.core_subscribed ? '1' : '0');
-                GLB_CORE_SUBSCRIBED = !!data.core_subscribed;
-                GLB_TRAVEL_ACTIVE = !!data.travel_active;
+            if (data && data.ok && data.customer_id) {
+                localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
+                if (data.core_subscribed) {
+                    localStorage.setItem('glb_subscribed', '1');
+                    localStorage.setItem(LS_BILLING_LOCK, '1');
+                } else {
+                    var keepLock = localStorage.getItem(LS_BILLING_LOCK) === '1';
+                    localStorage.setItem('glb_subscribed', keepLock ? '1' : '0');
+                }
+                try { localStorage.removeItem(LS_PENDING_SESSION_ID); } catch (e) { /* ignore */ }
+                updateEntitlementState(data);
                 if (typeof refreshFreeQuotaDisplay === 'function') refreshFreeQuotaDisplay();
                 if (typeof refreshSubscriptionUi === 'function') refreshSubscriptionUi();
             }
             return data;
         }
 
-        /** Webhook 遅延を吸収（決済直後の session_id 付き URL）。 */
-        async function syncEntitlementsWithCheckoutRetry() {
-            var loc = new URL(window.location.href);
-            var hasSessionInUrl = !!(loc.searchParams.get('session_id') || '').trim();
-            var maxTry = 5;
-            var delayMs = 1200;
-            var last = null;
-            for (var i = 0; i < maxTry; i++) {
-                try {
-                    last = await syncEntitlements();
-                } catch (e) {
-                    last = null;
-                }
-                if (last && last.ok && (last.core_subscribed || last.travel_active)) {
-                    return last;
-                }
-                if (!hasSessionInUrl) {
-                    return last;
-                }
-                if (i < maxTry - 1) {
-                    await new Promise(function (r) { setTimeout(r, delayMs); });
-                }
-            }
-            return last;
-        }
-
-        function redirectToCoreflowStripQuery() {
-            try {
-                window.location.replace(new URL('index.coreflow.html', window.location.href).href);
-            } catch (e) {
-                /* ignore */
-            }
-        }
-
         async function handleTravelActivationFlow() {
             var url = new URL(window.location.href);
             var isTravelRedirect = url.searchParams.get('travel') === '1';
             var isCoreRedirect = url.searchParams.get('subscribed') === '1';
+            var hasSessionId = !!(url.searchParams.get('session_id') || '').trim();
+            if (hasSessionId) {
+                try { localStorage.setItem(LS_PENDING_SESSION_ID, (url.searchParams.get('session_id') || '').trim()); } catch (e) { /* ignore */ }
+            }
 
             if (!isTravelRedirect && !isCoreRedirect) {
-                try {
-                    await syncEntitlements();
-                } catch (e) {
-                    /* ignore */
-                }
-                if (GLB_CORE_SUBSCRIBED && url.searchParams.get('stay') !== '1') {
-                    redirectToCoreflowStripQuery();
-                }
+                try { await syncEntitlements(); } catch (e) { /* ignore */ }
                 return;
             }
 
@@ -785,29 +658,29 @@
             }, 60000);
 
             try {
-                var ent = await syncEntitlementsWithCheckoutRetry();
+                var ent = await syncEntitlements();
                 if (ent && ent.ok && isCoreRedirect && ent.core_subscribed) {
                     localStorage.removeItem(LS_TRAVEL_PENDING);
                     showTravelStatus('Core Access Active');
-                    clearTimeout(timeoutId);
                     cleanupUrlParams();
-                    redirectToCoreflowStripQuery();
-                    return;
                 } else if (ent && ent.ok && ent.travel_active) {
                     localStorage.removeItem(LS_TRAVEL_PENDING);
                     showTravelStatus('Travel Pass Active');
+                    cleanupUrlParams();
                 }
             } catch (e) {
                 /* ignore */
             } finally {
                 clearTimeout(timeoutId);
-                cleanupUrlParams();
+                if ((localStorage.getItem(LS_CUSTOMER_ID) || '').trim()) {
+                    cleanupUrlParams();
+                }
             }
         }
 
         handleTravelActivationFlow();
         /** App UI + translation hub languages (English pivot). */
-        var GLB_UI_LANGS = ['en', 'ja', 'fa', 'zh', 'es', 'fr', 'de', 'pt', 'ar', 'ru', 'ko', 'hi', 'tr'];
+        var GLB_UI_LANGS = ['en', 'ja', 'zh', 'ko', 'vi', 'th', 'hi', 'pt', 'fr', 'es', 'de', 'it', 'ru'];
 
         var CURRENT_LANG = 'en';
         var GLB_FREE_DAILY = 10;
@@ -916,28 +789,27 @@
                 labelLangTo: 'To',
                 langFlowHint: '',
                 pricingH2: '$2.99 / month',
-                pricingLi1: '<strong>This page is text-only</strong> (no mic or read-aloud). <strong>$2.99/mo</strong> — unlimited cloud translation plus <strong>listen &amp; read-aloud</strong>. Free: <strong>10 text translations per day</strong>.',
-                pricingNote: 'Try 10 text runs per day here — subscribe for unlimited text plus voice features.',
+                pricingLi1: 'Try free, then subscribe for cloud translation.',
+                pricingNote: '',
                 linkTerms: 'Terms of Service',
                 linkPrivacy: 'Privacy Policy',
                 linkLegal: 'Legal',
                 linkSupport: 'Support',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
-                btnMonthly: 'Subscribe ($2.99/mo)',
-                travelH3: 'Travel Pass — $14.99 / 30 days',
-                travelLi: 'Adds a 30-day Travel add-on (stackable). Requires Core for full activation; see Terms.',
-                btnTravel: 'Travel Pass ($14.99)',
-                travelH3Active: 'Travel Pass — active',
-                travelLiActive: 'Your Travel add-on is active. Extend anytime — each purchase adds 30 days from your current expiry.',
+                btnMonthly: 'Subscribe — LIFE ($2.99/mo)',
+                travelMiniLink: 'Travel · $14.99',
+                travelMiniHint: 'Travel tier is offered from the LIFE page after Core purchase.',
                 travelExtendLink: 'Extend +30 days',
+                travelExtendHint: 'Adds 30 days from your current expiry (stacking).',
+                travelDaysLeft: 'Travel add-on: {{n}} days left (through {{date}})',
                 stripeHint: 'Secure checkout with Stripe.',
                 dictPlaceholder: 'Search 150k dictionary…',
                 dictResult: 'Results appear here',
                 dictLoaded: '150k entries loaded.',
                 dictFail: 'Dictionary failed to load. Check path.',
                 noMatch: 'No match',
-                transHead: 'Text translation',
-                phNormal: 'Type text to translate',
+                transHead: 'Translation',
+                phNormal: 'Text to translate (e.g. hello)',
                 sendBtn: 'GLB',
                 idle: 'Idle',
                 modelBadge: '',
@@ -946,21 +818,14 @@
                 apiNoResponse: '',
                 sending: 'Translating…',
                 sendingPivot: '',
-                btnMic: 'Mic',
-                btnClear: 'Clear',
-                btnSpeakSrc: 'Speak source',
-                btnSpeakTgt: 'Read translation',
                 failHttp: "Couldn't complete that.",
                 netErr: 'Network error:',
                 title: 'GLOBAL LANGUAGE BREAKER',
                 btnFlip: 'Flip',
                 flipTitle: 'Rotate the result 180° for the person across from you. Tap again to restore.',
-                freeQuotaUnlimited: 'Unlimited (subscriber)',
+                freeQuotaUnlimited: 'Ready.',
                 freeLeft: '{{n}} left today',
-                freeLimitExceeded: 'Higher tier — coming soon.',
-                langDetailsSummary: '{{from}} → {{to}} · tap to change languages',
-                resultLangLabel: 'Translation ({{lang}})',
-                ttsError: 'Read-aloud failed. Check volume, silent mode, and language.'
+                freeLimitExceeded: 'Higher tier — coming soon.'
             },
             ja: {
                 labelUiLang: '言語',
@@ -969,28 +834,27 @@
                 labelLangTo: '訳文',
                 langFlowHint: '',
                 pricingH2: '月額 $2.99',
-                pricingLi1: 'この画面は<strong>文字の翻訳のみ</strong>（マイク・読み上げはありません）。<strong>$2.99/月</strong>の購読ではクラウド翻訳に加え<strong>読み聞き・読み上げ</strong>が利用できます。無料は<strong>1日10回まで</strong>（文字）。',
-                pricingNote: 'まずはこの画面で毎日10回まで無料。購読で無制限の文字翻訳＋音声まわり。',
+                pricingLi1: '無料で試してから、クラウド翻訳にご登録ください。',
+                pricingNote: '',
                 linkTerms: '利用規約',
                 linkPrivacy: 'プライバシーポリシー',
                 linkLegal: '法的情報',
                 linkSupport: 'サポート',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
-                btnMonthly: '購読（$2.99/月）',
-                travelH3: 'トラベルパス — $14.99 / 30日',
-                travelLi: '30日のトラベルアドオン（累積可）。有効化にはコア購読が必要です。利用規約を参照。',
-                btnTravel: 'トラベルパス（$14.99）',
-                travelH3Active: 'トラベルパス — 有効中',
-                travelLiActive: 'トラベルアドオンは有効です。延長はいつでも可能です（購入ごとに現在の期限から30日追加）。',
+                btnMonthly: '購読 — LIFE（$2.99/月）',
+                travelMiniLink: 'トラベル · $14.99',
+                travelMiniHint: 'トラベル層はコア購入後、LIFEページから案内します。',
                 travelExtendLink: '延長 +30日',
+                travelExtendHint: '現在の期限から30日追加（累積延長）。',
+                travelDaysLeft: 'トラベル: 残り{{n}}日（{{date}}まで）',
                 stripeHint: 'Stripe で安全に決済',
                 dictPlaceholder: '15万語辞書を検索…',
                 dictResult: '結果がここに表示されます',
                 dictLoaded: '15万語 読み込み完了',
                 dictFail: '辞書を読み込めませんでした。パスを確認してください。',
                 noMatch: '見つかりません',
-                transHead: '文字翻訳',
-                phNormal: '翻訳したい文を入力',
+                transHead: '翻訳',
+                phNormal: '翻訳したい文（例: hello）',
                 sendBtn: 'GLB',
                 idle: '待機中',
                 modelBadge: '',
@@ -999,31 +863,24 @@
                 apiNoResponse: '',
                 sending: '翻訳中…',
                 sendingPivot: '',
-                btnMic: 'マイク',
-                btnClear: '消去',
-                btnSpeakSrc: '原文を読む',
-                btnSpeakTgt: '訳を読む',
                 failHttp: '完了できませんでした。',
                 netErr: 'ネットワークエラー:',
                 title: 'GLOBAL LANGUAGE BREAKER',
                 btnFlip: '反転',
                 flipTitle: '向かいに相手がいるとき、結果を180°回転。もう一度押すと元に戻ります。',
-                freeQuotaUnlimited: '購読中（無制限）',
+                freeQuotaUnlimited: '準備完了',
                 freeLeft: '本日 残り {{n}}',
-                freeLimitExceeded: '上位プラン準備中',
-                langDetailsSummary: '{{from}} → {{to}} · タップで言語を変更',
-                resultLangLabel: '表示は{{lang}}の訳です',
-                ttsError: '読み上げを開始できませんでした（音量・マナーモードを確認してください）'
+                freeLimitExceeded: '上位プラン準備中'
             },
             zh: {
                 labelUiLang: '界面语言', labelRegion: '地区', labelLangFrom: '原文', labelLangTo: '译文',
                 langFlowHint: '',
-                pricingH2: '$2.99 / 月', pricingLi1: '本页仅<strong>文字翻译</strong>（无麦克风与朗读按钮）。<strong>$2.99/月</strong>含云端无限翻译及<strong>听读与朗读</strong>。免费每日<strong>10 次文字</strong>。', pricingNote: '先在此试用每日 10 次；订阅解锁无限文字与语音相关功能。',
+                pricingH2: '$2.99 / 月', pricingLi1: '<strong>$2.99/月</strong> — 订阅后云端翻译无限制。免费每日最多 3 次（试用）。', pricingNote: '为手机优化；每日 3 次免费，需要无限制可订阅。',
                 linkTerms: '服务条款', linkPrivacy: '隐私政策', linkLegal: '法律信息', linkSupport: '支持',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
                 btnMonthly: '订阅（$2.99/月）', stripeHint: 'Stripe 安全支付',
                 dictPlaceholder: '词典搜索…', dictResult: '结果', dictLoaded: '已加载', dictFail: '加载失败', noMatch: '无',
-                transHead: '文字翻译', phNormal: '输入要翻译的文字', sendBtn: 'GLB', idle: '就绪',
+                transHead: '翻译', phNormal: '输入要翻译的文字', sendBtn: 'GLB', idle: '就绪',
                 apiChecking: '', apiOk: '', apiNoResponse: '', sending: '翻译中…', sendingPivot: '经英语…',
                 failHttp: '失败', netErr: '网络错误', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: '镜像',
                 flipTitle: '对面有人时把结果旋转180°；再按恢复。',
@@ -1034,12 +891,12 @@
             ko: {
                 labelUiLang: '앱 언어', labelRegion: '지역', labelLangFrom: '출발', labelLangTo: '도착',
                 langFlowHint: '',
-                pricingH2: '$2.99 / 월', pricingLi1: '이 화면은<strong>텍스트만</strong>(마이크·읽기 없음). <strong>$2.99/월</strong>에 클라우드 무제한 + <strong>듣기·읽어주기</strong>. 무료 하루 <strong>10회</strong>.', pricingNote: '매일 10회 무료 → 구독 시 무제한 텍스트 + 음성.',
+                pricingH2: '$2.99 / 월', pricingLi1: '<strong>$2.99/월</strong> — 구독 시 클라우드 번역 무제한. 무료는 하루 최대 3회.', pricingNote: '모바일 화면에 맞춤. 매일 3회 무료 → 무제한은 구독.',
                 linkTerms: '이용약관', linkPrivacy: '개인정보 처리방침', linkLegal: '법적 고지', linkSupport: '지원',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
                 btnMonthly: '구독 ($2.99/월)', stripeHint: 'Stripe 결제',
                 dictPlaceholder: '사전 검색…', dictResult: '결과', dictLoaded: '로드됨', dictFail: '실패', noMatch: '없음',
-                transHead: '텍스트 번역', phNormal: '번역할 문장을 입력', sendBtn: 'GLB', idle: '대기',
+                transHead: '번역', phNormal: '번역할 문장', sendBtn: 'GLB', idle: '대기',
                 apiChecking: '', apiOk: '', apiNoResponse: '', sending: '번역 중…', sendingPivot: '영어 경유…',
                 failHttp: '실패', netErr: '네트워크', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: '반전',
                 flipTitle: '맞은편에 있을 때 결과를 180° 회전. 다시 누르면 복원.',
@@ -1050,7 +907,7 @@
             es: {
                 labelUiLang: 'Idioma', labelRegion: 'Región', labelLangFrom: 'De', labelLangTo: 'A',
                 langFlowHint: '',
-                pricingH2: '$2.99 / mes', pricingLi1: 'Esta pantalla es solo <strong>texto</strong> (sin mic ni voz). <strong>$2.99/mes</strong>: traducción ilimitada + <strong>escuchar y leer en voz alta</strong>. Gratis: <strong>10 textos/día</strong>.', pricingNote: '10/día gratis aquí; al suscribirte, texto ilimitado + voz.',
+                pricingH2: '$2.99 / mes', pricingLi1: '<strong>$2.99/mes</strong> — Ilimitado con suscripción. Gratis: hasta 3/día.', pricingNote: 'Pensado para móvil: 3 pruebas/día, luego $2.99/mes ilimitado.',
                 linkTerms: 'Términos', linkPrivacy: 'Privacidad', linkLegal: 'Legal', linkSupport: 'Soporte',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
                 btnMonthly: 'Suscribirse ($2.99/mes)', stripeHint: 'Pago con Stripe',
@@ -1066,7 +923,7 @@
             fr: {
                 labelUiLang: 'Langue', labelRegion: 'Région', labelLangFrom: 'De', labelLangTo: 'Vers',
                 langFlowHint: '',
-                pricingH2: '$2.99 / mois', pricingLi1: 'Cette page : <strong>texte seulement</strong> (pas de micro ni lecture). <strong>$2.99/mois</strong> : traduction illimitée + <strong>écoute et lecture vocale</strong>. Gratuit : <strong>10 textes/jour</strong>.', pricingNote: '10 essais/jour ici ; abonnement = texte illimité + voix.',
+                pricingH2: '$2.99 / mois', pricingLi1: '<strong>$2.99/mois</strong> — Illimité avec abonnement. Gratuit : jusqu’à 3/jour.', pricingNote: 'Mobile : 3 essais/jour, puis abonnement illimité.',
                 linkTerms: 'Conditions', linkPrivacy: 'Confidentialité', linkLegal: 'Mentions légales', linkSupport: 'Assistance',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
                 btnMonthly: 'S’abonner ($2.99/mois)', stripeHint: 'Paiement Stripe',
@@ -1082,7 +939,7 @@
             de: {
                 labelUiLang: 'Sprache', labelRegion: 'Region', labelLangFrom: 'Von', labelLangTo: 'Nach',
                 langFlowHint: '',
-                pricingH2: '$2.99 / Monat', pricingLi1: 'Nur <strong>Text</strong> auf dieser Seite (kein Mikro/Vorlesen). <strong>$2.99/Monat</strong>: unbegrenzt + <strong>Hören &amp; Vorlesen</strong>. Gratis: <strong>10 Texte/Tag</strong>.', pricingNote: '10×/Tag testen — Abo: unbegrenzter Text + Sprachfunktionen.',
+                pricingH2: '$2.99 / Monat', pricingLi1: '<strong>$2.99/Monat</strong> — Mit Abo unbegrenzt. Kostenlos: bis zu 3× pro Tag.', pricingNote: 'Fürs Handy: 3 Tests/Tag, dann Abo.',
                 linkTerms: 'AGB', linkPrivacy: 'Datenschutz', linkLegal: 'Impressum', linkSupport: 'Support',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
                 btnMonthly: 'Abonnieren ($2.99/Monat)', stripeHint: 'Stripe-Zahlung',
@@ -1098,7 +955,7 @@
             th: {
                 labelUiLang: 'ภาษา', labelRegion: 'ภูมิภาค', labelLangFrom: 'จาก', labelLangTo: 'เป็น',
                 langFlowHint: '',
-                pricingH2: '$2.99 / เดือน', pricingLi1: 'หน้านี้<strong>พิมพ์ข้อความอย่างเดียว</strong> (ไม่มีไมค์/อ่านออกเสียง). <strong>$2.99/เดือน</strong> รวมแปลไม่จำกัด + <strong>ฟังและอ่านออกเสียง</strong> ฟรี <strong>10 ครั้ง/วัน</strong>', pricingNote: 'ลอง 10 ครั้ง/วัน — สมัครเพื่อข้อความไม่จำกัด + เสียง',
+                pricingH2: '$2.99 / เดือน', pricingLi1: '<strong>$2.99/เดือน</strong> — สมาชิกแปลไม่จำกัด ฟรีวันละสูงสุด 3 ครั้ง', pricingNote: 'ออกแบบให้มือถือ — ฟรี 3 ครั้ง/วัน แล้วสมัครได้',
                 linkTerms: 'ข้อกำหนด', linkPrivacy: 'ความเป็นส่วนตัว', linkLegal: 'กฎหมาย', linkSupport: 'ช่วยเหลือ',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
                 btnMonthly: 'สมัคร ($2.99/เดือน)', stripeHint: 'ชำระด้วย Stripe',
@@ -1114,7 +971,7 @@
             vi: {
                 labelUiLang: 'Ngôn ngữ', labelRegion: 'Khu vực', labelLangFrom: 'Từ', labelLangTo: 'Sang',
                 langFlowHint: '',
-                pricingH2: '$2.99 / tháng', pricingLi1: 'Trang này chỉ <strong>chữ</strong> (không mic/đọc). <strong>$2.99/tháng</strong>: dịch không giới hạn + <strong>nghe &amp; đọc</strong>. Miễn phí <strong>10 lần/ngày</strong>.', pricingNote: 'Dùng thử 10 lần/ngày — đăng ký để chữ không giới hạn + giọng.',
+                pricingH2: '$2.99 / tháng', pricingLi1: '<strong>$2.99/tháng</strong> — Thuê bao thì không giới hạn. Miễn phí tối đa 3 lần/ngày.', pricingNote: 'Tối ưu cho điện thoại — 3 lần miễn phí/ngày, sau đó đăng ký.',
                 linkTerms: 'Điều khoản', linkPrivacy: 'Riêng tư', linkLegal: 'Pháp lý', linkSupport: 'Hỗ trợ',
                 footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
                 btnMonthly: 'Đăng ký ($2.99/tháng)', stripeHint: 'Thanh toán Stripe',
@@ -1183,7 +1040,7 @@
 
         function isGlbUnlimited() {
             try {
-                return localStorage.getItem('glb_subscribed') === '1';
+                return localStorage.getItem('glb_subscribed') === '1' || localStorage.getItem(LS_BILLING_LOCK) === '1';
             } catch (e) {
                 return false;
             }
@@ -1191,27 +1048,29 @@
 
         function updateTravelOfferLabels() {
             var travelActive = GLB_TRAVEL_ACTIVE;
-            var coreSubscribed = GLB_CORE_SUBSCRIBED || isGlbUnlimited();
-            var th3 = document.getElementById('t-travel-h3');
-            var tli = document.getElementById('t-travel-li');
-            var btr = document.getElementById('t-btn-travel');
-            if (th3) th3.textContent = travelActive ? T('travelH3Active') : T('travelH3');
-            if (tli) tli.textContent = travelActive ? T('travelLiActive') : T('travelLi');
-            if (btr) btr.textContent = travelActive ? T('travelExtendLink') : T('btnTravel');
+            var ttm = document.getElementById('t-btn-travel-mini');
+            var tth = document.getElementById('t-travel-mini-hint');
+            if (ttm) ttm.textContent = travelActive ? T('travelExtendLink') : T('travelMiniLink');
+            if (tth) tth.textContent = travelActive ? T('travelExtendHint') : T('travelMiniHint');
         }
 
         function refreshSubscriptionUi() {
             var subscribeArea = document.getElementById('subscribe-area');
             var manageWrap = document.getElementById('manage-subscription-wrap');
             var coreBlk = document.getElementById('glb-core-subscribe-block');
-            var travelBlk = document.getElementById('glb-travel-subscribe-block');
+            var travelMini = document.getElementById('glb-travel-mini-row');
+            var coreBadge = document.getElementById('core-access-active');
             var coreSubscribed = GLB_CORE_SUBSCRIBED || isGlbUnlimited();
+            var travelActive = GLB_TRAVEL_ACTIVE;
+            var pending = localStorage.getItem(LS_TRAVEL_PENDING) === 'true';
             var showCoreOffer = !coreSubscribed;
+            if (pending && !coreSubscribed) showCoreOffer = false;
 
-            if (subscribeArea) subscribeArea.style.display = (showCoreOffer || coreSubscribed) ? '' : 'none';
             if (coreBlk) coreBlk.style.display = showCoreOffer ? '' : 'none';
-            if (travelBlk) travelBlk.style.display = coreSubscribed ? '' : 'none';
+            if (travelMini) travelMini.style.display = coreSubscribed ? '' : 'none';
+            if (subscribeArea) subscribeArea.style.display = (showCoreOffer || coreSubscribed) ? '' : 'none';
             if (manageWrap) manageWrap.style.display = coreSubscribed ? '' : 'none';
+            if (coreBadge) coreBadge.style.display = coreSubscribed ? '' : 'none';
             updateTravelOfferLabels();
         }
 
@@ -1281,91 +1140,12 @@
             el.classList.toggle('is-warn', left === 0);
         }
 
-        var GLB_LANG_SHORT = {
-            en: { en: 'English', ja: 'Japanese', fa: 'Persian (Farsi)', zh: 'Chinese', es: 'Spanish', fr: 'French', de: 'German', pt: 'Portuguese', ar: 'Arabic', ru: 'Russian', ko: 'Korean', hi: 'Hindi', tr: 'Turkish', it: 'Italian', th: 'Thai', vi: 'Vietnamese' },
-            ja: { en: '英語', ja: '日本語', fa: 'ペルシャ語（فارسی）', zh: '中国語', es: 'スペイン語', fr: 'フランス語', de: 'ドイツ語', pt: 'ポルトガル語', ar: 'アラビア語', ru: 'ロシア語', ko: '韓国語', hi: 'ヒンディー語', tr: 'トルコ語', it: 'イタリア語', th: 'タイ語', vi: 'ベトナム語' }
-        };
-        function glbLangDisplayName(code) {
-            var loc = (typeof CURRENT_LANG !== 'undefined' && CURRENT_LANG) ? CURRENT_LANG : 'en';
-            var pack = GLB_LANG_SHORT[loc] || GLB_LANG_SHORT.en;
-            return (pack && pack[code]) || GLB_LANG_SHORT.en[code] || code;
-        }
-        function updateLangDetailsSummary() {
-            var sum = document.getElementById('glb-lang-details-summary');
-            if (!sum) return;
-            var lf = document.getElementById('lang-from');
-            var lt = document.getElementById('lang-to');
-            var from = (lf && lf.value) ? glbLangDisplayName(lf.value) : '';
-            var to = (lt && lt.value) ? glbLangDisplayName(lt.value) : '';
-            sum.textContent = T('langDetailsSummary').replace(/\{\{from\}\}/g, from).replace(/\{\{to\}\}/g, to);
-        }
-
-        function glbFitResultTranslationFont() {
-            var el = document.getElementById('translate-measure-result');
-            var inner = document.querySelector('#glb-result-stage .glb-result-inner');
-            var cap = document.getElementById('glb-result-lang-caption');
-            if (!el || !inner) return;
-            var raw = (el.textContent || '').trim();
-            var idle = T('idle');
-            var sending = T('sending');
-            if (!raw || raw === idle || raw === sending) {
-                el.style.fontSize = '';
-                el.style.maxHeight = '';
-                el.style.lineHeight = '';
-                return;
-            }
-            el.style.lineHeight = '1.3';
-            var capGap = cap && cap.textContent && cap.textContent.trim() ? cap.offsetHeight + 12 : 8;
-            var maxH = Math.max(48, inner.clientHeight - capGap);
-            el.style.width = '100%';
-            el.style.maxWidth = '100%';
-            el.style.maxHeight = maxH + 'px';
-            el.style.overflow = 'hidden';
-            el.style.boxSizing = 'border-box';
-            var lo = 12;
-            var hi = 220;
-            var best = lo;
-            while (lo <= hi) {
-                var mid = (lo + hi + 1) >> 1;
-                el.style.fontSize = mid + 'px';
-                if (el.scrollHeight <= el.clientHeight + 2 && el.scrollWidth <= el.clientWidth + 2) {
-                    best = mid;
-                    lo = mid + 1;
-                } else {
-                    hi = mid - 1;
-                }
-            }
-            el.style.fontSize = best + 'px';
-        }
-
-        function updateResultLangCaption() {
-            var cap = document.getElementById('glb-result-lang-caption');
-            if (!cap) return;
-            var el = document.getElementById('translate-measure-result');
-            var lt = document.getElementById('lang-to');
-            var code = (lt && lt.value) ? lt.value : '';
-            if (!code || !el) {
-                cap.textContent = '';
-                return;
-            }
-            var t = (el.textContent || '').trim();
-            if (!t || t === T('idle') || t === T('sending')) {
-                cap.textContent = '';
-                return;
-            }
-            cap.textContent = T('resultLangLabel').replace(/\{\{lang\}\}/g, glbLangDisplayName(code));
-        }
-
         function setResultText(line, color, busy) {
             var el = document.getElementById('translate-measure-result');
             if (!el) return;
             el.textContent = line;
             if (color) el.style.color = color;
             if (busy !== undefined) el.dataset.busy = busy;
-            updateResultLangCaption();
-            requestAnimationFrame(function () {
-                requestAnimationFrame(glbFitResultTranslationFont);
-            });
         }
 
         function applyUiLang() {
@@ -1413,8 +1193,6 @@
             if (bm) bm.textContent = T('btnMonthly');
             if (sh) sh.textContent = T('stripeHint');
             updateTravelOfferLabels();
-            var tsh = document.getElementById('t-travel-stripe-hint');
-            if (tsh) tsh.textContent = T('stripeHint');
 
             var th = document.getElementById('t-trans-head');
             var trt = document.getElementById('tr-text');
@@ -1422,26 +1200,6 @@
             if (th) th.textContent = T('transHead');
             if (trt) trt.placeholder = T('phNormal');
             if (trb) trb.textContent = T('sendBtn');
-            var bMic = document.getElementById('glb-mic-btn');
-            var bClr = document.getElementById('glb-clear-btn');
-            var bSrc = document.getElementById('glb-speak-src-btn');
-            var bTgt = document.getElementById('glb-speak-tgt-btn');
-            if (bMic) {
-                bMic.textContent = T('btnMic');
-                bMic.setAttribute('aria-label', T('btnMic'));
-            }
-            if (bClr) {
-                bClr.textContent = T('btnClear');
-                bClr.setAttribute('aria-label', T('btnClear'));
-            }
-            if (bSrc) {
-                bSrc.textContent = T('btnSpeakSrc');
-                bSrc.setAttribute('aria-label', T('btnSpeakSrc'));
-            }
-            if (bTgt) {
-                bTgt.textContent = T('btnSpeakTgt');
-                bTgt.setAttribute('aria-label', T('btnSpeakTgt'));
-            }
 
             var gp = document.getElementById('gateway-pulse');
             if (gp && !gp.dataset.healthDone && T('apiChecking')) gp.textContent = T('apiChecking');
@@ -1466,24 +1224,8 @@
 
             refreshFreeQuotaDisplay();
             refreshSubscriptionUi();
-            updateLangDetailsSummary();
-            updateResultLangCaption();
+            if (typeof refreshTravelRemainingLine === 'function') refreshTravelRemainingLine();
         }
-
-        (function bindManualApprovalOnly() {
-            var title = document.getElementById('app-brand-title');
-            if (!title) return;
-            title.addEventListener('dblclick', function () {
-                var token = window.prompt('Manual approval token');
-                if (token == null) return;
-                try {
-                    grantExecution(token);
-                } catch (e) {
-                    var out = document.getElementById('translate-measure-result');
-                    if (out) out.textContent = renderHold(e);
-                }
-            });
-        })();
 
         (function syncUiLangSelect() {
             var u = document.getElementById('ui-lang');
@@ -1505,6 +1247,16 @@
             if (!btn) return;
             btn.addEventListener('click', function () {
                 openManageSubscription();
+            });
+        })();
+        (function bindCancelSubscriptionLockDrop() {
+            var cancel = document.getElementById('link-cancel-subscription');
+            if (!cancel) return;
+            cancel.addEventListener('click', function () {
+                try {
+                    localStorage.removeItem('glb_subscribed');
+                    localStorage.removeItem(LS_BILLING_LOCK);
+                } catch (e) { /* ignore */ }
             });
         })();
 
@@ -1554,14 +1306,6 @@
                 stage.classList.toggle('is-flipped');
                 if (result) result.classList.toggle('flipped-mode', stage.classList.contains('is-flipped'));
                 btn.setAttribute('aria-pressed', stage.classList.contains('is-flipped') ? 'true' : 'false');
-                requestAnimationFrame(function () {
-                    requestAnimationFrame(glbFitResultTranslationFont);
-                });
-            });
-            var glbResizeFitTimer;
-            window.addEventListener('resize', function () {
-                clearTimeout(glbResizeFitTimer);
-                glbResizeFitTimer = setTimeout(glbFitResultTranslationFont, 120);
             });
         })();
 
@@ -1569,17 +1313,17 @@
             var LANG_OPTS = [
                 { c: 'en', l: 'English' },
                 { c: 'ja', l: '日本語' },
-                { c: 'fa', l: 'فارسی' },
                 { c: 'zh', l: '中文' },
+                { c: 'ko', l: '한국어' },
                 { c: 'es', l: 'Español' },
                 { c: 'fr', l: 'Français' },
                 { c: 'de', l: 'Deutsch' },
-                { c: 'pt', l: 'Português' },
-                { c: 'ar', l: 'العربية' },
+                { c: 'it', l: 'Italiano' },
                 { c: 'ru', l: 'Русский' },
-                { c: 'ko', l: '한국어' },
+                { c: 'th', l: 'ไทย' },
+                { c: 'vi', l: 'Tiếng Việt' },
                 { c: 'hi', l: 'हिन्दी' },
-                { c: 'tr', l: 'Türkçe' }
+                { c: 'pt', l: 'Português' }
             ];
             var fromEl = document.getElementById('lang-from');
             var toEl = document.getElementById('lang-to');
@@ -1603,9 +1347,7 @@
             fillSelect(toEl);
 
             function defaultOther(code) {
-                if (code === 'en') return 'fa';
-                if (code === 'fa') return 'en';
-                return code === 'ja' ? 'en' : 'ja';
+                return code === 'en' ? 'ja' : 'en';
             }
 
             function syncHidden() {
@@ -1617,8 +1359,6 @@
                 }
                 hs.value = a;
                 ht.value = b;
-                updateLangDetailsSummary();
-                updateResultLangCaption();
             }
 
             function syncFromUiLang() {
@@ -1680,59 +1420,30 @@
             });
         })();
 
-        function glbUpdateReadalong() {
-            /* Text-only UI; mic / read-along removed from this page (see pricing copy for voice). */
-        }
-
-        function glbLogClientAudit(apiJson, src, tgt, micUsed, ttsSnap) {
-            var o = {
-                requestId: (apiJson && apiJson.requestId) ? apiJson.requestId : '',
-                routeType: (apiJson && apiJson.routeType) ? apiJson.routeType : '',
-                reasonCode: (apiJson && apiJson.reasonCode != null) ? String(apiJson.reasonCode) : '',
-                gateEnvName: (apiJson && apiJson.gateEnvName) ? apiJson.gateEnvName : '',
-                source: src,
-                target: tgt,
-                mic_used: !!micUsed,
-                tts_used: !!ttsSnap
-            };
-            console.log('[GLB_CLIENT]', JSON.stringify(o));
-        }
-
         (function translateMeasure() {
             var out = document.getElementById('translate-measure-result');
             var btn = document.getElementById('tr-run');
             if (!btn || !out) return;
 
-            function glbFinalizeOut(s) {
-                return (typeof glbTomoriPostRewrite === 'function') ? glbTomoriPostRewrite(s) : s;
-            }
-
             function parseResponse(x) {
                 if (x.status >= 200 && x.status < 300) {
                     try {
                         var j = JSON.parse(x.body);
-                        if (j.ok === false) {
-                            return { ok: false, json: j, text: '', raw: x.body };
-                        }
-                        var line = j.translatedText != null ? String(j.translatedText) : '';
-                        return { ok: true, text: safeOutput(line), json: j };
+                        var line = j.translatedText != null ? String(j.translatedText) : x.body;
+                        return { ok: true, text: line };
                     } catch (e) {
-                        return { ok: true, text: safeOutput(x.body), json: null };
+                        return { ok: true, text: x.body };
                     }
                 }
-                return { ok: false, status: x.status, body: x.body, json: null };
+                return { ok: false, status: x.status, body: x.body };
             }
 
             function fetchTranslate(text, source, target) {
+                var payload = { text: text, source: source, target: target, caller_id: 'prod' };
                 return fetch(NEXTBASE_APP_ORIGIN + '/translate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        text: text,
-                        source: source,
-                        target: target,
-                        caller_id: 'prod'
-                    }),
+                    body: JSON.stringify(payload),
                     cache: 'no-store'
                 }).then(function (r) {
                     return r.text().then(function (t) {
@@ -1747,7 +1458,6 @@
 
             btn.addEventListener('click', function () {
                 if (GLB_MAINTENANCE_ON) return;
-
                 var lf = document.getElementById('lang-from');
                 var lt = document.getElementById('lang-to');
                 var hs = document.getElementById('tr-src');
@@ -1757,13 +1467,12 @@
                     ht.value = lt.value.trim();
                 }
                 var text = (document.getElementById('tr-text') && document.getElementById('tr-text').value) || '';
-                text = (typeof glbTomoriNormalize === 'function') ? glbTomoriNormalize(text) : text.trim();
+                text = text.trim();
                 var source = ((document.getElementById('tr-src') && document.getElementById('tr-src').value) || 'en').trim();
-                var target = ((document.getElementById('tr-tgt') && document.getElementById('tr-tgt').value) || 'fa').trim();
+                var target = ((document.getElementById('tr-tgt') && document.getElementById('tr-tgt').value) || 'ja').trim();
 
                 if (!text) {
                     setResultText(T('idle'), '#eaeaea', '0');
-                    glbUpdateReadalong('', '', source, target);
                     return;
                 }
 
@@ -1771,25 +1480,21 @@
                     setResultText(text, '#eaeaea', '0');
                     recordGlbTranslateUse();
                     refreshFreeQuotaDisplay();
-                    glbUpdateReadalong(text, text, source, target);
                     return;
                 }
 
                 var cached = readTxCache(text, source, target);
                 if (cached != null && cached !== '') {
-                    var cDone = glbFinalizeOut(cached);
-                    setResultText(cDone, '#eaeaea', '0');
+                    setResultText(cached, '#eaeaea', '0');
                     refreshFreeQuotaDisplay();
-                    glbUpdateReadalong(text, cDone, source, target);
                     return;
                 }
 
                 var localOut = tryLocalRoute(text, source, target);
                 if (localOut != null && localOut !== '') {
-                    setResultText(glbFinalizeOut(localOut), '#eaeaea', '0');
+                    setResultText(localOut, '#eaeaea', '0');
                     writeTxCache(text, source, target, localOut);
                     refreshFreeQuotaDisplay();
-                    glbUpdateReadalong(text, localOut, source, target);
                     return;
                 }
 
@@ -1801,14 +1506,11 @@
 
                 var pivot = (source !== 'en' && target !== 'en');
 
-                function finishOk(line, apiJson) {
-                    var done = glbFinalizeOut(line);
-                    setResultText(done, '#eaeaea', '0');
-                    writeTxCache(text, source, target, done);
+                function finishOk(line) {
+                    setResultText(line, '#eaeaea', '0');
+                    writeTxCache(text, source, target, line);
                     recordGlbTranslateUse();
                     refreshFreeQuotaDisplay();
-                    glbUpdateReadalong(text, done, source, target);
-                    if (apiJson) glbLogClientAudit(apiJson, source, target, false, false);
                 }
 
                 setResultText(T('sending'), '#eaeaea', '1');
@@ -1817,11 +1519,8 @@
                     fetchTranslate(text, source, target)
                         .then(function (x) {
                             var p = parseResponse(x);
-                            if (p.ok) finishOk(p.text, p.json);
-                            else if (p.json && p.json.reasonCode) {
-                                setResultText(String(p.json.reasonCode), '#c99', '0');
-                                glbLogClientAudit(p.json, source, target, false, false);
-                            } else applyError(x);
+                            if (p.ok) finishOk(p.text);
+                            else applyError(x);
                         })
                         .catch(function (err) {
                             setResultText(T('netErr'), '#c99', '0');
@@ -1833,42 +1532,21 @@
                     .then(function (x1) {
                         var p1 = parseResponse(x1);
                         if (!p1.ok) {
-                            if (p1.json && p1.json.reasonCode) {
-                                setResultText(String(p1.json.reasonCode), '#c99', '0');
-                                glbLogClientAudit(p1.json, source, 'en', false, false);
-                            } else applyError(x1);
+                            applyError(x1);
                             return null;
                         }
-                        if (p1.json) glbLogClientAudit(p1.json, source, 'en', false, false);
                         setResultText(T('sending'), '#eaeaea', '1');
                         return fetchTranslate(p1.text, 'en', target);
                     })
                     .then(function (x2) {
                         if (x2 == null) return;
                         var p2 = parseResponse(x2);
-                        if (p2.ok) finishOk(p2.text, p2.json);
-                        else if (p2.json && p2.json.reasonCode) {
-                            setResultText(String(p2.json.reasonCode), '#c99', '0');
-                            glbLogClientAudit(p2.json, 'en', target, false, false);
-                        } else applyError(x2);
+                        if (p2.ok) finishOk(p2.text);
+                        else applyError(x2);
                     })
                     .catch(function (err) {
                         setResultText(T('netErr'), '#c99', '0');
                     });
-            });
-        })();
-
-        (function glbClearBtnOnly() {
-            var clearBtn = document.getElementById('glb-clear-btn');
-            var trInput = document.getElementById('tr-text');
-            if (!clearBtn) return;
-            clearBtn.addEventListener('click', function () {
-                if (trInput) trInput.value = '';
-                var idleEl = document.getElementById('translate-measure-result');
-                if (idleEl) {
-                    idleEl.textContent = T('idle');
-                    idleEl.dataset.busy = '0';
-                }
             });
         })();
     </script>

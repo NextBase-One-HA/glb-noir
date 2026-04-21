@@ -475,6 +475,7 @@
         const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
         const LS_TRAVEL_PENDING = 'glb_travel_pending';
         const LS_PENDING_SESSION_ID = 'GLB_PENDING_SESSION_ID';
+        const LS_BILLING_LOCK = 'glb_paid_lock_v1';
         var GLB_CORE_SUBSCRIBED = false;
         var GLB_TRAVEL_ACTIVE = false;
         var GLB_TRAVEL_EXPIRES_AT = null;
@@ -653,7 +654,13 @@
             if (data && data.ok) {
                 if (data.customer_id) {
                     localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
-                    localStorage.setItem('glb_subscribed', data.core_subscribed ? '1' : '0');
+                    if (data.core_subscribed) {
+                        localStorage.setItem('glb_subscribed', '1');
+                        localStorage.setItem(LS_BILLING_LOCK, '1');
+                    } else {
+                        var keepLock = localStorage.getItem(LS_BILLING_LOCK) === '1';
+                        localStorage.setItem('glb_subscribed', keepLock ? '1' : '0');
+                    }
                     try { localStorage.removeItem(LS_PENDING_SESSION_ID); } catch (e) { /* ignore */ }
                 }
                 updateEntitlementState(data);
@@ -1122,7 +1129,7 @@
 
         function isGlbUnlimited() {
             try {
-                return localStorage.getItem('glb_subscribed') === '1';
+                return localStorage.getItem('glb_subscribed') === '1' || localStorage.getItem(LS_BILLING_LOCK) === '1';
             } catch (e) {
                 return false;
             }
@@ -1368,6 +1375,16 @@
             if (!btn) return;
             btn.addEventListener('click', function () {
                 openManageSubscription();
+            });
+        })();
+        (function bindCancelSubscriptionLockDrop() {
+            var cancel = document.getElementById('link-cancel-subscription');
+            if (!cancel) return;
+            cancel.addEventListener('click', function () {
+                try {
+                    localStorage.removeItem('glb_subscribed');
+                    localStorage.removeItem(LS_BILLING_LOCK);
+                } catch (e) { /* ignore */ }
             });
         })();
 
