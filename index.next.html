@@ -581,6 +581,23 @@
         var GLB_SYSTEM_STATUS_TTL = 30000;
         var GLB_MAINTENANCE_ON = false;
 
+        (function guardPaidPageAccess() {
+            try {
+                var url = new URL(window.location.href);
+                var sessionId = (url.searchParams.get('session_id') || '').trim();
+                var subscribed = localStorage.getItem('glb_subscribed') === '1';
+                if (sessionId) {
+                    localStorage.setItem('glb_subscribed', '1');
+                    return;
+                }
+                if (!subscribed) {
+                    window.location.replace(new URL('index.html', window.location.href).href);
+                }
+            } catch (e) {
+                /* ignore */
+            }
+        })();
+
         function compareVersion(a, b) {
             var aa = String(a || '').split('.');
             var bb = String(b || '').split('.');
@@ -1190,6 +1207,7 @@
             }
             var fallback = GLB_STRIPE_PORTAL_LOGIN_FALLBACK || 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
             function go(url) {
+                try { localStorage.removeItem('glb_subscribed'); } catch (e0) { /* ignore */ }
                 window.location.href = url;
             }
             try {
