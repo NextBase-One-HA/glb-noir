@@ -582,25 +582,44 @@
         var GLB_SYSTEM_STATUS_TTL = 30000;
         var GLB_MAINTENANCE_ON = false;
 
+        function glbIsPaidFlag() {
+            try {
+                var v = localStorage.getItem('glb_subscribed');
+                return v === '1' || v === 'true';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        (function prehideLimitedUiWhenPaid() {
+            try {
+                if (!glbIsPaidFlag()) return;
+                var st = document.createElement('style');
+                st.id = 'glb-paid-mode-style';
+                st.textContent = '#t-free-quota,#subscribe-area,#glb-core-subscribe-block{display:none !important;}';
+                document.head.appendChild(st);
+            } catch (e) { /* ignore */ }
+        })();
+
         (function guardPaidPageAccess() {
             try {
                 var url = new URL(window.location.href);
                 var isAdminBypass = (url.searchParams.get('nori') || '') === 'admin';
                 var sessionId = (url.searchParams.get('session_id') || '').trim();
-                var subscribed = localStorage.getItem('glb_subscribed') === '1';
+                var subscribed = glbIsPaidFlag();
                 var locked = localStorage.getItem(LS_BILLING_LOCK) === '1';
                 if (isAdminBypass) {
-                    localStorage.setItem('glb_subscribed', '1');
+                    localStorage.setItem('glb_subscribed', 'true');
                     localStorage.setItem(LS_BILLING_LOCK, '1');
                     return;
                 }
                 if (sessionId) {
-                    localStorage.setItem('glb_subscribed', '1');
+                    localStorage.setItem('glb_subscribed', 'true');
                     localStorage.setItem(LS_BILLING_LOCK, '1');
                     return;
                 }
                 if (locked) {
-                    localStorage.setItem('glb_subscribed', '1');
+                    localStorage.setItem('glb_subscribed', 'true');
                     return;
                 }
                 if (!subscribed) {
@@ -610,6 +629,16 @@
                 /* ignore */
             }
         })();
+
+        function enforcePaidUiLock() {
+            if (!isGlbUnlimited()) return;
+            var quota = document.getElementById('t-free-quota');
+            if (quota) quota.remove();
+            var subscribeArea = document.getElementById('subscribe-area');
+            if (subscribeArea) subscribeArea.remove();
+            var subBtn = document.getElementById('t-btn-monthly');
+            if (subBtn) subBtn.remove();
+        }
 
         function compareVersion(a, b) {
             var aa = String(a || '').split('.');
@@ -717,16 +746,17 @@
             if (data && data.ok) {
                 if (data.customer_id) localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
                 if (data.core_subscribed) {
-                    localStorage.setItem('glb_subscribed', '1');
+                    localStorage.setItem('glb_subscribed', 'true');
                     localStorage.setItem(LS_BILLING_LOCK, '1');
                 } else {
                     var keepLock = localStorage.getItem(LS_BILLING_LOCK) === '1';
-                    localStorage.setItem('glb_subscribed', keepLock ? '1' : '0');
+                    localStorage.setItem('glb_subscribed', keepLock ? 'true' : '0');
                 }
                 GLB_CORE_SUBSCRIBED = !!data.core_subscribed;
                 GLB_TRAVEL_ACTIVE = !!data.travel_active;
                 if (typeof refreshFreeQuotaDisplay === 'function') refreshFreeQuotaDisplay();
                 if (typeof refreshSubscriptionUi === 'function') refreshSubscriptionUi();
+                enforcePaidUiLock();
             }
             return data;
         }
@@ -1196,7 +1226,7 @@
 
         function isGlbUnlimited() {
             try {
-                return localStorage.getItem('glb_subscribed') === '1';
+                return glbIsPaidFlag() || localStorage.getItem(LS_BILLING_LOCK) === '1';
             } catch (e) {
                 return false;
             }
@@ -1287,8 +1317,11 @@
             if (isGlbUnlimited()) {
                 el.textContent = T('freeQuotaUnlimited');
                 el.classList.remove('is-warn');
+                el.style.display = 'none';
+                enforcePaidUiLock();
                 return;
             }
+            el.style.display = '';
             var q = getGlbQuotaState();
             var left = Math.max(0, GLB_FREE_DAILY - q.count);
             el.textContent = T('freeLeft').replace(/\{\{n\}\}/g, String(left));
