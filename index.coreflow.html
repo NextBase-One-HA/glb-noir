@@ -146,16 +146,6 @@
         #glb-result-stage.is-flipped #translate-measure-result {
             transform: rotate(180deg);
         }
-        .free-quota-line {
-            font-size: 11px;
-            color: #aaa;
-            text-align: center;
-            margin: 10px 8px 0;
-            line-height: 1.5;
-            max-width: 100%;
-            word-break: break-word;
-        }
-        .free-quota-line.is-warn { color: #ffe08a; text-shadow: 0 0 10px var(--gold-glow-mid); }
         .flipped-mode {
             transform: rotate(180deg) !important;
             transition: transform 0.3s ease;
@@ -358,11 +348,6 @@
                 padding: 16px 20px;
                 letter-spacing: 0.2em;
             }
-            .free-quota-line {
-                font-size: 12px;
-                margin-top: 12px;
-                padding: 0 4px;
-            }
             .tr-run-wrap { margin-bottom: 4px; }
             .pricing-box { font-size: 13px; padding: 14px; }
             .pricing-box h2 { font-size: 15px; }
@@ -544,7 +529,6 @@
         </div>
         <div class="tr-run-wrap">
             <button type="button" id="tr-run" class="btn glb-main-btn">GLB</button>
-            <p class="free-quota-line" id="t-free-quota" role="status"></p>
         </div>
     </div>
 
@@ -553,7 +537,6 @@
     <div id="subscribe-area" style="max-width: min(600px, 100%); margin: 0 auto 20px;">
         <div id="glb-coreflow-entry-cta" style="display:none;">
             <p class="note" id="t-entry-cta-text" style="text-align:left; line-height:1.5; margin:0 0 12px;"></p>
-            <a href="https://nextbase-one-ha.github.io/nextbase-world/index.html" class="btn glb-subscribe-btn" style="font-size:16px; padding:14px 18px; border-radius:999px;" id="t-btn-back-entry">Open Entry (subscribe LIFE)</a>
         </div>
         <div id="glb-life-subscribed-block" style="display:none;">
             <p class="note" id="t-life-layer-blurb" style="text-align:left; line-height:1.5; margin:0 0 14px;"></p>
@@ -591,7 +574,7 @@
     <script>
         window.__GLB_PAGE_LAYER = 'coreflow';
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
-        const APP_VERSION = '2026.04.21.coreflow.9';
+        const APP_VERSION = '2026.04.21.coreflow.10';
         var GLB_COREFLOW_CONFIG = {
             API_BASE: 'https://smile-friend-engine-125142687526.us-central1.run.app',
             STRIPE_CORE: 'https://buy.stripe.com/bJedRbefH5yogzZfuDasg09',
@@ -927,7 +910,6 @@
         var GLB_UI_LANGS = ['en', 'ja', 'fa', 'zh', 'es', 'fr', 'de', 'pt', 'ar', 'ru', 'ko', 'hi', 'tr'];
 
         var CURRENT_LANG = 'en';
-        var GLB_FREE_DAILY = 10;
         var LS_GLB_QUOTA = 'glb_translate_quota_v1';
 
         /** false = ブラウザに 150k 辞書を配らない（サーバ ROUTES_CSV_PATH で照合）。パクり対策。開発時のみ localStorage glb_dev_csv=1 で従来のクライアント読込。 */
@@ -1036,7 +1018,6 @@
                 pricingLi1: '',
                 pricingNote: '',
                 entryCtaText: 'Subscribe from the home page, then return here.',
-                btnBackEntry: 'Home',
                 lifeLayerBlurb: '',
                 travelLayerH3: 'Travel',
                 travelLayerBody: '',
@@ -1097,7 +1078,6 @@
                 pricingLi1: '',
                 pricingNote: '',
                 entryCtaText: 'ホームから購入のうえ、こちらへ戻ってください。',
-                btnBackEntry: 'ホーム',
                 lifeLayerBlurb: '',
                 travelLayerH3: 'トラベル',
                 travelLayerBody: '',
@@ -1408,6 +1388,7 @@
         }
 
         function recordGlbTranslateUse() {
+            if (window.__GLB_PAGE_LAYER === 'coreflow') return;
             if (GLB_CORE_SUBSCRIBED || isGlbUnlimited()) return;
             var tk = glbTodayKey();
             var q = getGlbQuotaState();
@@ -1427,7 +1408,7 @@
                 return;
             }
             var q = getGlbQuotaState();
-            var left = Math.max(0, GLB_FREE_DAILY - q.count);
+            var left = Math.max(0, 10 - q.count);
             el.textContent = T('freeLeft').replace(/\{\{n\}\}/g, String(left));
             el.classList.toggle('is-warn', left === 0);
         }
@@ -1550,12 +1531,10 @@
             }
 
             var ect = document.getElementById('t-entry-cta-text');
-            var ebtn = document.getElementById('t-btn-back-entry');
             var lb = document.getElementById('t-life-layer-blurb');
             var th3 = document.getElementById('t-travel-layer-h3');
             var tbody = document.getElementById('t-travel-layer-body');
             if (ect) ect.textContent = T('entryCtaText');
-            if (ebtn) ebtn.textContent = T('btnBackEntry');
             if (lb) {
                 var lifeTxt = T('lifeLayerBlurb');
                 if (lifeTxt) {
