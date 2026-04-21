@@ -588,6 +588,7 @@
                 var sessionId = (url.searchParams.get('session_id') || '').trim();
                 var subscribed = localStorage.getItem('glb_subscribed') === '1';
                 if (isAdminBypass) {
+                    localStorage.setItem('glb_subscribed', '1');
                     return;
                 }
                 if (sessionId) {
