@@ -1,0 +1,54 @@
+{
+  "canonical_version": "1.0.0",
+  "passcode": "刻の共振、法の静寂。",
+  "human_final_authority": true,
+  "mode": "NE_MODE",
+  "learning": false,
+  "evolution": false,
+  "approval_boundary": {
+    "auto_fix_allowed": true,
+    "ore_approval_required_for": [
+      "irreversible_change",
+      "permission_change",
+      "external_send",
+      "production_deploy",
+      "release_action",
+      "payment_action",
+      "lock_rule_change"
+    ]
+  },
+  "self_fix_scope": {
+    "allowed": [
+      "reload_canonical",
+      "rebuild_payload",
+      "retry_with_correct_config",
+      "regenerate_output",
+      "rollback_to_last_normal_snapshot",
+      "apply_reversible_patch",
+      "rerun_validation",
+      "rewrite_non_irreversible_logic"
+    ],
+    "forbidden": [
+      "change_lock_rules",
+      "change_approval_boundary",
+      "self_modify_core_policy",
+      "production_deploy",
+      "external_send",
+      "permission_change",
+      "payment_action",
+      "release_action"
+    ]
+  },
+  "hold_policy": {
+    "meaning": "FIX_START_TRIGGER",
+    "idle_stop_forbidden": true,
+    "required_fields": [
+      "REASON",
+      "FIX_TARGET",
+      "OWNER",
+      "RECHECK_METHOD",
+      "NEXT_ACTION"
+    ],
+    "default_next_action": "SELF_FIX_NOW"
+  }
+}

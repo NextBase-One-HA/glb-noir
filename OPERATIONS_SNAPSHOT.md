@@ -44,6 +44,30 @@
   - cancel/manage route visible.
   - lock-drop behavior unchanged where specified.
 
+## Audit Operations
+- Use `AUDIT_LOG_TEMPLATE.md` for every billing-sensitive change before declaring completion.
+- Mark unresolved checks as HOLD (never force PASS).
+- Include evidence in each section (storage state, DOM behavior, or commit/build proof).
+
+## Self-Fix Boundary (No Self-Evolution)
+- Self-fix is allowed only for reversible actions inside approval boundaries:
+  - reload canonical files,
+  - rebuild payload/config,
+  - regenerate outputs,
+  - apply reversible patch,
+  - rerun validation/tests,
+  - rollback to last normal snapshot.
+- Self-evolution is prohibited:
+  - no lock-rule changes,
+  - no approval-boundary rewrites,
+  - no core-policy self-modification.
+- The following always require explicit ORE approval:
+  - irreversible changes, permission changes, external send, production deploy,
+  - payment actions, release actions, lock-rule changes.
+- Canonical source of truth for this boundary:
+  - `canonical/ORE_LAYER_LOCK.json`
+  - `canonical/ORE_LAYER_SYNC.json`
+
 ## Rollback Rule
 - If paid users can see free-tier restrictions after successful pay-state, rollback/fix is immediate priority.
 - Never trade billing correctness for new feature velocity.
