@@ -574,6 +574,7 @@
             EXECUTION_ALLOWED = false;
         }
         const LS_TRAVEL_PENDING = 'glb_travel_pending';
+        const LS_BILLING_LOCK = 'glb_paid_lock_v1';
         var GLB_CORE_SUBSCRIBED = false;
         var GLB_TRAVEL_ACTIVE = false;
         var GLB_SYSTEM_STATUS_CACHE = null;
@@ -587,11 +588,18 @@
                 var isAdminBypass = (url.searchParams.get('nori') || '') === 'admin';
                 var sessionId = (url.searchParams.get('session_id') || '').trim();
                 var subscribed = localStorage.getItem('glb_subscribed') === '1';
+                var locked = localStorage.getItem(LS_BILLING_LOCK) === '1';
                 if (isAdminBypass) {
                     localStorage.setItem('glb_subscribed', '1');
+                    localStorage.setItem(LS_BILLING_LOCK, '1');
                     return;
                 }
                 if (sessionId) {
+                    localStorage.setItem('glb_subscribed', '1');
+                    localStorage.setItem(LS_BILLING_LOCK, '1');
+                    return;
+                }
+                if (locked) {
                     localStorage.setItem('glb_subscribed', '1');
                     return;
                 }
@@ -708,7 +716,13 @@
             var data = await res.json();
             if (data && data.ok) {
                 if (data.customer_id) localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
-                localStorage.setItem('glb_subscribed', data.core_subscribed ? '1' : '0');
+                if (data.core_subscribed) {
+                    localStorage.setItem('glb_subscribed', '1');
+                    localStorage.setItem(LS_BILLING_LOCK, '1');
+                } else {
+                    var keepLock = localStorage.getItem(LS_BILLING_LOCK) === '1';
+                    localStorage.setItem('glb_subscribed', keepLock ? '1' : '0');
+                }
                 GLB_CORE_SUBSCRIBED = !!data.core_subscribed;
                 GLB_TRAVEL_ACTIVE = !!data.travel_active;
                 if (typeof refreshFreeQuotaDisplay === 'function') refreshFreeQuotaDisplay();
@@ -1212,7 +1226,6 @@
             }
             var fallback = GLB_STRIPE_PORTAL_LOGIN_FALLBACK || 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
             function go(url) {
-                try { localStorage.removeItem('glb_subscribed'); } catch (e0) { /* ignore */ }
                 window.location.href = url;
             }
             try {
@@ -1239,6 +1252,17 @@
                 go(fallback);
             }
         }
+
+        (function bindCancelSubscriptionLockDrop() {
+            var cancelBtn = document.getElementById('cancel-subscription-btn');
+            if (!cancelBtn) return;
+            cancelBtn.addEventListener('click', function () {
+                try {
+                    localStorage.removeItem('glb_subscribed');
+                    localStorage.removeItem(LS_BILLING_LOCK);
+                } catch (e) { /* ignore */ }
+            });
+        })();
 
         function canGlbTranslate() {
             if (isGlbUnlimited()) return true;
