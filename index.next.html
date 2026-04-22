@@ -464,13 +464,13 @@
     </div>
     <p id="travel-status" style="display:none; margin: 0 0 12px; color:#f5e6b8; font-size:12px; text-align:center;"></p>
 
-    <section id="glb-travel-pass-banner" class="glb-travel-pass-banner" aria-labelledby="glb-tpb-head" data-phase="TRAVEL_MARKETING_01">
-        <h2 id="glb-tpb-head" class="glb-tpb-head">Travel Pass（30日）を安心して使う</h2>
-        <p class="glb-tpb-sub">
-            空港・入国審査・タクシー・ホテル・レストラン・緊急時まで、旅行時に必要な表示を1画面で確認できます。30日買い切り・自動更新なし。終了後は Core（$2.99）表示に戻ります。
-            <span class="glb-tpb-sub-en">Clear travel layout with essential categories. One-time 30-day pass, no auto-renewal, then returns to Core.</span>
+    <section id="glb-travel-pass-banner" class="glb-travel-pass-banner" aria-labelledby="glb-tpb-head" data-phase="CORE_RELEASE_CLEANUP_01">
+        <h2 id="glb-tpb-head" class="glb-tpb-head">Travel Pass は準備中（Coming Soon）</h2>
+        <p class="glb-tpb-sub" style="margin-bottom:8px; font-size:11px; line-height:1.45;">
+            先行リリースは Core（$2.99）の翻訳体験に集中しています。Travel は準備が整い次第ご案内します。
+            <span class="glb-tpb-sub-en">Core translation is live first. Travel Pass is temporarily unavailable and will be announced soon.</span>
         </p>
-        <a href="index.premium.html" class="btn glb-subscribe-btn glb-tpb-cta">14.99ドルでTravel Passの詳細を見る</a>
+        <span class="btn glb-subscribe-btn glb-tpb-cta" aria-disabled="true" style="opacity:.65; pointer-events:none;">Travel Pass Coming Soon</span>
     </section>
 
     <div class="glb-billboard">
@@ -590,7 +590,7 @@
         /** Translate /health: smile-friend-engine (us-central1) */
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
         var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-        const APP_VERSION = '2026.04.22.canon.indexnext.1';
+        const APP_VERSION = '2026.04.22.core.cleanup.1';
         const MAINTENANCE_DEFAULT = 'We are currently enhancing the system for a better experience. Please check back shortly.';
         const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
         let EXECUTION_ALLOWED = false;
@@ -1191,9 +1191,9 @@
                 linkSupport: 'Support',
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'Subscribe ($2.99/mo)',
-                travelH3: 'Travel Pass — $14.99 / 30 days',
-                travelLi: 'Adds a 30-day Travel add-on (stackable). Requires Core for full activation; see Terms.',
-                btnTravel: 'Travel Pass ($14.99)',
+                travelH3: 'Travel Pass — Coming Soon',
+                travelLi: 'Travel add-on sales are paused. Core translation remains fully available.',
+                btnTravel: 'Coming Soon',
                 travelH3Active: 'Travel Pass — active',
                 travelLiActive: 'Your Travel add-on is active. Extend anytime — each purchase adds 30 days from your current expiry.',
                 travelExtendLink: 'Extend +30 days',
@@ -1244,9 +1244,9 @@
                 linkSupport: 'サポート',
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '購読（$2.99/月）',
-                travelH3: 'トラベルパス — $14.99 / 30日',
-                travelLi: '30日のトラベルアドオン（累積可）。有効化にはコア購読が必要です。利用規約を参照。',
-                btnTravel: 'トラベルパス（$14.99）',
+                travelH3: 'トラベルパス — 準備中',
+                travelLi: 'トラベル販売は一時停止中です。Core翻訳は通常どおり利用できます。',
+                btnTravel: '準備中',
                 travelH3Active: 'トラベルパス — 有効中',
                 travelLiActive: 'トラベルアドオンは有効です。延長はいつでも可能です（購入ごとに現在の期限から30日追加）。',
                 travelExtendLink: '延長 +30日',

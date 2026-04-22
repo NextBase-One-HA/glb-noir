@@ -407,7 +407,7 @@
     <p id="travel-remaining-line" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
     <p id="travel-expiry-display" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
 
-    <section id="glb-travel-lp-hero" class="glb-travel-lp-hero" aria-labelledby="glb-travel-lp-h2" data-phase="TRAVEL_MARKETING_01">
+    <section id="glb-travel-lp-hero" class="glb-travel-lp-hero" aria-labelledby="glb-travel-lp-h2" data-phase="CORE_RELEASE_CLEANUP_01">
         <h2 id="glb-travel-lp-h2">14.99ドルで、旅行中の準備と会話を安心して使える状態に。</h2>
         <p class="glb-travel-lp-lead">Coreに加えて、旅行で必要な導線を30日間まとめて使える一回購入のパスです。</p>
         <ul class="glb-travel-lp-merits">
@@ -416,11 +416,15 @@
             <li><strong>[課金で損しない]</strong> 30日買い切り。自動更新なし。期間後は $2.99/月の Core に戻ります。</li>
         </ul>
         <p class="glb-travel-lp-reassure">30日の買い切り（自動更新なし）です。期限後は Core（$2.99）に戻ります。</p>
-        <a href="https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v" class="btn glb-travel-lp-cta" id="glb-travel-lp-cta-btn">14.99ドルで30日間のTravel Passを購入する</a>
-        <span class="glb-travel-lp-en">One-time 30-day pass · no auto-renewal · returns to your $2.99/mo Core after the window</span>
+        <button type="button" class="btn glb-travel-lp-cta" id="glb-travel-lp-cta-btn" disabled aria-disabled="true" style="opacity:.65; cursor:not-allowed;">Travel Pass は準備中（Coming Soon）</button>
+        <span class="glb-travel-lp-en">Purchase is temporarily disabled. We will reopen once Travel is release-ready.</span>
+        <div class="maintenance-card" role="status" aria-live="polite" style="margin-top:14px; border:1px solid rgba(245,230,184,.35); background:rgba(26,24,18,.72);">
+            <h2 style="margin:0 0 8px; font-size:16px;">Travel Pass 準備中</h2>
+            <p style="margin:0; font-size:12px; color:#d6c999;">現在は Core（$2.99）を先行提供中です。Travel販売は一時停止しています。</p>
+        </div>
     </section>
 
-    <div class="glb-billboard">
+    <div class="glb-billboard" style="display:none;" aria-hidden="true">
         <div class="glb-billboard-tools">
             <button type="button" class="glb-flip-btn" id="glb-flip-btn">Flip</button>
         </div>
@@ -429,7 +433,7 @@
         </div>
     </div>
 
-    <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #2a2a2a; text-align: left;">
+    <div style="display:none; margin-top: 8px; padding-top: 12px; border-top: 1px solid #2a2a2a; text-align: left;" aria-hidden="true">
         <div class="trans-section-head" id="t-trans-head">Translation</div>
         <label for="ui-lang" style="display:block; font-size: 11px; color: #888; margin-bottom: 6px;" id="label-ui-lang">Language</label>
         <select id="ui-lang" class="lang-select" aria-label="App language">
@@ -507,7 +511,7 @@
                 <p id="t-travel-layer-body" style="font-size:12px; color:#aaa; text-align:left; margin:0 0 12px; line-height:1.45;"></p>
             </div>
             <div id="glb-travel-mini-row" class="glb-travel-mini-row" style="display:none;">
-                <a href="https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v" class="glb-travel-mini-link" id="t-btn-travel-mini" style="font-size:12px;">$14.99</a>
+                <span class="glb-travel-mini-link" id="t-btn-travel-mini" style="font-size:12px; opacity:.65; pointer-events:none;">Coming Soon</span>
                 <span class="glb-travel-mini-hint" id="t-travel-mini-hint"></span>
             </div>
         </div>
@@ -540,7 +544,7 @@
         var GLB_PROJECT_PUBLIC_ROOT = 'https://nextbase-one-ha.github.io/nextbase-world/';
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
         var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-        const APP_VERSION = '2026.04.22.travel.mktg.1';
+        const APP_VERSION = '2026.04.22.core.cleanup.1';
         var GLB_COREFLOW_CONFIG = {
             API_BASE: 'https://smile-friend-engine-125142687526.us-central1.run.app',
             STRIPE_CORE: 'https://buy.stripe.com/bJedRbefH5yogzZfuDasg09',
@@ -1230,9 +1234,9 @@
                 linkSupport: 'Support',
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '',
-                travelMiniLink: '$14.99',
-                travelMiniHint: 'Requires LIFE subscription.',
-                travelExtendLink: 'Extend +30 days',
+                travelMiniLink: 'Coming Soon',
+                travelMiniHint: 'Travel sales are temporarily paused.',
+                travelExtendLink: 'Coming Soon',
                 travelExtendHint: 'Adds 30 days from your current expiry (stacking).',
                 travelDaysLeft: 'Through {{date}}',
                 stripeHint: 'Secure checkout with Stripe.',
@@ -1281,9 +1285,9 @@
                 linkSupport: 'サポート',
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '',
-                travelMiniLink: '$14.99',
-                travelMiniHint: 'LIFE 購読が必要です。',
-                travelExtendLink: '延長 +30日',
+                travelMiniLink: '準備中',
+                travelMiniHint: 'トラベル販売は一時停止中です。',
+                travelExtendLink: '準備中',
                 travelExtendHint: '現在の期限から30日追加（累積延長）。',
                 travelDaysLeft: '{{date}} まで',
                 stripeHint: 'Stripe で安全に決済',
