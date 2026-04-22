@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<!-- nextbase-world · travel landing -->
+<!--
+  PROJECT_PUBLIC_ROOT: https://nextbase-one-ha.github.io/nextbase-world/
+  本ファイル: .../index.premium.html（Premium / 14.99 cancel 着地など）。
+  Stripe 正本は index.html DOCTYPE ブロックと同一。
+-->
 <html lang="en" class="notranslate" translate="no">
 <head>
     <meta charset="UTF-8">
@@ -456,12 +460,13 @@
             <span class="legal-sep" aria-hidden="true">|</span>
             <a href="https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00" id="link-cancel-subscription">Cancel Subscription</a>
         </div>
-        <p class="footer-copy" id="footer-copyright">&copy; 2026 GLB-Noir. All Rights Reserved. Patent Pending</p>
+        <p class="footer-copy" id="footer-copyright">&copy; 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending</p>
     </footer>
     </div>
 
     <script>
         if (typeof window.__GLB_PAGE_LAYER === 'undefined') window.__GLB_PAGE_LAYER = 'coreflow';
+        var GLB_PROJECT_PUBLIC_ROOT = 'https://nextbase-one-ha.github.io/nextbase-world/';
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
         var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
         const APP_VERSION = '2026.04.21.premium.2';
@@ -475,7 +480,10 @@
         const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
         const LS_TRAVEL_PENDING = 'glb_travel_pending';
         const LS_PENDING_SESSION_ID = 'GLB_PENDING_SESSION_ID';
-        const LS_BILLING_LOCK = 'glb_paid_lock_v1';
+        const LS_BILLING_STATE = 'glb_billing_state_v1';
+        const PLAN_CORE_299 = 'core_2_99';
+        const PLAN_TRAVEL_1499_30D = 'travel_14_99_30d';
+        const MS_30D = 30 * 24 * 60 * 60 * 1000;
         var GLB_CORE_SUBSCRIBED = false;
         var GLB_TRAVEL_ACTIVE = false;
         var GLB_TRAVEL_EXPIRES_AT = null;
@@ -484,33 +492,170 @@
         var GLB_SYSTEM_STATUS_TTL = 30000;
         var GLB_MAINTENANCE_ON = false;
 
-        function glbIsPaidFlag() {
+        function parseBillingState() {
             try {
-                var v = localStorage.getItem('glb_subscribed');
-                return v === '1' || v === 'true';
+                var raw = localStorage.getItem(LS_BILLING_STATE);
+                if (!raw) return null;
+                var o = JSON.parse(raw);
+                if (!o || typeof o !== 'object') return null;
+                return o;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function persistBillingState(patch) {
+            try {
+                var cur = parseBillingState() || {};
+                var next = {};
+                var k;
+                for (k in cur) {
+                    if (Object.prototype.hasOwnProperty.call(cur, k)) next[k] = cur[k];
+                }
+                for (k in patch) {
+                    if (Object.prototype.hasOwnProperty.call(patch, k)) next[k] = patch[k];
+                }
+                next.updatedAt = Date.now();
+                if (next.active === false) next.plan = null;
+                localStorage.setItem(LS_BILLING_STATE, JSON.stringify(next));
+                try { localStorage.removeItem('glb_subscribed'); localStorage.removeItem('glb_paid_lock_v1'); } catch (eRm) { /* ignore */ }
+            } catch (e) { /* ignore */ }
+        }
+
+        function clearBillingStateStorage() {
+            try {
+                localStorage.removeItem(LS_BILLING_STATE);
+                localStorage.removeItem('glb_subscribed');
+                localStorage.removeItem('glb_paid_lock_v1');
+            } catch (e) { /* ignore */ }
+        }
+
+        (function migrateLegacyBillingToState() {
+            try {
+                var cur = parseBillingState();
+                var hasState = !!(cur && typeof cur.active === 'boolean');
+                var legV = '';
+                var legLock = false;
+                try {
+                    legV = localStorage.getItem('glb_subscribed') || '';
+                    legLock = localStorage.getItem('glb_paid_lock_v1') === '1';
+                } catch (e0) { /* ignore */ }
+                var legacyPaid = legV === '1' || legV === 'true' || legLock;
+                if (!hasState && legacyPaid) {
+                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'migration_legacy', updatedAt: Date.now() });
+                }
+                if (parseBillingState()) {
+                    localStorage.removeItem('glb_subscribed');
+                    localStorage.removeItem('glb_paid_lock_v1');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+
+        function glbCorePaidActive() {
+            var s = parseBillingState();
+            if (!s || s.active !== true) return false;
+            return s.plan === PLAN_CORE_299 || s.plan === PLAN_TRAVEL_1499_30D;
+        }
+
+        function getTravelPassState() {
+            var s = parseBillingState();
+            return (s && s.travelPass && typeof s.travelPass === 'object') ? s.travelPass : null;
+        }
+
+        function isTravelPassActive(nowMs) {
+            nowMs = nowMs || Date.now();
+            var s = parseBillingState();
+            if (!s || s.active !== true || s.plan !== PLAN_TRAVEL_1499_30D) return false;
+            var tp = getTravelPassState();
+            if (!tp || tp.enabled !== true) return false;
+            if (tp.expired === true) return false;
+            var exp = Number(tp.expiresAt || 0);
+            if (!exp || !isFinite(exp)) return false;
+            return nowMs < exp;
+        }
+
+        function expireTravelPassIfNeeded() {
+            try {
+                var now = Date.now();
+                var s = parseBillingState();
+                if (!s || s.active !== true) return false;
+                if (s.plan !== PLAN_TRAVEL_1499_30D) return false;
+                var tp = getTravelPassState();
+                var exp = tp ? Number(tp.expiresAt || 0) : 0;
+                if (!exp || !isFinite(exp)) return false;
+                if (now < exp) return false;
+                persistBillingState({
+                    plan: PLAN_CORE_299,
+                    active: true,
+                    source: 'travel_expired',
+                    travelPass: {
+                        enabled: false,
+                        startedAt: tp ? tp.startedAt : null,
+                        expiresAt: exp,
+                        expired: true,
+                        timeSource: tp ? (tp.timeSource || 'local_pending_sync') : 'local_pending_sync'
+                    }
+                });
+                return true;
             } catch (e) {
                 return false;
             }
         }
 
-        (function primePaidLockFromUrl() {
+        function glbIsPaidFlag() {
+            return glbCorePaidActive();
+        }
+
+        (function primeBillingFromUrl() {
             try {
                 var u = new URL(window.location.href);
                 var sid = (u.searchParams.get('session_id') || '').trim();
-                if (sid) {
-                    localStorage.setItem('glb_subscribed', 'true');
-                    localStorage.setItem(LS_BILLING_LOCK, '1');
+                var subq = u.searchParams.get('subscribed');
+                var isTravelRedirect = u.searchParams.get('travel') === '1';
+                if (sid && isTravelRedirect) {
+                    var startedAt = Date.now();
+                    persistBillingState({
+                        plan: PLAN_TRAVEL_1499_30D,
+                        active: true,
+                        source: 'stripe_success',
+                        travelPass: {
+                            enabled: true,
+                            startedAt: startedAt,
+                            expiresAt: startedAt + MS_30D,
+                            expired: false,
+                            timeSource: 'local_pending_sync'
+                        }
+                    });
+                } else if (sid) {
+                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'stripe_success', updatedAt: Date.now() });
+                } else if (subq === '1' || subq === 'true') {
+                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'url_subscribed', updatedAt: Date.now() });
                 }
             } catch (e) { /* ignore */ }
         })();
 
         (function prehideLimitedUiWhenPaid() {
             try {
-                if (!glbIsPaidFlag() && localStorage.getItem(LS_BILLING_LOCK) !== '1') return;
+                if (!glbCorePaidActive()) return;
                 var st = document.createElement('style');
                 st.id = 'glb-paid-mode-style';
                 st.textContent = '#t-free-quota,#subscribe-area,#glb-coreflow-entry-cta{display:none !important;}';
                 document.head.appendChild(st);
+            } catch (e) { /* ignore */ }
+        })();
+
+        /** 失効は Core へ戻して index.next へ。Core 未課金は index へ。 */
+        (function guardPremiumEntitlements() {
+            try {
+                var u = new URL(window.location.href);
+                if ((u.searchParams.get('nori') || '') === 'admin') return;
+                if (expireTravelPassIfNeeded()) {
+                    window.location.replace(new URL('index.next.html', window.location.href).href);
+                    return;
+                }
+                if (!glbCorePaidActive()) {
+                    window.location.replace(new URL('index.html', window.location.href).href);
+                }
             } catch (e) { /* ignore */ }
         })();
 
@@ -604,7 +749,7 @@
 
         function updateEntitlementState(data) {
             if (data && data.ok) {
-                GLB_CORE_SUBSCRIBED = !!data.core_subscribed;
+                GLB_CORE_SUBSCRIBED = !!data.core_subscribed || glbCorePaidActive();
                 GLB_TRAVEL_ACTIVE = !!data.travel_active;
                 GLB_TRAVEL_EXPIRES_AT = data.travel_pass_expires_at ? String(data.travel_pass_expires_at) : null;
             }
@@ -693,18 +838,39 @@
             } catch (err) {
                 return null;
             }
-            if (data && data.ok) {
-                if (data.customer_id) {
-                    localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
-                    if (data.core_subscribed) {
-                        localStorage.setItem('glb_subscribed', '1');
-                        localStorage.setItem(LS_BILLING_LOCK, '1');
+            if (data && data.ok && data.customer_id) {
+                localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
+                if (data.core_subscribed && data.travel_active) {
+                    var expMs = 0;
+                    try { expMs = data.travel_pass_expires_at ? Date.parse(String(data.travel_pass_expires_at)) : 0; } catch (e0) { expMs = 0; }
+                    if (expMs && isFinite(expMs)) {
+                        persistBillingState({
+                            plan: PLAN_TRAVEL_1499_30D,
+                            active: true,
+                            source: 'entitlements_api',
+                            travelPass: {
+                                enabled: true,
+                                startedAt: expMs - MS_30D,
+                                expiresAt: expMs,
+                                expired: false,
+                                timeSource: 'entitlements_api'
+                            }
+                        });
                     } else {
-                        var keepLock = localStorage.getItem(LS_BILLING_LOCK) === '1';
-                        localStorage.setItem('glb_subscribed', keepLock ? '1' : '0');
+                        persistBillingState({ plan: PLAN_TRAVEL_1499_30D, active: true, source: 'entitlements_api', updatedAt: Date.now() });
                     }
-                    try { localStorage.removeItem(LS_PENDING_SESSION_ID); } catch (e) { /* ignore */ }
+                } else if (data.core_subscribed) {
+                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'entitlements_api', updatedAt: Date.now() });
+                } else {
+                    var st = parseBillingState();
+                    var holdCheckout = st && st.active && (st.source === 'stripe_success' || st.source === 'url_subscribed');
+                    if (holdCheckout) {
+                        persistBillingState({ plan: st.plan || PLAN_CORE_299, active: true, source: st.source, updatedAt: Date.now(), travelPass: st.travelPass });
+                    } else {
+                        persistBillingState({ plan: null, active: false, source: 'entitlements_api', updatedAt: Date.now() });
+                    }
                 }
+                try { localStorage.removeItem(LS_PENDING_SESSION_ID); } catch (e) { /* ignore */ }
                 updateEntitlementState(data);
                 if (typeof refreshFreeQuotaDisplay === 'function') refreshFreeQuotaDisplay();
                 if (typeof refreshSubscriptionUi === 'function') refreshSubscriptionUi();
@@ -920,7 +1086,7 @@
                 linkPrivacy: 'Privacy Policy',
                 linkLegal: 'Legal',
                 linkSupport: 'Support',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '',
                 travelMiniLink: '$14.99',
                 travelMiniHint: 'Requires LIFE subscription.',
@@ -971,7 +1137,7 @@
                 linkPrivacy: 'プライバシーポリシー',
                 linkLegal: '法的情報',
                 linkSupport: 'サポート',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '',
                 travelMiniLink: '$14.99',
                 travelMiniHint: 'LIFE 購読が必要です。',
@@ -1008,7 +1174,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / 月', pricingLi1: '<strong>$2.99/月</strong> — 订阅后云端翻译无限制。免费每日最多 3 次（试用）。', pricingNote: '为手机优化；每日 3 次免费，需要无限制可订阅。',
                 linkTerms: '服务条款', linkPrivacy: '隐私政策', linkLegal: '法律信息', linkSupport: '支持',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '订阅（$2.99/月）', stripeHint: 'Stripe 安全支付',
                 dictPlaceholder: '词典搜索…', dictResult: '结果', dictLoaded: '已加载', dictFail: '加载失败', noMatch: '无',
                 transHead: '翻译', phNormal: '输入要翻译的文字', sendBtn: 'GLB', idle: '就绪',
@@ -1024,7 +1190,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / 월', pricingLi1: '<strong>$2.99/월</strong> — 구독 시 클라우드 번역 무제한. 무료는 하루 최대 3회.', pricingNote: '모바일 화면에 맞춤. 매일 3회 무료 → 무제한은 구독.',
                 linkTerms: '이용약관', linkPrivacy: '개인정보 처리방침', linkLegal: '법적 고지', linkSupport: '지원',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '구독 ($2.99/월)', stripeHint: 'Stripe 결제',
                 dictPlaceholder: '사전 검색…', dictResult: '결과', dictLoaded: '로드됨', dictFail: '실패', noMatch: '없음',
                 transHead: '번역', phNormal: '번역할 문장', sendBtn: 'GLB', idle: '대기',
@@ -1040,7 +1206,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / mes', pricingLi1: '<strong>$2.99/mes</strong> — Ilimitado con suscripción. Gratis: hasta 3/día.', pricingNote: 'Pensado para móvil: 3 pruebas/día, luego $2.99/mes ilimitado.',
                 linkTerms: 'Términos', linkPrivacy: 'Privacidad', linkLegal: 'Legal', linkSupport: 'Soporte',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'Suscribirse ($2.99/mes)', stripeHint: 'Pago con Stripe',
                 dictPlaceholder: 'Buscar…', dictResult: 'Resultados', dictLoaded: 'Listo', dictFail: 'Error', noMatch: 'Nada',
                 transHead: 'Traducción', phNormal: 'Texto a traducir', sendBtn: 'GLB', idle: 'Listo',
@@ -1056,7 +1222,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / mois', pricingLi1: '<strong>$2.99/mois</strong> — Illimité avec abonnement. Gratuit : jusqu’à 3/jour.', pricingNote: 'Mobile : 3 essais/jour, puis abonnement illimité.',
                 linkTerms: 'Conditions', linkPrivacy: 'Confidentialité', linkLegal: 'Mentions légales', linkSupport: 'Assistance',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'S’abonner ($2.99/mois)', stripeHint: 'Paiement Stripe',
                 dictPlaceholder: 'Recherche…', dictResult: 'Résultats', dictLoaded: 'Chargé', dictFail: 'Échec', noMatch: 'Rien',
                 transHead: 'Traduction', phNormal: 'Texte à traduire', sendBtn: 'GLB', idle: 'Prêt',
@@ -1072,7 +1238,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / Monat', pricingLi1: '<strong>$2.99/Monat</strong> — Mit Abo unbegrenzt. Kostenlos: bis zu 3× pro Tag.', pricingNote: 'Fürs Handy: 3 Tests/Tag, dann Abo.',
                 linkTerms: 'AGB', linkPrivacy: 'Datenschutz', linkLegal: 'Impressum', linkSupport: 'Support',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'Abonnieren ($2.99/Monat)', stripeHint: 'Stripe-Zahlung',
                 dictPlaceholder: 'Suche…', dictResult: 'Ergebnis', dictLoaded: 'Geladen', dictFail: 'Fehler', noMatch: 'Kein Treffer',
                 transHead: 'Übersetzung', phNormal: 'Text eingeben', sendBtn: 'GLB', idle: 'Bereit',
@@ -1088,7 +1254,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / เดือน', pricingLi1: '<strong>$2.99/เดือน</strong> — สมาชิกแปลไม่จำกัด ฟรีวันละสูงสุด 3 ครั้ง', pricingNote: 'ออกแบบให้มือถือ — ฟรี 3 ครั้ง/วัน แล้วสมัครได้',
                 linkTerms: 'ข้อกำหนด', linkPrivacy: 'ความเป็นส่วนตัว', linkLegal: 'กฎหมาย', linkSupport: 'ช่วยเหลือ',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'สมัคร ($2.99/เดือน)', stripeHint: 'ชำระด้วย Stripe',
                 dictPlaceholder: 'ค้นหา…', dictResult: 'ผลลัพธ์', dictLoaded: 'โหลดแล้ว', dictFail: 'ล้มเหลว', noMatch: 'ไม่พบ',
                 transHead: 'แปล', phNormal: 'ข้อความที่จะแปล', sendBtn: 'GLB', idle: 'พร้อม',
@@ -1104,7 +1270,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / tháng', pricingLi1: '<strong>$2.99/tháng</strong> — Thuê bao thì không giới hạn. Miễn phí tối đa 3 lần/ngày.', pricingNote: 'Tối ưu cho điện thoại — 3 lần miễn phí/ngày, sau đó đăng ký.',
                 linkTerms: 'Điều khoản', linkPrivacy: 'Riêng tư', linkLegal: 'Pháp lý', linkSupport: 'Hỗ trợ',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'Đăng ký ($2.99/tháng)', stripeHint: 'Thanh toán Stripe',
                 dictPlaceholder: 'Tìm…', dictResult: 'Kết quả', dictLoaded: 'Đã tải', dictFail: 'Lỗi', noMatch: 'Không có',
                 transHead: 'Dịch', phNormal: 'Nhập văn bản', sendBtn: 'GLB', idle: 'Sẵn sàng',
@@ -1171,7 +1337,7 @@
 
         function isGlbUnlimited() {
             try {
-                return glbIsPaidFlag() || localStorage.getItem(LS_BILLING_LOCK) === '1';
+                return glbCorePaidActive();
             } catch (e) {
                 return false;
             }
@@ -1426,8 +1592,7 @@
             if (!cancel) return;
             cancel.addEventListener('click', function () {
                 try {
-                    localStorage.removeItem('glb_subscribed');
-                    localStorage.removeItem(LS_BILLING_LOCK);
+                    clearBillingStateStorage();
                 } catch (e) { /* ignore */ }
             });
         })();

@@ -48,12 +48,14 @@
 
     <h2>Billing and subscriptions</h2>
     <p>For payment receipts, refunds where eligible, and subscription status, use the tools provided by the checkout provider shown at purchase time. GLB does not handle card data directly.</p>
+    <p>Standard mode (2.99 USD / month) is subscription-based and can be cancelled via Stripe Customer Portal.</p>
+    <p>Travel mode (14.99 USD / 30 days) is a one-time 30-day purchase and does not require cancellation.</p>
     <div class="box">
       <p><strong>Cancel subscription (self-service, no support email needed)</strong></p>
       <p>1) Open <a href="https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00">Subscription management / cancel</a></p>
       <p>2) Sign in with the email used at purchase</p>
       <p>3) Choose <strong>Cancel plan</strong></p>
-      <p>This flow is available anytime. Cancellation and payment-method updates are handled directly in Stripe Customer Portal.</p>
+      <p>This flow applies to subscription-based plans. Payment-method updates are handled directly in Stripe Customer Portal.</p>
     </div>
     <div class="box support-section">
       <p><strong>Status Reload / 課金ステータスの再読込</strong></p>
@@ -79,7 +81,7 @@
     <h2>Response times</h2>
     <p>We aim to respond to reasonable inquiries within several business days. Complex legal or regulatory requests may take longer.</p>
 
-    <p class="note">© 2026 GLB-Noir. All Rights Reserved. Patent Pending</p>
+    <p class="note">© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending</p>
   </div>
   <script>
     (function billingStatusSync() {
@@ -108,7 +110,13 @@
           var data = await res.json();
           if (!data || data.ok !== true) throw new Error("entitlements_not_ok");
           if (data.customer_id) localStorage.setItem("GLB_CUSTOMER_ID", String(data.customer_id));
-          localStorage.setItem("glb_subscribed", data.core_subscribed ? "1" : "0");
+          var now = Date.now();
+          if (data.core_subscribed) {
+            localStorage.setItem("glb_billing_state_v1", JSON.stringify({ plan: "core_2_99", active: true, source: "entitlements_api", updatedAt: now }));
+          } else {
+            localStorage.setItem("glb_billing_state_v1", JSON.stringify({ plan: null, active: false, source: "entitlements_api", updatedAt: now }));
+          }
+          try { localStorage.removeItem("glb_subscribed"); localStorage.removeItem("glb_paid_lock_v1"); } catch (e) {}
           setStatus(data.core_subscribed ? "Synced: paid mode is active. / 同期完了: 課金モードです。" : "Synced: free mode is active. / 同期完了: 無料モードです。");
         } catch (e) {
           setStatus("Could not sync right now. Please retry. / 今は同期できません。再試行してください。");

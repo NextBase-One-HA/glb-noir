@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<!-- nextbase-world · index.coreflow.html — $2.99/月 コア契約者向け「対面特化」: マイク聞き取り・翻訳・訳の読み上げ。通常は index.next（$2.99購入・entitlements 同期）からリダイレクト。返信URL: ?subscribed=1&session_id=… -->
+<!--
+  PROJECT_PUBLIC_ROOT: https://nextbase-one-ha.github.io/nextbase-world/
+  本ファイル: .../travel.html（14.99 Travel 30-Day Pass UI）。Stripe 14.99 success は必ず
+  .../travel.html?travel=1&session_id={CHECKOUT_SESSION_ID}（Dashboard 絶対URL）。
+  14.99 cancel 正本: .../index.premium.html（index.html の DOCTYPE と同一表を参照）。
+-->
 <html lang="en" class="notranslate" translate="no">
 <head>
     <meta charset="UTF-8">
@@ -421,6 +426,183 @@
             line-height: 1.45;
             text-align: left;
         }
+
+        /* PHASE_TRAVEL_UI_30DAY_PLAN_03 — 6大カテゴリ */
+        .glb-travel-six {
+            margin: 14px 0 18px;
+            padding: 12px 10px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 230, 100, 0.22);
+            background: radial-gradient(ellipse 100% 80% at 50% 0%, rgba(255, 210, 60, 0.06) 0%, #101010 55%);
+            text-align: left;
+        }
+        .glb-travel-six-title {
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #b9a66a;
+            margin: 0 0 10px;
+            font-weight: 700;
+        }
+        .glb-travel-six-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .glb-travel-tile {
+            min-height: 52px;
+            padding: 12px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 230, 100, 0.45);
+            background: #161616;
+            color: #fff8e8;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 0 12px rgba(255, 220, 100, 0.12);
+            line-height: 1.25;
+        }
+        .glb-travel-tile:active { opacity: 0.92; filter: brightness(1.06); }
+        .glb-travel-tile--emergency {
+            grid-column: 1 / -1;
+            min-height: 58px;
+            font-size: 15px;
+            border-color: rgba(255, 80, 80, 0.85);
+            background: linear-gradient(180deg, #2a1212 0%, #140606 100%);
+            color: #ffe8e8;
+            box-shadow:
+                0 0 22px rgba(255, 60, 60, 0.35),
+                inset 0 0 20px rgba(120, 20, 20, 0.25);
+        }
+        .glb-travel-cat-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 18000;
+            background: rgba(0, 0, 0, 0.72);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: max(12px, env(safe-area-inset-bottom));
+            box-sizing: border-box;
+        }
+        .glb-travel-cat-overlay.hidden { display: none !important; }
+        .glb-travel-cat-panel {
+            width: 100%;
+            max-width: min(560px, 100%);
+            max-height: min(88dvh, 720px);
+            overflow: auto;
+            border-radius: 16px 16px 10px 10px;
+            border: 1px solid rgba(255, 230, 100, 0.35);
+            background: #111;
+            padding: 14px 12px 12px;
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.55);
+        }
+        .glb-travel-cat-title {
+            margin: 0 0 10px;
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff4c8;
+            letter-spacing: 0.06em;
+        }
+        .glb-travel-cat-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .glb-travel-action-btn {
+            width: 100%;
+            padding: 12px 12px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            background: #1a1a1a;
+            color: #eee;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+            line-height: 1.35;
+            cursor: pointer;
+        }
+        .glb-travel-action-btn.is-selected {
+            border-color: rgba(255, 230, 100, 0.65);
+            box-shadow: 0 0 12px rgba(255, 210, 60, 0.15);
+        }
+        .glb-travel-action-sub {
+            display: block;
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        .glb-travel-action-ja {
+            display: block;
+            font-size: 13px;
+            color: #f2f2f2;
+        }
+        .glb-travel-cat-toolbar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #2a2a2a;
+        }
+        .glb-travel-cat-toolbar button {
+            min-height: 48px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 230, 100, 0.45);
+            background: linear-gradient(180deg, #fff6a8 0%, var(--gold) 45%, var(--gold-deep) 100%);
+            color: #0a0a06;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+        }
+        .glb-travel-cat-toolbar button.glb-travel-toolbar-muted {
+            background: #222;
+            color: #ddd;
+            border-color: #444;
+        }
+        .glb-travel-zoom-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 19000;
+            background: rgba(0, 0, 0, 0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .glb-travel-zoom-overlay.hidden { display: none !important; }
+        .glb-travel-zoom-inner {
+            width: 100%;
+            max-width: min(560px, 100%);
+            padding: 20px 16px;
+            border-radius: 14px;
+            border: 2px solid var(--gold);
+            background: #0b0b0b;
+        }
+        #glb-travel-zoom-text {
+            margin: 0 0 16px;
+            font-size: clamp(22px, 6.5vw, 34px);
+            line-height: 1.35;
+            font-weight: 800;
+            color: #fff;
+            text-align: center;
+            word-break: break-word;
+        }
+        #glb-travel-zoom-close {
+            width: 100%;
+            min-height: 48px;
+            border-radius: 12px;
+            border: 1px solid #555;
+            background: #222;
+            color: #eee;
+            font-weight: 700;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -440,6 +622,32 @@
     <p id="core-access-active" style="display:none; margin: 0 0 12px; color:#f5e6b8; font-size:12px; text-align:center; font-weight:700;">Core Access Active</p>
     <p id="travel-remaining-line" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
     <p id="travel-expiry-display" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
+
+    <!-- PHASE_TRAVEL_UI_30DAY_PLAN_03: 6カテゴリ即用タイル -->
+    <section id="glb-travel-six" class="glb-travel-six" aria-labelledby="glb-travel-six-heading">
+        <div id="glb-travel-six-heading" class="glb-travel-six-title">Travel phrases — tap a category</div>
+        <div id="glb-travel-six-grid" class="glb-travel-six-grid" role="navigation" aria-label="Six travel categories"></div>
+    </section>
+
+    <div id="glb-travel-cat-overlay" class="glb-travel-cat-overlay hidden" aria-hidden="true">
+        <div id="glb-travel-cat-panel" class="glb-travel-cat-panel" role="dialog" aria-modal="true" aria-labelledby="glb-travel-cat-title">
+            <h2 id="glb-travel-cat-title" class="glb-travel-cat-title"></h2>
+            <div id="glb-travel-cat-actions" class="glb-travel-cat-actions"></div>
+            <div class="glb-travel-cat-toolbar">
+                <button type="button" id="glb-travel-act-speaknow">今すぐ話す</button>
+                <button type="button" id="glb-travel-act-zoom">大きく表示</button>
+                <button type="button" id="glb-travel-act-tts">音声再生</button>
+                <button type="button" id="glb-travel-act-back" class="glb-travel-toolbar-muted">戻る</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="glb-travel-zoom-overlay" class="glb-travel-zoom-overlay hidden" aria-hidden="true">
+        <div class="glb-travel-zoom-inner">
+            <p id="glb-travel-zoom-text"></p>
+            <button type="button" id="glb-travel-zoom-close">閉じる</button>
+        </div>
+    </div>
 
     <div class="glb-billboard">
         <div class="glb-billboard-tools">
@@ -569,12 +777,13 @@
             <span class="legal-sep" aria-hidden="true">|</span>
             <a href="https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00" id="link-cancel-subscription">Cancel Subscription</a>
         </div>
-        <p class="footer-copy" id="footer-copyright">&copy; 2026 GLB-Noir. All Rights Reserved. Patent Pending</p>
+        <p class="footer-copy" id="footer-copyright">&copy; 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending</p>
     </footer>
     </div>
 
     <script>
         window.__GLB_PAGE_LAYER = 'coreflow';
+        var GLB_PROJECT_PUBLIC_ROOT = 'https://nextbase-one-ha.github.io/nextbase-world/';
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
         /** API 未デプロイ時・session 失敗時: Stripe 公式ポータル入口（支払い・解約） */
         var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
@@ -637,6 +846,10 @@
         function revokeExecution() {
             EXECUTION_ALLOWED = false;
         }
+        const LS_BILLING_STATE = 'glb_billing_state_v1';
+        const PLAN_CORE_299 = 'core_2_99';
+        const PLAN_TRAVEL_1499_30D = 'travel_14_99_30d';
+        const MS_30D = 30 * 24 * 60 * 60 * 1000;
         var GLB_CORE_SUBSCRIBED = false;
         var GLB_TRAVEL_ACTIVE = false;
         var GLB_TRAVEL_EXPIRES_AT = null;
@@ -644,6 +857,164 @@
         var GLB_SYSTEM_STATUS_AT = 0;
         var GLB_SYSTEM_STATUS_TTL = 30000;
         var GLB_MAINTENANCE_ON = false;
+
+        function parseBillingState() {
+            try {
+                var raw = localStorage.getItem(LS_BILLING_STATE);
+                if (!raw) return null;
+                var o = JSON.parse(raw);
+                if (!o || typeof o !== 'object') return null;
+                return o;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function persistBillingState(patch) {
+            try {
+                var cur = parseBillingState() || {};
+                var next = {};
+                var k;
+                for (k in cur) {
+                    if (Object.prototype.hasOwnProperty.call(cur, k)) next[k] = cur[k];
+                }
+                for (k in patch) {
+                    if (Object.prototype.hasOwnProperty.call(patch, k)) next[k] = patch[k];
+                }
+                next.updatedAt = Date.now();
+                if (next.active === false) next.plan = null;
+                localStorage.setItem(LS_BILLING_STATE, JSON.stringify(next));
+                try { localStorage.removeItem('glb_subscribed'); localStorage.removeItem('glb_paid_lock_v1'); } catch (eRm) { /* ignore */ }
+            } catch (e) { /* ignore */ }
+        }
+
+        function clearBillingStateStorage() {
+            try {
+                localStorage.removeItem(LS_BILLING_STATE);
+                localStorage.removeItem('glb_subscribed');
+                localStorage.removeItem('glb_paid_lock_v1');
+            } catch (e) { /* ignore */ }
+        }
+
+        (function migrateLegacyBillingToState() {
+            try {
+                var cur = parseBillingState();
+                var hasState = !!(cur && typeof cur.active === 'boolean');
+                var legV = '';
+                var legLock = false;
+                try {
+                    legV = localStorage.getItem('glb_subscribed') || '';
+                    legLock = localStorage.getItem('glb_paid_lock_v1') === '1';
+                } catch (e0) { /* ignore */ }
+                var legacyPaid = legV === '1' || legV === 'true' || legLock;
+                if (!hasState && legacyPaid) {
+                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'migration_legacy', updatedAt: Date.now() });
+                }
+                if (parseBillingState()) {
+                    localStorage.removeItem('glb_subscribed');
+                    localStorage.removeItem('glb_paid_lock_v1');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+
+        function glbCorePaidActive() {
+            var s = parseBillingState();
+            if (!s || s.active !== true) return false;
+            return s.plan === PLAN_CORE_299 || s.plan === PLAN_TRAVEL_1499_30D;
+        }
+
+        function getTravelPassState() {
+            var s = parseBillingState();
+            return (s && s.travelPass && typeof s.travelPass === 'object') ? s.travelPass : null;
+        }
+
+        function isTravelPassActive(nowMs) {
+            nowMs = nowMs || Date.now();
+            var s = parseBillingState();
+            if (!s || s.active !== true || s.plan !== PLAN_TRAVEL_1499_30D) return false;
+            var tp = getTravelPassState();
+            if (!tp || tp.enabled !== true) return false;
+            if (tp.expired === true) return false;
+            var exp = Number(tp.expiresAt || 0);
+            if (!exp || !isFinite(exp)) return false;
+            return nowMs < exp;
+        }
+
+        function expireTravelPassIfNeeded() {
+            try {
+                var now = Date.now();
+                var s = parseBillingState();
+                if (!s || s.active !== true) return false;
+                if (s.plan !== PLAN_TRAVEL_1499_30D) return false;
+                var tp = getTravelPassState();
+                var exp = tp ? Number(tp.expiresAt || 0) : 0;
+                if (!exp || !isFinite(exp)) return false;
+                if (now < exp) return false;
+                persistBillingState({
+                    plan: PLAN_CORE_299,
+                    active: true,
+                    source: 'travel_expired',
+                    travelPass: {
+                        enabled: false,
+                        startedAt: tp ? tp.startedAt : null,
+                        expiresAt: exp,
+                        expired: true,
+                        timeSource: tp ? (tp.timeSource || 'local_pending_sync') : 'local_pending_sync'
+                    }
+                });
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        (function primeBillingFromUrl() {
+            try {
+                var u = new URL(window.location.href);
+                var sid = (u.searchParams.get('session_id') || '').trim();
+                var subq = u.searchParams.get('subscribed');
+                var isTravelRedirect = u.searchParams.get('travel') === '1';
+                if (sid && isTravelRedirect) {
+                    var startedAt = Date.now();
+                    persistBillingState({
+                        plan: PLAN_TRAVEL_1499_30D,
+                        active: true,
+                        source: 'stripe_success',
+                        travelPass: {
+                            enabled: true,
+                            startedAt: startedAt,
+                            expiresAt: startedAt + MS_30D,
+                            expired: false,
+                            timeSource: 'local_pending_sync'
+                        }
+                    });
+                } else if (sid) {
+                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'stripe_success', updatedAt: Date.now() });
+                } else if (subq === '1' || subq === 'true') {
+                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'url_subscribed', updatedAt: Date.now() });
+                }
+            } catch (e) { /* ignore */ }
+        })();
+
+        /** travel/coreflow は Travel Pass 専用。失効は Core へ戻して index.next へ、未課金は index へ。 */
+        (function guardTravelRequiresActiveTravelPass() {
+            try {
+                var u = new URL(window.location.href);
+                if ((u.searchParams.get('nori') || '') === 'admin') return;
+                if (expireTravelPassIfNeeded()) {
+                    window.location.replace(new URL('index.next.html', window.location.href).href);
+                    return;
+                }
+                if (!glbCorePaidActive()) {
+                    window.location.replace(new URL('index.html', window.location.href).href);
+                    return;
+                }
+                if (!isTravelPassActive()) {
+                    window.location.replace(new URL('index.next.html', window.location.href).href);
+                    return;
+                }
+            } catch (e) { /* ignore */ }
+        })();
 
         function compareVersion(a, b) {
             var aa = String(a || '').split('.');
@@ -735,7 +1106,7 @@
 
         function updateEntitlementState(data) {
             if (data && data.ok) {
-                GLB_CORE_SUBSCRIBED = !!data.core_subscribed;
+                GLB_CORE_SUBSCRIBED = !!data.core_subscribed || glbCorePaidActive();
                 GLB_TRAVEL_ACTIVE = !!data.travel_active;
                 GLB_TRAVEL_EXPIRES_AT = data.travel_pass_expires_at ? String(data.travel_pass_expires_at) : null;
             }
@@ -815,8 +1186,39 @@
             if (data && data.ok) {
                 if (data.customer_id) {
                     localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
-                    localStorage.setItem('glb_subscribed', data.core_subscribed ? '1' : '0');
                     try { localStorage.removeItem(LS_PENDING_SESSION_ID); } catch (e) { /* ignore */ }
+                }
+                if (data.core_subscribed && data.travel_active) {
+                    var expMs = 0;
+                    try { expMs = data.travel_pass_expires_at ? Date.parse(String(data.travel_pass_expires_at)) : 0; } catch (e0) { expMs = 0; }
+                    if (expMs && isFinite(expMs)) {
+                        persistBillingState({
+                            plan: PLAN_TRAVEL_1499_30D,
+                            active: true,
+                            source: 'entitlements_api',
+                            travelPass: {
+                                enabled: true,
+                                startedAt: expMs - MS_30D,
+                                expiresAt: expMs,
+                                expired: false,
+                                timeSource: 'entitlements_api'
+                            }
+                        });
+                    } else {
+                        persistBillingState({ plan: PLAN_TRAVEL_1499_30D, active: true, source: 'entitlements_api', updatedAt: Date.now() });
+                    }
+                } else if (data.core_subscribed) {
+                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'entitlements_api', updatedAt: Date.now() });
+                } else {
+                    var st = parseBillingState();
+                    var holdCheckout = st && st.active && (st.source === 'stripe_success' || st.source === 'url_subscribed');
+                    if (holdCheckout) {
+                        persistBillingState({ plan: st.plan || PLAN_CORE_299, active: true, source: st.source, updatedAt: Date.now(), travelPass: st.travelPass });
+                    } else if (st && st.active && st.source === 'migration_legacy' && !(data.customer_id && data.ok)) {
+                        persistBillingState({ plan: st.plan || PLAN_CORE_299, active: true, source: 'migration_legacy', updatedAt: Date.now(), travelPass: st.travelPass });
+                    } else {
+                        persistBillingState({ plan: null, active: false, source: 'entitlements_api', updatedAt: Date.now() });
+                    }
                 }
                 updateEntitlementState(data);
                 if (typeof refreshFreeQuotaDisplay === 'function') refreshFreeQuotaDisplay();
@@ -1031,7 +1433,7 @@
                 linkPrivacy: 'Privacy Policy',
                 linkLegal: 'Legal',
                 linkSupport: 'Support',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '',
                 travelMiniLink: '$14.99',
                 travelMiniHint: 'Requires LIFE subscription.',
@@ -1091,7 +1493,7 @@
                 linkPrivacy: 'プライバシーポリシー',
                 linkLegal: '法的情報',
                 linkSupport: 'サポート',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '',
                 travelMiniLink: '$14.99',
                 travelMiniHint: 'LIFE 購読が必要です。',
@@ -1138,7 +1540,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / 月', pricingLi1: '<strong>$2.99/月</strong> — 订阅后云端翻译无限制。免费每日最多 3 次（试用）。', pricingNote: '为手机优化；每日 3 次免费，需要无限制可订阅。',
                 linkTerms: '服务条款', linkPrivacy: '隐私政策', linkLegal: '法律信息', linkSupport: '支持',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '订阅（$2.99/月）', stripeHint: 'Stripe 安全支付',
                 dictPlaceholder: '词典搜索…', dictResult: '结果', dictLoaded: '已加载', dictFail: '加载失败', noMatch: '无',
                 transHead: '翻译', phNormal: '输入要翻译的文字', sendBtn: 'GLB', idle: '就绪',
@@ -1154,7 +1556,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / 월', pricingLi1: '<strong>$2.99/월</strong> — 구독 시 클라우드 번역 무제한. 무료는 하루 최대 3회.', pricingNote: '모바일 화면에 맞춤. 매일 3회 무료 → 무제한은 구독.',
                 linkTerms: '이용약관', linkPrivacy: '개인정보 처리방침', linkLegal: '법적 고지', linkSupport: '지원',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '구독 ($2.99/월)', stripeHint: 'Stripe 결제',
                 dictPlaceholder: '사전 검색…', dictResult: '결과', dictLoaded: '로드됨', dictFail: '실패', noMatch: '없음',
                 transHead: '번역', phNormal: '번역할 문장', sendBtn: 'GLB', idle: '대기',
@@ -1170,7 +1572,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / mes', pricingLi1: '<strong>$2.99/mes</strong> — Ilimitado con suscripción. Gratis: hasta 3/día.', pricingNote: 'Pensado para móvil: 3 pruebas/día, luego $2.99/mes ilimitado.',
                 linkTerms: 'Términos', linkPrivacy: 'Privacidad', linkLegal: 'Legal', linkSupport: 'Soporte',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'Suscribirse ($2.99/mes)', stripeHint: 'Pago con Stripe',
                 dictPlaceholder: 'Buscar…', dictResult: 'Resultados', dictLoaded: 'Listo', dictFail: 'Error', noMatch: 'Nada',
                 transHead: 'Traducción', phNormal: 'Texto a traducir', sendBtn: 'GLB', idle: 'Listo',
@@ -1186,7 +1588,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / mois', pricingLi1: '<strong>$2.99/mois</strong> — Illimité avec abonnement. Gratuit : jusqu’à 3/jour.', pricingNote: 'Mobile : 3 essais/jour, puis abonnement illimité.',
                 linkTerms: 'Conditions', linkPrivacy: 'Confidentialité', linkLegal: 'Mentions légales', linkSupport: 'Assistance',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'S’abonner ($2.99/mois)', stripeHint: 'Paiement Stripe',
                 dictPlaceholder: 'Recherche…', dictResult: 'Résultats', dictLoaded: 'Chargé', dictFail: 'Échec', noMatch: 'Rien',
                 transHead: 'Traduction', phNormal: 'Texte à traduire', sendBtn: 'GLB', idle: 'Prêt',
@@ -1202,7 +1604,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / Monat', pricingLi1: '<strong>$2.99/Monat</strong> — Mit Abo unbegrenzt. Kostenlos: bis zu 3× pro Tag.', pricingNote: 'Fürs Handy: 3 Tests/Tag, dann Abo.',
                 linkTerms: 'AGB', linkPrivacy: 'Datenschutz', linkLegal: 'Impressum', linkSupport: 'Support',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'Abonnieren ($2.99/Monat)', stripeHint: 'Stripe-Zahlung',
                 dictPlaceholder: 'Suche…', dictResult: 'Ergebnis', dictLoaded: 'Geladen', dictFail: 'Fehler', noMatch: 'Kein Treffer',
                 transHead: 'Übersetzung', phNormal: 'Text eingeben', sendBtn: 'GLB', idle: 'Bereit',
@@ -1218,7 +1620,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / เดือน', pricingLi1: '<strong>$2.99/เดือน</strong> — สมาชิกแปลไม่จำกัด ฟรีวันละสูงสุด 3 ครั้ง', pricingNote: 'ออกแบบให้มือถือ — ฟรี 3 ครั้ง/วัน แล้วสมัครได้',
                 linkTerms: 'ข้อกำหนด', linkPrivacy: 'ความเป็นส่วนตัว', linkLegal: 'กฎหมาย', linkSupport: 'ช่วยเหลือ',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'สมัคร ($2.99/เดือน)', stripeHint: 'ชำระด้วย Stripe',
                 dictPlaceholder: 'ค้นหา…', dictResult: 'ผลลัพธ์', dictLoaded: 'โหลดแล้ว', dictFail: 'ล้มเหลว', noMatch: 'ไม่พบ',
                 transHead: 'แปล', phNormal: 'ข้อความที่จะแปล', sendBtn: 'GLB', idle: 'พร้อม',
@@ -1234,7 +1636,7 @@
                 langFlowHint: '',
                 pricingH2: '$2.99 / tháng', pricingLi1: '<strong>$2.99/tháng</strong> — Thuê bao thì không giới hạn. Miễn phí tối đa 3 lần/ngày.', pricingNote: 'Tối ưu cho điện thoại — 3 lần miễn phí/ngày, sau đó đăng ký.',
                 linkTerms: 'Điều khoản', linkPrivacy: 'Riêng tư', linkLegal: 'Pháp lý', linkSupport: 'Hỗ trợ',
-                footerCopyright: '© 2026 GLB-Noir. All Rights Reserved. Patent Pending',
+                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'Đăng ký ($2.99/tháng)', stripeHint: 'Thanh toán Stripe',
                 dictPlaceholder: 'Tìm…', dictResult: 'Kết quả', dictLoaded: 'Đã tải', dictFail: 'Lỗi', noMatch: 'Không có',
                 transHead: 'Dịch', phNormal: 'Nhập văn bản', sendBtn: 'GLB', idle: 'Sẵn sàng',
@@ -1301,7 +1703,7 @@
 
         function isGlbUnlimited() {
             try {
-                return localStorage.getItem('glb_subscribed') === '1';
+                return glbCorePaidActive();
             } catch (e) {
                 return false;
             }
@@ -1666,6 +2068,16 @@
             if (!btn) return;
             btn.addEventListener('click', function () {
                 openManageSubscription();
+            });
+        })();
+
+        (function bindCancelSubscriptionLockDrop() {
+            var cancel = document.getElementById('link-cancel-subscription');
+            if (!cancel) return;
+            cancel.addEventListener('click', function () {
+                try {
+                    clearBillingStateStorage();
+                } catch (e) { /* ignore */ }
             });
         })();
 
@@ -2222,6 +2634,229 @@
                     if (!tx || tx === T('idle') || tx === T('sending')) return;
                     var p = currentPair();
                     try { glbSpeakText(tx, p.tgt); } catch (h) { setResultText(renderHold(h), '#c99', '0'); }
+                });
+            }
+        })();
+
+        /** PHASE_TRAVEL_UI_30DAY_PLAN_03 — 定義はこのオブジェクトのみ（証拠用） */
+        var GLB_TRAVEL_SIX_PHRASES = [
+            {
+                id: 'emergency',
+                label: 'Emergency',
+                emergency: true,
+                actions: [
+                    { labelJa: '助けて', phraseEn: 'Help! I need help right now.' },
+                    { labelJa: '警察', phraseEn: 'Please call the police.' },
+                    { labelJa: '病院', phraseEn: 'I need a hospital or emergency medical help.' },
+                    { labelJa: '紛失/盗難', phraseEn: 'My passport was lost or stolen. Please help.' },
+                    { labelJa: '事故', phraseEn: 'There was an accident. Please send help.' },
+                    { labelJa: '家族/大使館連絡', phraseEn: 'I need to contact my family or embassy.' }
+                ]
+            },
+            {
+                id: 'airport',
+                label: 'Airport',
+                actions: [
+                    { labelJa: 'チェックイン', phraseEn: 'Where is the check-in counter for my flight?' },
+                    { labelJa: '搭乗口確認', phraseEn: 'Which gate is my flight? Can you show me on the board?' },
+                    { labelJa: '荷物紛失', phraseEn: 'My luggage did not arrive. I need help finding it.' },
+                    { labelJa: '遅延/乗継', phraseEn: 'My flight is delayed. I need help with my connection.' },
+                    { labelJa: 'Wi-Fi/SIM', phraseEn: 'Where can I buy a SIM card or connect to Wi-Fi?' },
+                    { labelJa: 'トイレ/両替', phraseEn: 'Where is the restroom and currency exchange?' }
+                ]
+            },
+            {
+                id: 'immigration',
+                label: 'Immigration',
+                actions: [
+                    { labelJa: '入国審査', phraseEn: 'I am here for immigration inspection.' },
+                    { labelJa: '滞在目的', phraseEn: 'The purpose of my visit is tourism.' },
+                    { labelJa: '宿泊先説明', phraseEn: 'I will stay at this hotel address.' },
+                    { labelJa: '書類不足', phraseEn: 'I am missing a document. What should I do?' },
+                    { labelJa: '税関', phraseEn: 'Do I need to declare anything at customs?' },
+                    { labelJa: '指紋/写真案内', phraseEn: 'Where do I go for fingerprints and photos?' }
+                ]
+            },
+            {
+                id: 'taxi',
+                label: 'Taxi',
+                actions: [
+                    { labelJa: '行き先表示', phraseEn: 'Please take me to this address.' },
+                    { labelJa: '料金確認', phraseEn: 'About how much will the fare be?' },
+                    { labelJa: 'メーター確認', phraseEn: 'Please use the meter.' },
+                    { labelJa: '遠回り拒否', phraseEn: 'Please do not take a long route.' },
+                    { labelJa: '支払い方法', phraseEn: 'Can I pay by card or cash?' },
+                    { labelJa: '降車依頼', phraseEn: 'Please stop here.' }
+                ]
+            },
+            {
+                id: 'hotel',
+                label: 'Hotel',
+                actions: [
+                    { labelJa: 'チェックイン', phraseEn: 'I have a reservation. I would like to check in.' },
+                    { labelJa: '予約確認', phraseEn: 'Please confirm my reservation under this name.' },
+                    { labelJa: '部屋トラブル', phraseEn: 'There is a problem with my room.' },
+                    { labelJa: 'Wi-Fi', phraseEn: 'What is the Wi-Fi password?' },
+                    { labelJa: '延泊', phraseEn: 'I would like to extend my stay.' },
+                    { labelJa: 'チェックアウト', phraseEn: 'I would like to check out.' }
+                ]
+            },
+            {
+                id: 'restaurant',
+                label: 'Restaurant',
+                actions: [
+                    { labelJa: '人数', phraseEn: 'A table for two, please.' },
+                    { labelJa: '注文', phraseEn: 'I would like to order this.' },
+                    { labelJa: 'アレルギー', phraseEn: 'I have a food allergy. No nuts, please.' },
+                    { labelJa: 'おすすめ確認', phraseEn: 'What do you recommend?' },
+                    { labelJa: '会計', phraseEn: 'The bill, please.' },
+                    { labelJa: '持ち帰り', phraseEn: 'Takeaway, please.' }
+                ]
+            }
+        ];
+
+        (function initTravelSixUi() {
+            var grid = document.getElementById('glb-travel-six-grid');
+            var overlay = document.getElementById('glb-travel-cat-overlay');
+            var panel = document.getElementById('glb-travel-cat-panel');
+            var titleEl = document.getElementById('glb-travel-cat-title');
+            var actionsEl = document.getElementById('glb-travel-cat-actions');
+            var zoomOv = document.getElementById('glb-travel-zoom-overlay');
+            var zoomTxt = document.getElementById('glb-travel-zoom-text');
+            var btnSpeak = document.getElementById('glb-travel-act-speaknow');
+            var btnZoom = document.getElementById('glb-travel-act-zoom');
+            var btnTts = document.getElementById('glb-travel-act-tts');
+            var btnBack = document.getElementById('glb-travel-act-back');
+            var btnZoomClose = document.getElementById('glb-travel-zoom-close');
+            var curCatId = null;
+            var selPhraseEn = '';
+
+            function closeZoom() {
+                if (!zoomOv) return;
+                zoomOv.classList.add('hidden');
+                zoomOv.setAttribute('aria-hidden', 'true');
+            }
+
+            function openZoom(text) {
+                if (!zoomOv || !zoomTxt) return;
+                zoomTxt.textContent = text || '';
+                zoomOv.classList.remove('hidden');
+                zoomOv.setAttribute('aria-hidden', 'false');
+            }
+
+            function closeCatOverlay() {
+                if (!overlay) return;
+                overlay.classList.add('hidden');
+                overlay.setAttribute('aria-hidden', 'true');
+                curCatId = null;
+                selPhraseEn = '';
+                if (actionsEl) actionsEl.innerHTML = '';
+            }
+
+            function openCat(catId) {
+                var cat = GLB_TRAVEL_SIX_PHRASES.filter(function (c) { return c.id === catId; })[0];
+                if (!cat || !overlay || !titleEl || !actionsEl) return;
+                curCatId = catId;
+                titleEl.textContent = cat.label;
+                actionsEl.innerHTML = '';
+                for (var i = 0; i < cat.actions.length; i++) {
+                    (function (a) {
+                        var b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'glb-travel-action-btn';
+                        b.setAttribute('data-phrase', a.phraseEn);
+                        var sj = document.createElement('span');
+                        sj.className = 'glb-travel-action-ja';
+                        sj.textContent = a.labelJa || '';
+                        var ss = document.createElement('span');
+                        ss.className = 'glb-travel-action-sub';
+                        ss.textContent = a.phraseEn || '';
+                        b.appendChild(sj);
+                        b.appendChild(ss);
+                        b.addEventListener('click', function () {
+                            var prev = actionsEl.querySelectorAll('.glb-travel-action-btn.is-selected');
+                            for (var j = 0; j < prev.length; j++) prev[j].classList.remove('is-selected');
+                            b.classList.add('is-selected');
+                            selPhraseEn = a.phraseEn || '';
+                            var inp = document.getElementById('tr-text');
+                            var trRun = document.getElementById('tr-run');
+                            if (inp) inp.value = selPhraseEn;
+                            if (trRun) trRun.click();
+                        });
+                        actionsEl.appendChild(b);
+                    })(cat.actions[i]);
+                }
+                overlay.classList.remove('hidden');
+                overlay.setAttribute('aria-hidden', 'false');
+            }
+
+            function getDisplayTextForZoom() {
+                var idleEl = document.getElementById('translate-measure-result');
+                var idleT = typeof T === 'function' ? T('idle') : 'Idle';
+                var sendT = typeof T === 'function' ? T('sending') : 'Sending';
+                var tx = idleEl ? (idleEl.textContent || '').trim() : '';
+                if (tx && tx !== idleT && tx !== sendT) return tx;
+                return selPhraseEn || '';
+            }
+
+            function getLangPair() {
+                var lf = document.getElementById('lang-from');
+                var lt = document.getElementById('lang-to');
+                return {
+                    src: (lf && lf.value) ? lf.value : 'en',
+                    tgt: (lt && lt.value) ? lt.value : 'en'
+                };
+            }
+
+            if (grid) {
+                for (var k = 0; k < GLB_TRAVEL_SIX_PHRASES.length; k++) {
+                    (function (cat) {
+                        var bt = document.createElement('button');
+                        bt.type = 'button';
+                        bt.className = 'glb-travel-tile' + (cat.emergency ? ' glb-travel-tile--emergency' : '');
+                        bt.textContent = cat.label;
+                        bt.setAttribute('data-category', cat.id);
+                        bt.addEventListener('click', function () { openCat(cat.id); });
+                        grid.appendChild(bt);
+                    })(GLB_TRAVEL_SIX_PHRASES[k]);
+                }
+            }
+
+            if (btnBack) btnBack.addEventListener('click', closeCatOverlay);
+            if (overlay) {
+                overlay.addEventListener('click', function (ev) {
+                    if (ev.target === overlay) closeCatOverlay();
+                });
+            }
+            if (btnSpeak) {
+                btnSpeak.addEventListener('click', function () {
+                    var micBtn = document.getElementById('glb-mic-btn');
+                    if (micBtn) micBtn.click();
+                });
+            }
+            if (btnZoom) {
+                btnZoom.addEventListener('click', function () {
+                    openZoom(getDisplayTextForZoom());
+                });
+            }
+            if (btnTts) {
+                btnTts.addEventListener('click', function () {
+                    var idleEl = document.getElementById('translate-measure-result');
+                    var idleT = typeof T === 'function' ? T('idle') : 'Idle';
+                    var sendT = typeof T === 'function' ? T('sending') : 'Sending';
+                    var tx = idleEl ? (idleEl.textContent || '').trim() : '';
+                    var p = getLangPair();
+                    if (tx && tx !== idleT && tx !== sendT) {
+                        try { glbSpeakText(tx, p.tgt); } catch (e0) { /* ignore */ }
+                    } else if (selPhraseEn) {
+                        try { glbSpeakText(selPhraseEn, p.tgt); } catch (e1) { /* ignore */ }
+                    }
+                });
+            }
+            if (btnZoomClose) btnZoomClose.addEventListener('click', closeZoom);
+            if (zoomOv) {
+                zoomOv.addEventListener('click', function (ev) {
+                    if (ev.target === zoomOv) closeZoom();
                 });
             }
         })();
