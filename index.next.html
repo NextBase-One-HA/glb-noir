@@ -668,7 +668,19 @@
         (function glbMicInputOnly() {
             var micBtn = document.getElementById('glb-mic-btn');
             var trInput = document.getElementById('tr-text');
+            var srcSel = document.getElementById('lang-from');
+            var srcHidden = document.getElementById('tr-src');
             if (!micBtn || !trInput) return;
+            var micUserSelectedSource = false;
+            function glbMicResolveLang() {
+                var srcCode = srcHidden && srcHidden.value ? String(srcHidden.value).trim() : '';
+                if (micUserSelectedSource && srcCode) return glbBcp47ForTargetLang(srcCode);
+                if (navigator.language && String(navigator.language).trim()) {
+                    return glbBcp47ForTargetLang(String(navigator.language).trim());
+                }
+                if (srcCode) return glbBcp47ForTargetLang(srcCode);
+                return 'en-US';
+            }
             function showMicUnavailable() {
                 var base = micBtn.dataset.baseLabel || micBtn.textContent || 'Mic';
                 micBtn.classList.add('is-disabled');
@@ -694,10 +706,14 @@
                 });
                 return;
             }
-            recognition.lang = 'en-US';
             recognition.continuous = false;
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
+            if (srcSel) {
+                srcSel.addEventListener('change', function () {
+                    micUserSelectedSource = true;
+                });
+            }
             recognition.onstart = function () {
                 micBtn.classList.add('is-recording');
                 try { console.log('[GLB_MIC] start'); } catch (e1) { /* ignore */ }
@@ -724,6 +740,7 @@
                 showMicUnavailable();
             };
             micBtn.addEventListener('click', function () {
+                recognition.lang = glbMicResolveLang();
                 try { recognition.start(); } catch (e4) { showMicUnavailable(); }
             });
         })();
