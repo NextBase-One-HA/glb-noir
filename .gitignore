@@ -15,3 +15,11 @@ offline-glb/主力データ/
 # Local billing SQLite (Cloud Run uses BILLING_DB_PATH volume or /tmp)
 billing_api/*.db
 billing_api/__pycache__/
+
+# Python / local tooling
+**/__pycache__/
+*.pyc
+
+# Runtime logs and Playwright artifacts (do not publish)
+logs/
+test-results/

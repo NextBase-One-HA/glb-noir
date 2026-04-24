@@ -11,7 +11,7 @@ dart/          … 上記 Dart 核のコピー（参照用）
 trust_boundary.dart … クライアントに載せる層の型（秘密・大表は載せない前提）
 glb_tomori_web.js … ブラウザ用。core_pipeline の normalize/post と揃えた薄い層
 
-Web（index.next / index.coreflow）では API の前に glbTomoriNormalize を通し、
+Web（Core 正本 index.next）では API の前に glbTomoriNormalize を通し、
 応答表示前に glbTomoriPostRewrite を通す。
 
 ロジックコード内外装 2.zip

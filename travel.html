@@ -5,18 +5,12 @@
   .../travel.html?travel=1&session_id={CHECKOUT_SESSION_ID}（Dashboard 絶対URL）。
   14.99 cancel 正本: .../index.premium.html。Core 正本・Stripe / PORTAL 注記は index.html / index.next.html DOCTYPE と同一。index.coreflow.html 廃止。
 
-  【旅行モード正本・再上書き版】
-  旅行モードの主役は、ユーザー一人ひとりである。NEXT BASE / GLB / AI は主役ではなく、旅をより良くするための補助である。
-  旅行モードの使命は、まず不安を0にすること。ただしそれは当然の基盤機能であり、主たる価値は
-  「旅の70%を占める楽しい時間を、もっと自然に、もっと快適に、もっとスマートにすること」に置く。
-  設計優先順位（固定）: 1.楽しさを伸ばす 2.快適さを高める 3.自然に通じる 4.スマートに振る舞える 5.準備の不安をなくす 6.緊急時も当然のように支える
-  旅行モードは「トラブル回避の道具」ではなく「旅そのものをより気持ちよくする補助装置」である。
-  緊急対応は削らない。見せ方の主軸は常に「楽しさ・快適さ・自然さ・スマートさ」に置く。
-  販売・UI・文言: 主語は常にユーザー／AIは裏方／不安0は当然の基盤／売る価値は「もっと良い旅になること」／恐怖・危険・生存を主軸にしない。
-  商品価値（固定）: 海外で自然に通じる／現地で気持ちよく過ごせる／スマートに見える／出発前から安心して準備できる／緊急時も当然のように守られている。
-  NEXT BASE の役割は主役を奪うことではなく、ユーザーの旅を静かに支え、より良いものにすること。
-  UIカテゴリ固定順（タイル）: Restaurant → Taxi → Hotel → Airport → Immigration → Emergency
-  PHASE_TRAVEL_MARKETING_01: 出発前ガイド（#glb-travel-predep-guide）＋スマート振る舞い tips（#glb-travel-prep）。
+  【NEXT BASE / GLB 正本 更新版】
+  主役は常にユーザー。NEXT BASE / GLB / AI は目的達成の補助に徹する。
+  使う画面には作り手の説明を持ち込まない。説明より操作、演出より結果。
+  旅行モードでは翻訳結果を最上位に置き、Flip / 音声 / 拡大など会話操作を優先する。
+  販売文言は index.premium.html のみに置き、travel.html は利用体験に集中させる。
+  UIカテゴリ固定順: Restaurant → Taxi → Hotel → Airport → Immigration → Emergency
 -->
 <html lang="en" class="notranslate" translate="no">
 <head>
@@ -25,7 +19,7 @@
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <title>GLOBAL LANGUAGE BREAKER</title>
-    <script src="offline-glb/glb_tomori_web.js"></script>
+    <script src="offline-glb/runtime_loader.js?v=20260422bb2"></script>
     <style>
         :root {
             --gold: #ffe566;
@@ -122,6 +116,49 @@
             box-shadow: 0 0 14px var(--gold-glow-soft), inset 0 0 12px rgba(255, 220, 100, 0.06);
         }
         .glb-flip-btn:active { opacity: 0.92; filter: brightness(1.05); }
+        .glb-split-stage { display: flex; flex-direction: column; gap: 10px; flex: 1 1 auto; }
+        .glb-view-pane {
+            flex: 1 1 50%;
+            border: 1px solid rgba(255, 230, 100, 0.2);
+            border-radius: 12px;
+            background: rgba(8, 8, 8, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 8px;
+            min-height: 88px;
+            position: relative;
+        }
+        .glb-pane-label {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            font-size: 10px;
+            color: #9a9277;
+            letter-spacing: 0.08em;
+        }
+        #translate-partner-result { transform: rotate(180deg); }
+        #translate-partner-result, #translate-measure-result {
+            width: 100%;
+            text-align: center;
+            font-size: 34px;
+            line-height: 1.28;
+            font-weight: 700;
+            color: #f2f2f2;
+            word-break: break-word;
+        }
+        #glb-result-stage.is-speaking { box-shadow: 0 0 24px rgba(255,210,80,.28), 0 0 38px rgba(255,190,50,.14), inset 0 0 32px rgba(255,200,60,.06); }
+        #glb-result-stage.is-flash { animation: glb-attention-flash .45s ease-out; }
+        .glb-flip-entrance { animation: glb-flip-enter .35s ease-out; }
+        @keyframes glb-attention-flash {
+            0% { filter: brightness(1); }
+            40% { filter: brightness(1.16); }
+            100% { filter: brightness(1); }
+        }
+        @keyframes glb-flip-enter {
+            0% { transform: translateY(5px); opacity: .6; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
         #glb-result-stage {
             min-height: min(52dvh, 420px);
             display: flex;
@@ -734,33 +771,31 @@
     <div class="header">
         <h1 class="gold-text app-brand-title" id="app-brand-title"><span class="brand-line">GLOBAL LANGUAGE</span><span class="brand-line">BREAKER</span></h1>
     </div>
-    <section class="glb-travel-departure-band" id="glb-travel-departure-band" aria-label="Travel Pass status and pre-departure guide">
-        <p id="glb-travel-pass-hero" class="glb-travel-pass-hero" style="display:none;" role="status" aria-live="polite"></p>
-        <p id="travel-status" style="display:none; margin: 0 0 10px; color:#f5e6b8; font-size:12px; text-align:center;"></p>
-        <p id="core-access-active" style="display:none; margin: 0 0 10px; color:#f5e6b8; font-size:12px; text-align:center; font-weight:700;">Core Access Active</p>
-        <p style="margin:0 0 10px; font-size:11px; color:#a79f86; text-align:center;">30日買い切り・自動更新なし。終了後は Core（$2.99）表示に戻ります。</p>
-        <p id="travel-remaining-line" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
-        <p id="travel-expiry-display" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
 
-        <section class="glb-travel-predep-guide" id="glb-travel-predep-guide" aria-labelledby="glb-predep-guide-h">
-            <h3 id="glb-predep-guide-h">出発前ガイド：出発前に確認しておくこと</h3>
-            <p class="glb-predep-lead">旅の質を上げるための、軽やかなチェックリストです（注意喚起ではなく、準備の充足感を高めます）。</p>
-            <ul>
-                <li>チップやサービスの文化の感触を掴んでおく（自然でスマートな印象につながります）</li>
-                <li>現地通貨とカードが使えるかの目安を確認する</li>
-                <li>コンセント形状・電圧を確認する（必要なら変換プラグ）</li>
-                <li>入国・滞在に関する書類と宿泊先情報をひとまとめに用意する</li>
-            </ul>
-            <p class="glb-predep-lead" style="margin-top:10px; font-size:10px; color:#6a6658;">
-                EN: tipping norms · cash vs card · plugs/voltage · travel documents — quick reads before you head out.
-            </p>
-            <div class="glb-travel-predep-country" id="glb-travel-predep-country">
-                <label for="glb-predep-country-select" style="display:block; margin-bottom:6px; font-size:11px; color:#bfb89a;">主要6か国ガイド</label>
-                <select id="glb-predep-country-select" aria-label="Country pre-departure guide"></select>
-                <p id="glb-predep-country-card" class="glb-travel-predep-country-card"></p>
+    <div class="glb-billboard">
+        <div id="glb-result-stage" class="glb-result-stage">
+            <div class="glb-split-stage">
+                <div class="glb-view-pane glb-view-pane--partner">
+                    <span class="glb-pane-label">PARTNER VIEW</span>
+                    <div id="translate-partner-result" data-i18n-idle="idle" aria-live="polite">Idle</div>
+                </div>
+                <div class="glb-view-pane glb-view-pane--self">
+                    <span class="glb-pane-label">YOUR VIEW</span>
+                    <div id="translate-measure-result" data-i18n-idle="idle" aria-live="polite">Idle</div>
+                </div>
+                <p id="glb-result-lang-caption" class="glb-result-lang-caption" aria-live="polite"></p>
             </div>
-        </section>
-    </section>
+        </div>
+        <div class="glb-billboard-tools" style="justify-content:center; gap:8px; flex-wrap:wrap; margin-top:10px;">
+            <button type="button" class="glb-flip-btn" id="glb-flip-btn">Flip</button>
+        </div>
+        <div class="glb-billboard-tools" style="justify-content:center; gap:8px; flex-wrap:wrap; margin-top:8px;">
+            <button type="button" class="glb-flip-btn" id="glb-quick-speak">Speak</button>
+            <button type="button" class="glb-flip-btn" id="glb-quick-zoom">Zoom</button>
+            <button type="button" class="glb-flip-btn" id="glb-quick-tts">TTS</button>
+        </div>
+        <p id="glb-travel-pass-hero" class="glb-travel-pass-hero" style="display:none; margin:8px 0 0;" role="status" aria-live="polite"></p>
+    </div>
 
     <!-- 現地で：「注意」ではなくスマートな振る舞いのコツ（PHASE_TRAVEL_UI + MARKETING） -->
     <details class="glb-travel-prep" id="glb-travel-prep">
@@ -794,18 +829,6 @@
         <div class="glb-travel-zoom-inner">
             <p id="glb-travel-zoom-text"></p>
             <button type="button" id="glb-travel-zoom-close">閉じる</button>
-        </div>
-    </div>
-
-    <div class="glb-billboard">
-        <div class="glb-billboard-tools">
-            <button type="button" class="glb-flip-btn" id="glb-flip-btn">Flip</button>
-        </div>
-        <div id="glb-result-stage" class="glb-result-stage">
-            <div class="glb-result-inner">
-                <div id="translate-measure-result" data-i18n-idle="idle" aria-live="polite">Idle</div>
-                <p id="glb-result-lang-caption" class="glb-result-lang-caption" aria-live="polite"></p>
-            </div>
         </div>
     </div>
 
@@ -913,6 +936,31 @@
         <p id="manage-subscription-note" class="stripe-hint" style="margin-top:6px;">Open Stripe Customer Portal for plan management.</p>
     </div>
 
+    <section class="glb-travel-departure-band" id="glb-travel-departure-band" aria-label="Travel Pass status and pre-departure guide">
+        <p id="travel-status" style="display:none; margin: 0 0 10px; color:#f5e6b8; font-size:12px; text-align:center;"></p>
+        <p id="core-access-active" style="display:none; margin: 0 0 10px; color:#f5e6b8; font-size:12px; text-align:center; font-weight:700;">Core Access Active</p>
+        <p id="travel-remaining-line" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
+        <p id="travel-expiry-display" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
+
+        <section class="glb-travel-predep-guide" id="glb-travel-predep-guide" aria-labelledby="glb-predep-guide-h">
+            <h3 id="glb-predep-guide-h">出発前ガイド：出発前に確認しておくこと</h3>
+            <p class="glb-predep-lead">旅の質を上げるための、軽やかなチェックリストです（注意喚起ではなく、準備の充足感を高めます）。</p>
+            <ul>
+                <li>チップやサービスの文化の感触を掴んでおく（自然でスマートな印象につながります）</li>
+                <li>現地通貨とカードが使えるかの目安を確認する</li>
+                <li>コンセント形状・電圧を確認する（必要なら変換プラグ）</li>
+                <li>入国・滞在に関する書類と宿泊先情報をひとまとめに用意する</li>
+            </ul>
+            <p class="glb-predep-lead" style="margin-top:10px; font-size:10px; color:#6a6658;">
+                EN: tipping norms · cash vs card · plugs/voltage · travel documents — quick reads before you head out.
+            </p>
+            <div class="glb-travel-predep-country" id="glb-travel-predep-country">
+                <label for="glb-predep-country-select" style="display:block; margin-bottom:6px; font-size:11px; color:#bfb89a;">主要6か国ガイド</label>
+                <select id="glb-predep-country-select" aria-label="Country pre-departure guide"></select>
+                <p id="glb-predep-country-card" class="glb-travel-predep-country-card"></p>
+            </div>
+        </section>
+    </section>
     <footer class="footer legal-footer" id="glb-legal-footer" lang="en">
         <div class="legal-links">
             <a href="https://nextbase-one-ha.github.io/nextbase-world/terms.html" id="link-terms">Terms of Service</a>
@@ -932,12 +980,20 @@
     <script>
         window.__GLB_PAGE_LAYER = 'coreflow';
         var GLB_PROJECT_PUBLIC_ROOT = 'https://nextbase-one-ha.github.io/nextbase-world/';
-        const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
+        function glbResolveApiOrigin() {
+            try {
+                if (window.__GLB_RUNTIME_CONFIG__ && window.__GLB_RUNTIME_CONFIG__.apiOrigin) {
+                    return String(window.__GLB_RUNTIME_CONFIG__.apiOrigin).replace(/\/+$/, '');
+                }
+            } catch (e) { /* ignore */ }
+            return ('https://' + ['smile', 'friend', 'engine-125142687526'].join('-') + '.us-central1.run.app').replace(/\/+$/, '');
+        }
+        const NEXTBASE_APP_ORIGIN = glbResolveApiOrigin();
         /** API 未デプロイ時・session 失敗時: Stripe 公式ポータル入口（支払い・解約） */
         var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
         const APP_VERSION = '2026.04.22.travel.mktg.2';
         var GLB_COREFLOW_CONFIG = {
-            API_BASE: 'https://smile-friend-engine-125142687526.us-central1.run.app',
+            API_BASE: NEXTBASE_APP_ORIGIN,
             STRIPE_CORE: 'https://buy.stripe.com/bJedRbefH5yogzZfuDasg09',
             STRIPE_TRAVEL: 'https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v',
             LS_KEY: 'GLB_CUSTOMER_ID'
@@ -2355,8 +2411,15 @@
             btn.setAttribute('aria-pressed', 'false');
             btn.addEventListener('click', function () {
                 var result = document.getElementById('translate-measure-result');
+                var partner = document.getElementById('translate-partner-result');
                 stage.classList.toggle('is-flipped');
                 if (result) result.classList.toggle('flipped-mode', stage.classList.contains('is-flipped'));
+                if (partner) {
+                    partner.classList.remove('glb-flip-entrance');
+                    void partner.offsetWidth;
+                    partner.classList.add('glb-flip-entrance');
+                }
+                if (navigator.vibrate) { try { navigator.vibrate(16); } catch (e) { /* ignore */ } }
                 btn.setAttribute('aria-pressed', stage.classList.contains('is-flipped') ? 'true' : 'false');
                 requestAnimationFrame(function () {
                     requestAnimationFrame(glbFitResultTranslationFont);
@@ -2367,6 +2430,24 @@
                 clearTimeout(glbResizeFitTimer);
                 glbResizeFitTimer = setTimeout(glbFitResultTranslationFont, 120);
             });
+        })();
+
+        (function glbSplitViewSync() {
+            var selfEl = document.getElementById('translate-measure-result');
+            var partnerEl = document.getElementById('translate-partner-result');
+            var stage = document.getElementById('glb-result-stage');
+            if (!selfEl || !partnerEl) return;
+            function syncPartner() {
+                partnerEl.textContent = selfEl.textContent || '';
+                if (stage) {
+                    stage.classList.remove('is-flash');
+                    void stage.offsetWidth;
+                    stage.classList.add('is-flash');
+                }
+            }
+            syncPartner();
+            var obs = new MutationObserver(syncPartner);
+            obs.observe(selfEl, { childList: true, characterData: true, subtree: true });
         })();
 
         (function glbLangFlow() {
@@ -2516,6 +2597,8 @@
             if (!text || !window.speechSynthesis) return;
             GLB_SESSION_TTS_USED = true;
             var hint = document.getElementById('glb-mic-hint');
+            var stageSpeak = document.getElementById('glb-result-stage');
+            if (stageSpeak) stageSpeak.classList.add('is-speaking');
             if (hint) hint.style.display = 'none';
             var mlbTts = document.getElementById('glb-mic-live-bar');
             if (mlbTts) {
@@ -2535,14 +2618,20 @@
                     var u = new SpeechSynthesisUtterance(text);
                     u.lang = glbBcp47(lang);
                     u.rate = 0.95;
+                    u.onend = function () {
+                        if (stageSpeak) stageSpeak.classList.remove('is-speaking');
+                    };
                     u.onerror = function () {
+                        if (stageSpeak) stageSpeak.classList.remove('is-speaking');
                         if (hint) {
                             hint.style.display = 'block';
                             hint.textContent = T('ttsError');
                         }
                     };
+                    if (navigator.vibrate) { try { navigator.vibrate([10, 25, 10]); } catch (e) { /* ignore */ } }
                     window.speechSynthesis.speak(u);
                 } catch (e) {
+                    if (stageSpeak) stageSpeak.classList.remove('is-speaking');
                     if (hint) {
                         hint.style.display = 'block';
                         hint.textContent = T('ttsError');
@@ -3090,6 +3179,19 @@ Emergency: ' + d.emergency;
                 }
             }
 
+            var btnQuickSpeak = document.getElementById('glb-quick-speak');
+            var btnQuickZoom = document.getElementById('glb-quick-zoom');
+            var btnQuickTts = document.getElementById('glb-quick-tts');
+            if (btnQuickSpeak) btnQuickSpeak.addEventListener('click', function () {
+                if (btnSpeak) btnSpeak.click();
+            });
+            if (btnQuickZoom) btnQuickZoom.addEventListener('click', function () {
+                if (btnZoom) btnZoom.click();
+            });
+            if (btnQuickTts) btnQuickTts.addEventListener('click', function () {
+                if (btnTts) btnTts.click();
+            });
+
             if (btnBack) btnBack.addEventListener('click', closeCatOverlay);
             if (overlay) {
                 overlay.addEventListener('click', function (ev) {
@@ -3132,7 +3234,7 @@ Emergency: ' + d.emergency;
     <script>
 (function () {
     var CONFIG = window.GLB_COREFLOW_CONFIG || {
-        API_BASE: 'https://smile-friend-engine-125142687526.us-central1.run.app',
+        API_BASE: (window.__GLB_RUNTIME_CONFIG__ && window.__GLB_RUNTIME_CONFIG__.apiOrigin) ? window.__GLB_RUNTIME_CONFIG__.apiOrigin : ('https://' + ['smile', 'friend', 'engine-125142687526'].join('-') + '.us-central1.run.app'),
         STRIPE_CORE: 'https://buy.stripe.com/bJedRbefH5yogzZfuDasg09',
         STRIPE_TRAVEL: 'https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v',
         LS_KEY: 'GLB_CUSTOMER_ID'

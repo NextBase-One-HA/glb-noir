@@ -13,17 +13,17 @@
 
 ## Entry Audit Matrix
 
-### 1) `index.next.html` (paid entry)
-- [ ] `session_id` present -> `glb_subscribed` set paid and `LS_BILLING_LOCK=1` (PASS/FAIL)
+### 1) `index.next.html` (Core entry + Stripe)
+- [ ] `session_id` present -> billing state primes Core paid (`glb_billing_state_v1` / entitlements) (PASS/FAIL)
 - [ ] Paid pre-hide active before visible render (`#t-free-quota`, subscribe area hidden) (PASS/FAIL)
-- [ ] Guard blocks unpaid direct access and redirects to `index.html` (PASS/FAIL)
-- [ ] Stripe cancel/manage routes visible and clickable (PASS/FAIL)
+- [ ] **Unpaid** users can load the page (same free quota as `index.html`); subscribe block shows Stripe link (PASS/FAIL)
+- [ ] Footer manage/cancel (Customer Portal) routes visible when applicable (PASS/FAIL)
 - Evidence (console/storage/DOM):
 
-### 2) `index.html` (free entry)
+### 2) `index.html` (free entry — no Stripe on page)
 - [ ] `session_id` landing primes paid lock (`LS_BILLING_LOCK=1`) (PASS/FAIL)
 - [ ] Paid pre-hide suppresses free-tier UI flash (PASS/FAIL)
-- [ ] Unpaid state still shows free entry as designed (PASS/FAIL)
+- [ ] Unpaid state: free quota UX; **Core CTA points to** `index.next.html#glb-core-subscribe-block` (not direct Stripe) (PASS/FAIL)
 - Evidence:
 
 ### 3) `index.premium.html` (premium/travel layer)

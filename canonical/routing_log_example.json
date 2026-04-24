@@ -1,0 +1,8 @@
+{
+  "src": "ja",
+  "tgt": "fa",
+  "route": "pivot_en",
+  "result_length": 32,
+  "speak_used": true,
+  "user_retry": false
+}

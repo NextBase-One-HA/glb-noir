@@ -4,6 +4,14 @@
   "version": "1.0.0",
   "description": "Static HTML frontends for GLB (no bundler). Render build is a no-op; files are served from repo root.",
   "scripts": {
-    "build": "node build.js"
+    "build": "node build.js",
+    "watchdog:check": "node tools/glb_watchdog.js",
+    "watchdog:autofix": "node tools/glb_watchdog.js --autofix",
+    "watchdog:watch": "node tools/glb_watchdog.js --watch",
+    "watchdog:check:strict": "node tools/glb_watchdog.js --no-autofix",
+    "security:startup-gate": "python3 tools/glb_startup_integrity_gate.py --app-version glb-2.99-release --release-channel glb_2_99",
+    "security:test": "python3 -m unittest discover -s tests -p 'test_*.py'",
+    "launch:ready": "npm run watchdog:check && npm run security:startup-gate && node tools/launch_readiness_check.js",
+    "marketing:utm": "node tools/utm_link_builder.js"
   }
 }

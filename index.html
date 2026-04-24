@@ -4,19 +4,19 @@
   https://nextbase-one-ha.github.io/nextbase-world/
   リポジトリ名 glb-noir とデプロイ先 nextbase-world の混線防止用。Stripe / 外部文書はこの絶対URLで指定すること。
 
-  固定ページ:
-  - 無料:    .../index.html
-  - 2.99:    .../index.next.html
-  - Travel:  .../travel.html
-  - Premium: .../index.premium.html
+  ページ正本（Core 本体は index.next.html。index.coreflow.html 廃止）:
+  - 無料10回/日: index.html（$2.99 の Stripe は置かず Core ページへリンク）
+  - Core + 課金: index.next.html（Stripe Payment Link はここ）
+  - Travel: travel.html
+  - Premium: index.premium.html
 
   Stripe Payment Link（Dashboard 正本・絶対URL）:
-  - 2.99 success:  https://nextbase-one-ha.github.io/nextbase-world/index.next.html?session_id={CHECKOUT_SESSION_ID}
-  - 2.99 cancel:   https://nextbase-one-ha.github.io/nextbase-world/index.html
-  - 14.99 success: https://nextbase-one-ha.github.io/nextbase-world/travel.html?travel=1&session_id={CHECKOUT_SESSION_ID}
-  - 14.99 cancel:  https://nextbase-one-ha.github.io/nextbase-world/index.premium.html
+  - 2.99 success:  index.next.html?session_id={CHECKOUT_SESSION_ID}
+  - 2.99 cancel:   index.html
+  - 14.99 success: travel.html?travel=1&session_id={CHECKOUT_SESSION_ID}
+  - 14.99 cancel:  index.premium.html
 
-  Portal 等のサイト戻り例: https://nextbase-one-ha.github.io/nextbase-world/index.html
+  PORTAL_RETURN_URL 正本: index.next.html
   コード内の location.replace は相対パス可（同一オリジン）。Dashboard 設定のみ絶対URL必須。
 -->
 <html lang="en" class="notranslate" translate="no">
@@ -340,6 +340,34 @@
                 padding: 0 4px;
             }
             .tr-run-wrap { margin-bottom: 4px; }
+        }
+        .glb-post-translate-nudge {
+            max-width: 100%;
+            margin: 14px auto 0;
+            padding: 16px 14px;
+            border: 1px solid rgba(255, 230, 100, 0.48);
+            border-radius: 12px;
+            background: rgba(255, 220, 80, 0.09);
+            text-align: center;
+            box-sizing: border-box;
+            box-shadow:
+                0 0 22px rgba(255, 200, 60, 0.14),
+                inset 0 1px 0 rgba(255, 245, 200, 0.1);
+        }
+        .glb-post-translate-nudge-line {
+            font-size: 13px;
+            color: #ece6d4;
+            margin: 0 0 14px;
+            line-height: 1.45;
+            font-weight: 600;
+        }
+        .glb-post-translate-nudge .glb-post-translate-nudge-btn {
+            margin: 0 auto;
+            max-width: min(420px, 100%);
+            font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+        @media (max-width: 480px) {
             .pricing-box { font-size: 13px; padding: 14px; }
             .pricing-box h2 { font-size: 15px; }
         }
@@ -367,6 +395,10 @@
         </div>
         <div id="glb-result-stage" class="glb-result-stage">
             <div id="translate-measure-result" data-i18n-idle="idle" aria-live="polite">Idle</div>
+        </div>
+        <div id="glb-post-translate-nudge" class="glb-post-translate-nudge" style="display:none;" role="region" aria-labelledby="glb-post-translate-nudge-line">
+            <p id="glb-post-translate-nudge-line" class="glb-post-translate-nudge-line"></p>
+            <a href="index.next.html#glb-core-subscribe-block" class="btn glb-subscribe-btn glb-post-translate-nudge-btn" style="font-size:16px; padding:14px 18px; border-radius:999px;" id="glb-post-translate-core-btn">Start GLB 2.99</a>
         </div>
     </div>
 
@@ -429,7 +461,7 @@
             </select>
         </div>
         <div class="tr-run-wrap">
-            <button type="button" id="tr-run" class="btn glb-main-btn">GLB</button>
+            <button type="button" id="tr-run" class="btn glb-main-btn">Translate</button>
             <p class="free-quota-line" id="t-free-quota" role="status"></p>
         </div>
     </div>
@@ -439,17 +471,17 @@
     <div id="subscribe-area" style="max-width: min(600px, 100%); margin: 0 auto 20px;">
         <div id="glb-core-subscribe-block">
             <div class="pricing-box">
-                <h2 id="t-pricing-h2">$2.99 / month</h2>
+                <h2 id="t-pricing-h2">Core — $2.99/mo</h2>
                 <ul>
-                    <li id="t-pricing-li1"><strong>$2.99/mo</strong> — Unlimited when subscribed. Free tier: <strong>10 translations per day</strong>; subscribe to remove the cap.</li>
+                    <li id="t-pricing-li1">Translate free (10/day). One plan unlocks unlimited.</li>
                 </ul>
                 <p class="note" id="t-pricing-note"></p>
             </div>
-            <!-- Payment Link: DOCTYPE 内 PROJECT_PUBLIC_ROOT と Stripe 絶対URL正本に照合 -->
-            <a href="https://buy.stripe.com/bJedRbefH5yogzZfuDasg09" class="btn glb-subscribe-btn" style="font-size:18px; padding:18px 20px; border-radius:999px; margin-top:4px;" id="t-btn-monthly">
-                Subscribe ($2.99/mo)
+            <!-- 課金は index.next.html の Stripe のみ（本ページは無料枠 → Core へ誘導） -->
+            <a href="index.next.html#glb-core-subscribe-block" class="btn glb-subscribe-btn" style="font-size:18px; padding:18px 20px; border-radius:999px; margin-top:4px;" id="t-btn-monthly">
+                Start GLB 2.99
             </a>
-            <p class="stripe-hint" id="t-stripe-hint">Secure checkout with Stripe.</p>
+            <p class="stripe-hint" id="t-stripe-hint">Checkout lives on the Core page (Stripe).</p>
         </div>
     </div>
     <div id="manage-subscription-wrap" style="display:none; max-width:min(600px, 100%); margin: 0 auto 20px;">
@@ -461,13 +493,13 @@
 
     <footer class="footer legal-footer" id="glb-legal-footer" lang="en">
         <div class="legal-links">
-            <a href="https://nextbase-one-ha.github.io/nextbase-world/terms.html" id="link-terms">Terms of Service</a>
+            <a href="terms.html" id="link-terms">Terms of Service</a>
             <span class="legal-sep" aria-hidden="true">|</span>
-            <a href="https://nextbase-one-ha.github.io/nextbase-world/privacy.html" id="link-privacy">Privacy Policy</a>
+            <a href="privacy.html" id="link-privacy">Privacy Policy</a>
             <span class="legal-sep" aria-hidden="true">|</span>
-            <a href="https://nextbase-one-ha.github.io/nextbase-world/legal.html" id="link-legal">Legal</a>
+            <a href="legal.html" id="link-legal">Legal</a>
             <span class="legal-sep" aria-hidden="true">|</span>
-            <a href="https://nextbase-one-ha.github.io/nextbase-world/support.html" id="link-support">Support</a>
+            <a href="support.html" id="link-support">Support</a>
             <span class="legal-sep" aria-hidden="true">|</span>
             <a href="https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00" id="link-cancel-subscription">Cancel Subscription</a>
         </div>
@@ -477,11 +509,11 @@
 
     <script>
         /** 公開URL正本（Dashboard・文書・Gate1 照合）。相対 redirect は同一デプロイ内で有効。 */
-        var GLB_PROJECT_PUBLIC_ROOT = 'https://nextbase-one-ha.github.io/nextbase-world/';
+        var GLB_PROJECT_PUBLIC_ROOT = './';
         /** Translate /health: smile-friend-engine (us-central1) */
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
         var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-        const APP_VERSION = '2026.04.21.entry.2';
+        const APP_VERSION = '2026.04.24.index.free-entry.1';
         const MAINTENANCE_DEFAULT = 'We are currently enhancing the system for a better experience. Please check back shortly.';
         const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
         const LS_TRAVEL_PENDING = 'glb_travel_pending';
@@ -489,6 +521,7 @@
         const PLAN_CORE_299 = 'core_2_99';
         const PLAN_TRAVEL_1499_30D = 'travel_14_99_30d';
         const LS_PENDING_SESSION_ID = 'GLB_PENDING_SESSION_ID';
+        const SS_POST_TRANSLATE_CORE_NUDGE = 'glb_post_translate_core_nudge_v1';
         var GLB_CORE_SUBSCRIBED = false;
         var GLB_TRAVEL_ACTIVE = false;
         var GLB_TRAVEL_EXPIRES_AT = null;
@@ -496,6 +529,59 @@
         var GLB_SYSTEM_STATUS_AT = 0;
         var GLB_SYSTEM_STATUS_TTL = 30000;
         var GLB_MAINTENANCE_ON = false;
+
+        (function glbFunnelInit() {
+            var EP = '';
+            try {
+                EP = (window.__GLB_METRICS_ENDPOINT__ && String(window.__GLB_METRICS_ENDPOINT__).trim()) || '';
+            } catch (e0) { EP = ''; }
+            var LS_AGG = 'glb_funnel_metrics_v1';
+            function bump(key) {
+                try {
+                    var o = JSON.parse(localStorage.getItem(LS_AGG) || '{}') || {};
+                    o[key] = (Number(o[key]) || 0) + 1;
+                    localStorage.setItem(LS_AGG, JSON.stringify(o));
+                } catch (e1) { /* ignore */ }
+            }
+            window.GLBFunnel = {
+                track: function (event, detail) {
+                    var payload = {
+                        t: Date.now(),
+                        v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '',
+                        path: (function () { try { return location.pathname; } catch (e) { return ''; } })(),
+                        event: event,
+                        detail: detail || {}
+                    };
+                    try {
+                        console.log('[GLB funnel]', JSON.stringify(payload));
+                    } catch (e2) { /* ignore */ }
+                    if (event === 'index_reach') bump('index_reach');
+                    if (event === 'translate_click') bump('translate_click');
+                    if (event === 'stripe_click') bump('stripe_click');
+                    if (event === 'checkout_success') bump('checkout_success');
+                    if (event === 'core_page_click') bump('core_page_click');
+                    if (EP) {
+                        try {
+                            fetch(EP, {
+                                method: 'POST',
+                                mode: 'cors',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload),
+                                keepalive: true
+                            }).catch(function () { /* ignore */ });
+                        } catch (e3) { /* ignore */ }
+                    }
+                },
+                summary: function () {
+                    try {
+                        return JSON.parse(localStorage.getItem(LS_AGG) || '{}');
+                    } catch (e4) {
+                        return {};
+                    }
+                }
+            };
+            window.GLBFunnel.track('index_reach', { page: 'index.html' });
+        })();
 
         function parseBillingState() {
             try {
@@ -930,21 +1016,23 @@
                 labelLangFrom: 'From',
                 labelLangTo: 'To',
                 langFlowHint: '',
-                pricingH2: '$2.99 / month',
-                pricingLi1: 'Try free, then subscribe for cloud translation.',
+                pricingH2: 'Free — 10 text runs / day',
+                pricingLi1: 'Use this page to try GLB free (10 text translations per day). Open the Core page to subscribe ($2.99/mo) for unlimited text plus voice features.',
                 pricingNote: '',
                 linkTerms: 'Terms of Service',
                 linkPrivacy: 'Privacy Policy',
                 linkLegal: 'Legal',
                 linkSupport: 'Support',
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: 'Subscribe — LIFE ($2.99/mo)',
+                btnMonthly: 'Start GLB 2.99',
+                postTranslateNudgeLine: 'Want unlimited? Continue on the Core page.',
+                postTranslateNudgeBtn: 'Start GLB 2.99',
                 travelMiniLink: 'Travel · $14.99',
                 travelMiniHint: 'Travel tier is offered from the LIFE page after Core purchase.',
                 travelExtendLink: 'Extend +30 days',
                 travelExtendHint: 'Adds 30 days from your current expiry (stacking).',
                 travelDaysLeft: 'Travel add-on: {{n}} days left (through {{date}})',
-                stripeHint: 'Secure checkout with Stripe.',
+                stripeHint: 'Checkout is on the Core page (Stripe).',
                 dictPlaceholder: 'Search 150k dictionary…',
                 dictResult: 'Results appear here',
                 dictLoaded: '150k entries loaded.',
@@ -952,7 +1040,7 @@
                 noMatch: 'No match',
                 transHead: 'Translation',
                 phNormal: 'Text to translate (e.g. hello)',
-                sendBtn: 'GLB',
+                sendBtn: 'Translate',
                 idle: 'Idle',
                 modelBadge: '',
                 apiChecking: '',
@@ -975,21 +1063,23 @@
                 labelLangFrom: '原文',
                 labelLangTo: '訳文',
                 langFlowHint: '',
-                pricingH2: '月額 $2.99',
-                pricingLi1: '無料で試してから、クラウド翻訳にご登録ください。',
+                pricingH2: '無料 — 1日10回まで',
+                pricingLi1: 'このページは無料お試し（文字翻訳・1日10回）。課金（月 $2.99）は Core ページで Stripe 決済。',
                 pricingNote: '',
                 linkTerms: '利用規約',
                 linkPrivacy: 'プライバシーポリシー',
                 linkLegal: '法的情報',
                 linkSupport: 'サポート',
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: '購読 — LIFE（$2.99/月）',
+                btnMonthly: 'GLB 2.99 を開始',
+                postTranslateNudgeLine: '無制限にしたい場合は Core ページへ。',
+                postTranslateNudgeBtn: 'GLB 2.99 を開始',
                 travelMiniLink: 'トラベル · $14.99',
                 travelMiniHint: 'トラベル層はコア購入後、LIFEページから案内します。',
                 travelExtendLink: '延長 +30日',
                 travelExtendHint: '現在の期限から30日追加（累積延長）。',
                 travelDaysLeft: 'トラベル: 残り{{n}}日（{{date}}まで）',
-                stripeHint: 'Stripe で安全に決済',
+                stripeHint: '決済は Core ページで Stripe。',
                 dictPlaceholder: '15万語辞書を検索…',
                 dictResult: '結果がここに表示されます',
                 dictLoaded: '15万語 読み込み完了',
@@ -997,7 +1087,7 @@
                 noMatch: '見つかりません',
                 transHead: '翻訳',
                 phNormal: '翻訳したい文（例: hello）',
-                sendBtn: 'GLB',
+                sendBtn: '翻訳',
                 idle: '待機中',
                 modelBadge: '',
                 apiChecking: '',
@@ -1022,7 +1112,7 @@
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '订阅（$2.99/月）', stripeHint: 'Stripe 安全支付',
                 dictPlaceholder: '词典搜索…', dictResult: '结果', dictLoaded: '已加载', dictFail: '加载失败', noMatch: '无',
-                transHead: '翻译', phNormal: '输入要翻译的文字', sendBtn: 'GLB', idle: '就绪',
+                transHead: '翻译', phNormal: '输入要翻译的文字', sendBtn: 'Translate', idle: '就绪',
                 apiChecking: '', apiOk: '', apiNoResponse: '', sending: '翻译中…', sendingPivot: '经英语…',
                 failHttp: '失败', netErr: '网络错误', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: '镜像',
                 flipTitle: '对面有人时把结果旋转180°；再按恢复。',
@@ -1038,7 +1128,7 @@
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: '구독 ($2.99/월)', stripeHint: 'Stripe 결제',
                 dictPlaceholder: '사전 검색…', dictResult: '결과', dictLoaded: '로드됨', dictFail: '실패', noMatch: '없음',
-                transHead: '번역', phNormal: '번역할 문장', sendBtn: 'GLB', idle: '대기',
+                transHead: '번역', phNormal: '번역할 문장', sendBtn: 'Translate', idle: '대기',
                 apiChecking: '', apiOk: '', apiNoResponse: '', sending: '번역 중…', sendingPivot: '영어 경유…',
                 failHttp: '실패', netErr: '네트워크', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: '반전',
                 flipTitle: '맞은편에 있을 때 결과를 180° 회전. 다시 누르면 복원.',
@@ -1054,7 +1144,7 @@
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'Suscribirse ($2.99/mes)', stripeHint: 'Pago con Stripe',
                 dictPlaceholder: 'Buscar…', dictResult: 'Resultados', dictLoaded: 'Listo', dictFail: 'Error', noMatch: 'Nada',
-                transHead: 'Traducción', phNormal: 'Texto a traducir', sendBtn: 'GLB', idle: 'Listo',
+                transHead: 'Traducción', phNormal: 'Texto a traducir', sendBtn: 'Translate', idle: 'Listo',
                 apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Traduciendo…', sendingPivot: 'Vía inglés…',
                 failHttp: 'Error', netErr: 'Red', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Espejo',
                 flipTitle: 'Gira el resultado 180° para quien está enfrente. Pulsa otra vez para volver.',
@@ -1070,7 +1160,7 @@
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'S’abonner ($2.99/mois)', stripeHint: 'Paiement Stripe',
                 dictPlaceholder: 'Recherche…', dictResult: 'Résultats', dictLoaded: 'Chargé', dictFail: 'Échec', noMatch: 'Rien',
-                transHead: 'Traduction', phNormal: 'Texte à traduire', sendBtn: 'GLB', idle: 'Prêt',
+                transHead: 'Traduction', phNormal: 'Texte à traduire', sendBtn: 'Translate', idle: 'Prêt',
                 apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Traduction…', sendingPivot: 'Via anglais…',
                 failHttp: 'Échec', netErr: 'Réseau', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Miroir',
                 flipTitle: 'Tourne le résultat à 180° pour la personne en face. Re-tape pour revenir.',
@@ -1086,7 +1176,7 @@
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'Abonnieren ($2.99/Monat)', stripeHint: 'Stripe-Zahlung',
                 dictPlaceholder: 'Suche…', dictResult: 'Ergebnis', dictLoaded: 'Geladen', dictFail: 'Fehler', noMatch: 'Kein Treffer',
-                transHead: 'Übersetzung', phNormal: 'Text eingeben', sendBtn: 'GLB', idle: 'Bereit',
+                transHead: 'Übersetzung', phNormal: 'Text eingeben', sendBtn: 'Translate', idle: 'Bereit',
                 apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Übersetzen…', sendingPivot: 'Über Englisch…',
                 failHttp: 'Fehler', netErr: 'Netz', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Spiegeln',
                 flipTitle: 'Ergebnis um 180° drehen für die Person gegenüber. Erneut tippen zum Zurück.',
@@ -1102,7 +1192,7 @@
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'สมัคร ($2.99/เดือน)', stripeHint: 'ชำระด้วย Stripe',
                 dictPlaceholder: 'ค้นหา…', dictResult: 'ผลลัพธ์', dictLoaded: 'โหลดแล้ว', dictFail: 'ล้มเหลว', noMatch: 'ไม่พบ',
-                transHead: 'แปล', phNormal: 'ข้อความที่จะแปล', sendBtn: 'GLB', idle: 'พร้อม',
+                transHead: 'แปล', phNormal: 'ข้อความที่จะแปล', sendBtn: 'Translate', idle: 'พร้อม',
                 apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'กำลังแปล…', sendingPivot: 'ผ่านอังกฤษ…',
                 failHttp: 'ล้มเหลว', netErr: 'เครือข่าย', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'พลิก',
                 flipTitle: 'หมุนผลลัพธ์ 180° ให้คนที่นั่งตรงข้าม — กดอีกครั้งเพื่อกลับ',
@@ -1118,7 +1208,7 @@
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
                 btnMonthly: 'Đăng ký ($2.99/tháng)', stripeHint: 'Thanh toán Stripe',
                 dictPlaceholder: 'Tìm…', dictResult: 'Kết quả', dictLoaded: 'Đã tải', dictFail: 'Lỗi', noMatch: 'Không có',
-                transHead: 'Dịch', phNormal: 'Nhập văn bản', sendBtn: 'GLB', idle: 'Sẵn sàng',
+                transHead: 'Dịch', phNormal: 'Nhập văn bản', sendBtn: 'Translate', idle: 'Sẵn sàng',
                 apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Đang dịch…', sendingPivot: 'Qua tiếng Anh…',
                 failHttp: 'Lỗi', netErr: 'Mạng', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Lật',
                 flipTitle: 'Xoay kết quả 180° cho người đối diện. Bấm lại để trở về.',
@@ -1213,7 +1303,24 @@
             if (subscribeArea) subscribeArea.style.display = (showCoreOffer || coreSubscribed) ? '' : 'none';
             if (manageWrap) manageWrap.style.display = coreSubscribed ? '' : 'none';
             if (coreBadge) coreBadge.style.display = coreSubscribed ? '' : 'none';
+            var postNudge = document.getElementById('glb-post-translate-nudge');
+            if (postNudge && coreSubscribed) postNudge.style.display = 'none';
             updateTravelOfferLabels();
+        }
+
+        function maybeShowPostTranslateCoreNudge() {
+            try {
+                if (sessionStorage.getItem(SS_POST_TRANSLATE_CORE_NUDGE) === '1') return;
+                if (isGlbUnlimited() || GLB_CORE_SUBSCRIBED) return;
+                var box = document.getElementById('glb-post-translate-nudge');
+                if (!box) return;
+                sessionStorage.setItem(SS_POST_TRANSLATE_CORE_NUDGE, '1');
+                var line = document.getElementById('glb-post-translate-nudge-line');
+                var btn = document.getElementById('glb-post-translate-core-btn');
+                if (line) line.textContent = T('postTranslateNudgeLine');
+                if (btn) btn.textContent = T('postTranslateNudgeBtn');
+                box.style.display = '';
+            } catch (e) { /* ignore */ }
         }
 
         async function openManageSubscription() {
@@ -1336,6 +1443,10 @@
             var sh = document.getElementById('t-stripe-hint');
             if (bm) bm.textContent = T('btnMonthly');
             if (sh) sh.textContent = T('stripeHint');
+            var ptn = document.getElementById('glb-post-translate-nudge-line');
+            var ptb = document.getElementById('glb-post-translate-core-btn');
+            if (ptn) ptn.textContent = T('postTranslateNudgeLine');
+            if (ptb) ptb.textContent = T('postTranslateNudgeBtn');
             updateTravelOfferLabels();
 
             var th = document.getElementById('t-trans-head');
@@ -1540,6 +1651,22 @@
             syncFromUiLang();
         })();
 
+        (function glbCoreEntryClickMetrics() {
+            function wire(id, src) {
+                var a = document.getElementById(id);
+                if (!a) return;
+                a.addEventListener('click', function () {
+                    try {
+                        if (window.GLBFunnel) {
+                            window.GLBFunnel.track('core_page_click', { href: a.getAttribute('href') || '', source: src || id });
+                        }
+                    } catch (eS) { /* ignore */ }
+                });
+            }
+            wire('t-btn-monthly', 'subscribe_block');
+            wire('glb-post-translate-core-btn', 'post_translate_nudge');
+        })();
+
         (function regionPreset() {
             var sel = document.getElementById('region-preset');
             if (!sel) return;
@@ -1614,6 +1741,12 @@
                 var source = ((document.getElementById('tr-src') && document.getElementById('tr-src').value) || 'en').trim();
                 var target = ((document.getElementById('tr-tgt') && document.getElementById('tr-tgt').value) || 'ja').trim();
 
+                if (text) {
+                    try {
+                        if (window.GLBFunnel) window.GLBFunnel.track('translate_click', { source: source, target: target });
+                    } catch (eT) { /* ignore */ }
+                }
+
                 if (!text) {
                     setResultText(T('idle'), '#eaeaea', '0');
                     return;
@@ -1623,6 +1756,7 @@
                     setResultText(text, '#eaeaea', '0');
                     recordGlbTranslateUse();
                     refreshFreeQuotaDisplay();
+                    maybeShowPostTranslateCoreNudge();
                     return;
                 }
 
@@ -1630,6 +1764,7 @@
                 if (cached != null && cached !== '') {
                     setResultText(cached, '#eaeaea', '0');
                     refreshFreeQuotaDisplay();
+                    maybeShowPostTranslateCoreNudge();
                     return;
                 }
 
@@ -1638,6 +1773,7 @@
                     setResultText(localOut, '#eaeaea', '0');
                     writeTxCache(text, source, target, localOut);
                     refreshFreeQuotaDisplay();
+                    maybeShowPostTranslateCoreNudge();
                     return;
                 }
 
@@ -1654,6 +1790,7 @@
                     writeTxCache(text, source, target, line);
                     recordGlbTranslateUse();
                     refreshFreeQuotaDisplay();
+                    maybeShowPostTranslateCoreNudge();
                 }
 
                 setResultText(T('sending'), '#eaeaea', '1');

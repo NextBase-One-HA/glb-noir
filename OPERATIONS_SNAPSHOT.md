@@ -1,5 +1,9 @@
 # OPERATIONS SNAPSHOT
 
+## Dynamic Canonical Pointer
+- Cross-layer live snapshot (GLB / Smile Friend / Self-Opt):
+  - `/Users/user/nextbase_self_opt_layer/config/NEXTBASE_DYNAMIC_CANONICAL_STATE.json`
+
 ## Live Premise (Do Not Regress)
 - Current production premise is **Render Static Site + GitHub Pages dual structure**.
 - Reverting to server-runtime assumptions for the static frontend (for example, accidental Python build/runtime expectations on static deploy path) is prohibited.

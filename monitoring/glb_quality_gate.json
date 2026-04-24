@@ -1,0 +1,8 @@
+{
+  "schema": "nextbase.glb_quality_gate.v1",
+  "thresholds": {
+    "api_failure_rate_max": 0.02,
+    "untranslated_rate_max": 0.05,
+    "billing_path_break_rate_max": 0.0
+  }
+}

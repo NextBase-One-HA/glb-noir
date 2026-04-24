@@ -1,0 +1,14 @@
+{
+  "schema": "nextbase.glb_startup_manifest.v1",
+  "timestamp": "2026-04-24T03:53:07.808360Z",
+  "build_id": "proof-smoke-1776998279",
+  "app_version": "glb-2.99-release",
+  "immutable_json_sha256": "64352f6bd4d28a62e45e52773820737985d8421008b556356a10b423fff97e2a",
+  "dynamic_json_sha256": "1f022767d89ca4c14bc35287f84a579536641edfb607ee0b7693c6d59613517e",
+  "manifest_sha256": "37f4f85d7981ec17ecdaa262104662b66561df53c77d15b32bc2db934cb7ff1a",
+  "approval_mode": "GO",
+  "signer_id": "NORI-san",
+  "token_id": "SAMPLE-TOKEN-LOCAL-DEV",
+  "revocation_status": "ACTIVE",
+  "release_channel": "glb_2_99"
+}

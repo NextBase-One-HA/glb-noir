@@ -5,7 +5,8 @@
 
   【ページ正本・CANONICAL_UNIFY_INDEX_NEXT】
   Core 2.99 本体は本ファイル index.next.html のみ。index.coreflow.html は廃止（参照禁止）。
-  無料: .../index.html
+  無料10回/日: .../index.html（課金ボタンなし → Core ページへ誘導）
+  Core 本体・$2.99 Stripe: 本ファイル（未課金も閲覧可・同一クォータ）
   Travel 14.99: .../travel.html
   Premium LP: .../index.premium.html
 
@@ -26,6 +27,16 @@
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <title>GLOBAL LANGUAGE BREAKER</title>
+    <meta name="description" content="GLOBAL LANGUAGE BREAKER (GLB): a focused translation surface built for clarity and calm. Early access Core plan available. If something breaks, we will say so and fix fast.">
+    <link rel="canonical" href="https://nextbase-one-ha.github.io/nextbase-world/index.next.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="GLOBAL LANGUAGE BREAKER">
+    <meta property="og:description" content="Focused translation. Low-noise UI. Clear billing self-service. Early access; we improve in public.">
+    <meta property="og:url" content="https://nextbase-one-ha.github.io/nextbase-world/index.next.html">
+    <meta property="og:image" content="https://nextbase-one-ha.github.io/nextbase-world/icon.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="GLOBAL LANGUAGE BREAKER">
+    <meta name="twitter:description" content="Focused translation with a calm UI. Early access Core plan. Honest ops: maintenance mode if we find a serious issue.">
     <script src="offline-glb/glb_tomori_web.js?v=20260422core1"></script>
     <style>
         :root {
@@ -618,6 +629,39 @@
 
     <div id="gateway-pulse" style="display:none;" aria-hidden="true" data-i18n-placeholder="apiChecking"></div>
 
+    <div id="subscribe-area" style="max-width: min(600px, 100%); margin: 12px auto 18px;">
+        <div id="glb-core-subscribe-block">
+            <div class="pricing-box">
+                <h2 id="t-pricing-h2">$2.99 / month</h2>
+                <ul>
+                    <li id="t-pricing-li1">Core on this page: subscribe for unlimited text plus listen &amp; read-aloud. Free tier: 10 text runs per day until you subscribe.</li>
+                </ul>
+                <p class="note" id="t-pricing-note"></p>
+            </div>
+            <a href="https://buy.stripe.com/bJedRbefH5yogzZfuDasg09" class="btn glb-subscribe-btn" style="font-size:18px; padding:18px 20px; border-radius:999px; margin-top:4px;" id="t-btn-monthly">
+                Start GLB 2.99
+            </a>
+            <p class="stripe-hint" id="t-stripe-hint">Secure checkout with Stripe.</p>
+        </div>
+    </div>
+    <section id="glb-travel-minimal" style="display:none; max-width:min(600px,100%); margin:0 auto 16px; text-align:left; border:1px solid #2a2a2a; border-radius:10px; padding:12px 14px; background:#121212;">
+        <h3 style="margin:0 0 8px; color:#f5e6b8; font-size:14px;">Travel Mode (minimal)</h3>
+        <p style="margin:0 0 10px; color:#b6b6b6; font-size:12px; line-height:1.45;">Airport to Trouble: use a short phrase and show the translated line quickly.</p>
+        <label for="glb-travel-category" style="display:block; margin:0 0 6px; font-size:11px; color:#888;">Category</label>
+        <select id="glb-travel-category" class="lang-select" aria-label="Travel category"></select>
+        <p id="glb-travel-jp" style="margin:10px 0 6px; color:#f5f5f5; font-size:13px; font-weight:700;"></p>
+        <p id="glb-travel-en" style="margin:0 0 8px; color:#dcdcdc; font-size:12px; line-height:1.45;"></p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+            <button type="button" class="glb-flip-btn" id="glb-travel-show" style="padding:8px 10px;">相手に見せる</button>
+            <button type="button" class="glb-flip-btn" id="glb-travel-voice" style="padding:8px 10px;">音声を出す</button>
+            <button type="button" class="glb-flip-btn" id="glb-travel-zoom" style="padding:8px 10px;">大きく表示</button>
+        </div>
+        <p id="glb-travel-display" style="margin:0 0 8px; color:#fff8c8; font-size:12px; line-height:1.5; border:1px solid #2f2f2f; border-radius:8px; padding:8px;"></p>
+        <p id="glb-travel-emergency" style="margin:0 0 8px; color:#ffdca1; font-size:11px; line-height:1.45;"></p>
+        <ul id="glb-travel-next-actions" style="margin:0; padding-left:18px; color:#aaa; font-size:11px; line-height:1.45;"></ul>
+        <p id="glb-travel-minimal-hint" style="margin:10px 0 0; font-size:11px; color:#8f8f8f;">Feature flag: NEXTBASE_TRAVEL_MODE_FULL</p>
+    </section>
+
     <p id="app-brand-title" class="glb-footer-brand" translate="no">GLOBAL LANGUAGE BREAKER</p>
 
     <footer class="footer legal-footer" id="glb-legal-footer" lang="en">
@@ -644,7 +688,106 @@
         /** Translate /health: smile-friend-engine (us-central1) */
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
         var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-        const APP_VERSION = '2026.04.23.core.speak.3';
+        const APP_VERSION = '2026.04.24.core.funnel.1';
+        const NEXTBASE_TRAVEL_MODE_FULL = (function () {
+            try {
+                if (window.__GLB_FLAGS__ && typeof window.__GLB_FLAGS__.NEXTBASE_TRAVEL_MODE_FULL === 'boolean') {
+                    return !!window.__GLB_FLAGS__.NEXTBASE_TRAVEL_MODE_FULL;
+                }
+            } catch (e0) { /* ignore */ }
+            try {
+                if (localStorage.getItem('NEXTBASE_TRAVEL_MODE_FULL') === '1') return true;
+            } catch (e1) { /* ignore */ }
+            try {
+                var u = new URL(window.location.href);
+                return u.searchParams.get('travel_full') === '1';
+            } catch (e2) { /* ignore */ }
+            return false;
+        })();
+        var GLB_SESSION_EVENTS = { translated: 0, apiFail: 0, translateFail: 0, cta: 0, purchase: 0, travelUse: 0 };
+        function glbTrackOpsEvent(event, detail) {
+            try {
+                if (window.GLBFunnel && typeof window.GLBFunnel.track === 'function') {
+                    window.GLBFunnel.track(event, detail || {});
+                }
+            } catch (e) { /* ignore */ }
+        }
+        function glbInitTravelMinimal() {
+            var box = document.getElementById('glb-travel-minimal');
+            var sel = document.getElementById('glb-travel-category');
+            var jp = document.getElementById('glb-travel-jp');
+            var en = document.getElementById('glb-travel-en');
+            var disp = document.getElementById('glb-travel-display');
+            var emer = document.getElementById('glb-travel-emergency');
+            var nextList = document.getElementById('glb-travel-next-actions');
+            var btnShow = document.getElementById('glb-travel-show');
+            var btnVoice = document.getElementById('glb-travel-voice');
+            var btnZoom = document.getElementById('glb-travel-zoom');
+            if (!box || !sel || !jp || !en || !disp || !emer || !nextList || !btnShow || !btnVoice || !btnZoom) return;
+            if (!NEXTBASE_TRAVEL_MODE_FULL) {
+                box.style.display = 'none';
+                return;
+            }
+            fetch('canonical/travel_mode_minimal.json', { cache: 'no-store' })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    var categories = (data && Array.isArray(data.categories)) ? data.categories : [];
+                    sel.innerHTML = '';
+                    for (var i = 0; i < categories.length; i++) {
+                        var op = document.createElement('option');
+                        op.value = String(i);
+                        op.textContent = String(categories[i].category || '');
+                        sel.appendChild(op);
+                    }
+                    function renderItem(ci) {
+                        if (!categories[ci]) return;
+                        var item = (categories[ci].items && categories[ci].items[0]) ? categories[ci].items[0] : null;
+                        if (!item) return;
+                        jp.textContent = item.japanese_phrase || '';
+                        en.textContent = item.translated_phrase || '';
+                        disp.textContent = item.show_to_staff_text || item.translated_phrase || '';
+                        emer.textContent = item.emergency_short_phrase ? ('Emergency: ' + item.emergency_short_phrase) : '';
+                        nextList.innerHTML = '';
+                        var nextActions = Array.isArray(item.next_actions) ? item.next_actions.slice(0, 3) : [];
+                        for (var n = 0; n < nextActions.length; n++) {
+                            var li = document.createElement('li');
+                            li.textContent = String(nextActions[n] || '');
+                            nextList.appendChild(li);
+                        }
+                        GLB_SESSION_EVENTS.travelUse += 1;
+                        glbTrackOpsEvent('travel_phrase_used', { category: categories[ci].category || '', intent_id: item.intent_id || '' });
+                    }
+                    btnShow.addEventListener('click', function () {
+                        var idx = parseInt(sel.value || '0', 10);
+                        renderItem(idx);
+                    });
+                    btnVoice.addEventListener('click', function () {
+                        try {
+                            var idx = parseInt(sel.value || '0', 10);
+                            var item = (categories[idx] && categories[idx].items && categories[idx].items[0]) ? categories[idx].items[0] : null;
+                            if (!item || !item.voice_output_text || !window.speechSynthesis) return;
+                            window.speechSynthesis.cancel();
+                            var u = new SpeechSynthesisUtterance(String(item.voice_output_text));
+                            u.lang = 'en-US';
+                            window.speechSynthesis.speak(u);
+                        } catch (e0) { /* ignore */ }
+                    });
+                    btnZoom.addEventListener('click', function () {
+                        var curr = disp.style.fontSize || '12px';
+                        disp.style.fontSize = curr === '12px' ? '20px' : '12px';
+                    });
+                    sel.addEventListener('change', function () {
+                        var idx = parseInt(sel.value || '0', 10);
+                        renderItem(idx);
+                    });
+                    box.style.display = '';
+                    renderItem(0);
+                    glbTrackOpsEvent('travel_mode_entry', { source: 'index.next', flag: true, categories: categories.length });
+                })
+                .catch(function () {
+                    box.style.display = 'none';
+                });
+        }
         (function glbSpeechSynthIosUnlock() {
             document.body.addEventListener('touchstart', function () {
                 try {
@@ -751,6 +894,7 @@
                 '#glb-quick-speak',
                 '#glb-zoom-btn',
                 '#glb-mic-btn',
+                '#t-btn-monthly',
                 '#link-manage-mini',
                 '#link-cancel-mini'
             ];
@@ -837,6 +981,9 @@
         var GLB_SYSTEM_STATUS_AT = 0;
         var GLB_SYSTEM_STATUS_TTL = 30000;
         var GLB_MAINTENANCE_ON = false;
+        /** When true, remote status fetch must not silently disable maintenance overlay. */
+        var GLB_MAINT_HARD_LOCK = false;
+        const LS_MAINT_FORCE = 'GLB_MAINTENANCE_FORCE_V1';
 
         (function glbFunnelInitNext() {
             var EP = '';
@@ -867,6 +1014,15 @@
                     if (event === 'translate_click') bump('translate_click');
                     if (event === 'stripe_click') bump('stripe_click');
                     if (event === 'checkout_success') bump('checkout_success');
+                    if (event === 'purchase_success') bump('purchase_success');
+                    if (event === 'payment_cta_click') bump('payment_cta_click');
+                    if (event === 'translation_success') bump('translation_success');
+                    if (event === 'translation_failure') bump('translation_failure');
+                    if (event === 'api_failure') bump('api_failure');
+                    if (event === 'user_drop_point') bump('user_drop_point');
+                    if (event === 'travel_mode_entry') bump('travel_mode_entry');
+                    if (event === 'travel_phrase_used') bump('travel_phrase_used');
+                    if (event === 'core_page_click') bump('core_page_click');
                     if (EP) {
                         try {
                             fetch(EP, {
@@ -889,6 +1045,23 @@
             };
         })();
 
+        (function glbStripeClickMetricsNext() {
+            function wire(id, src) {
+                var a = document.getElementById(id);
+                if (!a) return;
+                a.addEventListener('click', function () {
+                    try {
+                        GLB_SESSION_EVENTS.cta += 1;
+                        glbTrackOpsEvent('payment_cta_click', { href: a.getAttribute('href') || '', source: src || id });
+                        if (window.GLBFunnel) {
+                            window.GLBFunnel.track('stripe_click', { href: a.getAttribute('href') || '', source: src || id });
+                        }
+                    } catch (eS) { /* ignore */ }
+                });
+            }
+            wire('t-btn-monthly', 'subscribe_block');
+        })();
+
         function glbIsCoreCheckoutReturn() {
             try {
                 var u = new URL(window.location.href);
@@ -909,6 +1082,8 @@
                 if (sessionStorage.getItem(key) === sid) return;
                 sessionStorage.setItem(key, sid);
                 window.GLBFunnel.track('checkout_success', detail || {});
+                GLB_SESSION_EVENTS.purchase += 1;
+                glbTrackOpsEvent('purchase_success', detail || {});
             } catch (e) { /* ignore */ }
         }
 
@@ -1093,20 +1268,6 @@
             } catch (e) { /* ignore */ }
         })();
 
-        (function guardPaidPageAccess() {
-            try {
-                var url = new URL(window.location.href);
-                if ((url.searchParams.get('nori') || '') === 'admin') {
-                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'admin_bypass', updatedAt: Date.now() });
-                    return;
-                }
-                if (glbBillingPaidActive()) return;
-                window.location.replace(new URL('index.html', window.location.href).href);
-            } catch (e) {
-                /* ignore */
-            }
-        })();
-
         function enforcePaidUiLock() {
             if (!isGlbUnlimited()) return;
             var quota = document.getElementById('t-free-quota');
@@ -1153,7 +1314,81 @@
                 setMaintenanceOverlay(true, status.maintenance_message || MAINTENANCE_DEFAULT, false);
                 return;
             }
+            if (GLB_MAINT_HARD_LOCK) return;
             setMaintenanceOverlay(false, '', false);
+        }
+
+        function clearMaintenanceForceLocal() {
+            try { localStorage.removeItem(LS_MAINT_FORCE); } catch (e0) { /* ignore */ }
+        }
+
+        function applyMaintenanceForceLocal(cfg) {
+            try {
+                localStorage.setItem(LS_MAINT_FORCE, JSON.stringify(cfg || { enabled: true }));
+            } catch (e1) { /* ignore */ }
+        }
+
+        function readMaintenanceForceLocal() {
+            try {
+                var raw = localStorage.getItem(LS_MAINT_FORCE) || '';
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (e2) {
+                return null;
+            }
+        }
+
+        function applyHardMaintenanceControls() {
+            GLB_MAINT_HARD_LOCK = false;
+            try {
+                var url = new URL(window.location.href);
+                var onParam = (url.searchParams.get('glb_maint') || '').trim();
+                var offParam = (url.searchParams.get('glb_maint_off') || '').trim();
+                var msgParam = (url.searchParams.get('glb_maint_msg') || '').trim();
+
+                if (offParam === '1' || offParam.toLowerCase() === 'true' || offParam.toLowerCase() === 'yes') {
+                    clearMaintenanceForceLocal();
+                    setMaintenanceOverlay(false, '', false);
+                    return;
+                }
+
+                if (onParam === '1' || onParam.toLowerCase() === 'true' || onParam.toLowerCase() === 'yes') {
+                    GLB_MAINT_HARD_LOCK = true;
+                    applyMaintenanceForceLocal({ enabled: true, message: msgParam || '', source: 'url', ts: Date.now() });
+                    setMaintenanceOverlay(true, msgParam || MAINTENANCE_DEFAULT, false);
+                    return;
+                }
+
+                var local = readMaintenanceForceLocal();
+                if (local && local.enabled) {
+                    var until = Number(local.until || 0) || 0;
+                    if (until && Date.now() > until) {
+                        clearMaintenanceForceLocal();
+                    } else {
+                        GLB_MAINT_HARD_LOCK = true;
+                        setMaintenanceOverlay(true, local.message || MAINTENANCE_DEFAULT, false);
+                        return;
+                    }
+                }
+            } catch (e3) { /* ignore */ }
+
+            // Same-origin static switch file (deploy alongside index.next.html)
+            try {
+                var u = new URL('glb_maintenance.json', window.location.href);
+                u.searchParams.set('t', String(Date.now()));
+                fetch(u.toString(), { method: 'GET', cache: 'no-store' })
+                    .then(function (r) { return r.ok ? r.json() : null; })
+                    .then(function (j) {
+                        if (!j) return;
+                        if (GLB_MAINT_HARD_LOCK) return;
+                        if (j.maintenance_mode) {
+                            setMaintenanceOverlay(true, j.maintenance_message || MAINTENANCE_DEFAULT, false);
+                            return;
+                        }
+                        if (!GLB_MAINT_HARD_LOCK) setMaintenanceOverlay(false, '', false);
+                    })
+                    .catch(function () { /* ignore */ });
+            } catch (e4) { /* ignore */ }
         }
 
         function fetchSystemStatus(force) {
@@ -1171,7 +1406,9 @@
                     return j;
                 })
                 .catch(function () {
-                    try { setMaintenanceOverlay(false, '', false); } catch (e0) { /* ignore */ }
+                    try {
+                        if (!GLB_MAINT_HARD_LOCK) setMaintenanceOverlay(false, '', false);
+                    } catch (e0) { /* ignore */ }
                     return GLB_SYSTEM_STATUS_CACHE;
                 });
         }
@@ -1179,6 +1416,7 @@
         (function initSystemStatusWatcher() {
             var reloadBtn = document.getElementById('maintenance-reload');
             if (reloadBtn) reloadBtn.addEventListener('click', function () { location.reload(); });
+            applyHardMaintenanceControls();
             fetchSystemStatus(true);
             setInterval(function () { fetchSystemStatus(false); }, 30000);
         })();
@@ -1452,7 +1690,7 @@
                 linkLegal: 'Legal',
                 linkSupport: 'Support',
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: 'Subscribe ($2.99/mo)',
+                btnMonthly: 'Start GLB 2.99',
                 travelH3: 'Travel Pass — Coming Soon',
                 travelLi: 'Travel add-on sales are paused. Core translation remains fully available.',
                 btnTravel: 'Coming Soon',
@@ -1479,8 +1717,8 @@
                 btnClear: 'Clear',
                 btnSpeakSrc: 'Speak source',
                 btnSpeakTgt: 'Read translation',
-                failHttp: "Couldn't complete that.",
-                netErr: 'Network error:',
+                failHttp: 'Could not finish this translation yet. Please try once more.',
+                netErr: 'Network is unstable right now. Please try again.',
                 title: 'GLOBAL LANGUAGE BREAKER',
                 btnFlip: 'Flip',
                 btnQuickSpeak: 'Speak',
@@ -1507,7 +1745,7 @@
                 linkLegal: '法的情報',
                 linkSupport: 'サポート',
                 footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: '購読（$2.99/月）',
+                btnMonthly: 'GLB 2.99 を開始',
                 travelH3: 'トラベルパス — 準備中',
                 travelLi: 'トラベル販売は一時停止中です。Core翻訳は通常どおり利用できます。',
                 btnTravel: '準備中',
@@ -1534,8 +1772,8 @@
                 btnClear: '消去',
                 btnSpeakSrc: '原文を読む',
                 btnSpeakTgt: '訳を読む',
-                failHttp: '完了できませんでした。',
-                netErr: 'ネットワークエラー:',
+                failHttp: '翻訳を完了できませんでした。もう一度お試しください。',
+                netErr: '通信が不安定です。時間をおいて再度お試しください。',
                 title: 'GLOBAL LANGUAGE BREAKER',
                 btnFlip: '反転',
                 btnQuickSpeak: '読み上げ',
@@ -1734,7 +1972,12 @@
         }
 
         function refreshSubscriptionUi() {
-            /* CORE_USER_FEELING_FIRST_04: billing / cancel UI lives on support.html */
+            var subscribeArea = document.getElementById('subscribe-area');
+            var coreBlk = document.getElementById('glb-core-subscribe-block');
+            var coreSubscribed = GLB_CORE_SUBSCRIBED || isGlbUnlimited();
+            var showStripe = !coreSubscribed;
+            if (coreBlk) coreBlk.style.display = showStripe ? '' : 'none';
+            if (subscribeArea) subscribeArea.style.display = showStripe || coreSubscribed ? '' : 'none';
         }
 
         function canGlbTranslate() {
@@ -1988,6 +2231,14 @@
             var u = document.getElementById('ui-lang');
             if (u) u.value = getStoredUiLang();
         })();
+        glbInitTravelMinimal();
+        window.addEventListener('beforeunload', function () {
+            var point = 'landing_only';
+            if (GLB_SESSION_EVENTS.translated > 0) point = 'after_translation';
+            if (GLB_SESSION_EVENTS.cta > 0) point = 'payment_cta';
+            if (GLB_SESSION_EVENTS.purchase > 0) point = 'purchase_done';
+            glbTrackOpsEvent('user_drop_point', { point: point });
+        });
         applyUiLang();
 
         (function bindUiLang() {
@@ -2260,6 +2511,10 @@
 
             function applyError(x) {
                 setResultText(T('failHttp'), '#c99', '0');
+                GLB_SESSION_EVENTS.translateFail += 1;
+                GLB_SESSION_EVENTS.apiFail += 1;
+                glbTrackOpsEvent('translation_failure', { stage: 'http', status: (x && x.status) || 0 });
+                glbTrackOpsEvent('api_failure', { stage: 'http', status: (x && x.status) || 0 });
             }
 
             btn.addEventListener('click', function () {
@@ -2283,6 +2538,7 @@
                     glbUpdateReadalong('', '', source, target);
                     return;
                 }
+                glbTrackOpsEvent('translate_click', { source: source, target: target });
 
                 if (source === target) {
                     setResultText(text, '#eaeaea', '0');
@@ -2326,6 +2582,8 @@
                     refreshFreeQuotaDisplay();
                     glbUpdateReadalong(text, done, source, target);
                     if (apiJson) glbLogClientAudit(apiJson, source, target, false, false);
+                    GLB_SESSION_EVENTS.translated += 1;
+                    glbTrackOpsEvent('translation_success', { pivot: pivot, route: apiJson && apiJson.routeType ? apiJson.routeType : '' });
                 }
 
                 setResultText(T('sending'), '#eaeaea', '1');
@@ -2338,10 +2596,16 @@
                             else if (p.json && p.json.reasonCode) {
                                 setResultText(String(p.json.reasonCode), '#c99', '0');
                                 glbLogClientAudit(p.json, source, target, false, false);
+                                GLB_SESSION_EVENTS.translateFail += 1;
+                                glbTrackOpsEvent('translation_failure', { stage: 'direct_reason', reason_code: String(p.json.reasonCode) });
                             } else applyError(x);
                         })
                         .catch(function (err) {
                             setResultText(T('netErr'), '#c99', '0');
+                            GLB_SESSION_EVENTS.translateFail += 1;
+                            GLB_SESSION_EVENTS.apiFail += 1;
+                            glbTrackOpsEvent('translation_failure', { stage: 'direct_network' });
+                            glbTrackOpsEvent('api_failure', { stage: 'direct_network' });
                         });
                     return;
                 }
@@ -2353,6 +2617,8 @@
                             if (p1.json && p1.json.reasonCode) {
                                 setResultText(String(p1.json.reasonCode), '#c99', '0');
                                 glbLogClientAudit(p1.json, source, 'en', false, false);
+                                GLB_SESSION_EVENTS.translateFail += 1;
+                                glbTrackOpsEvent('translation_failure', { stage: 'pivot_first', reason_code: String(p1.json.reasonCode) });
                             } else applyError(x1);
                             return null;
                         }
@@ -2367,10 +2633,16 @@
                         else if (p2.json && p2.json.reasonCode) {
                             setResultText(String(p2.json.reasonCode), '#c99', '0');
                             glbLogClientAudit(p2.json, 'en', target, false, false);
+                            GLB_SESSION_EVENTS.translateFail += 1;
+                            glbTrackOpsEvent('translation_failure', { stage: 'pivot_second', reason_code: String(p2.json.reasonCode) });
                         } else applyError(x2);
                     })
                     .catch(function (err) {
                         setResultText(T('netErr'), '#c99', '0');
+                        GLB_SESSION_EVENTS.translateFail += 1;
+                        GLB_SESSION_EVENTS.apiFail += 1;
+                        glbTrackOpsEvent('translation_failure', { stage: 'pivot_network' });
+                        glbTrackOpsEvent('api_failure', { stage: 'pivot_network' });
                     });
             });
         })();

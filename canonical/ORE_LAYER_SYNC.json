@@ -1,5 +1,6 @@
 {
   "canonical_version": "1.0.0",
+  "canonical_hash": "b0e5c050932369a53d2e24797cf6f000420cfd0aac27bc1d233c8b5af474734d",
   "passcode": "刻の共振、法の静寂。",
   "external_enforcement": {
     "source_of_truth": "external_canonical_only",
