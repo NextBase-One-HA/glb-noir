@@ -361,65 +361,6 @@
             cursor: pointer;
         }
         .tr-run-wrap { text-align: center; margin-top: 10px; margin-bottom: 6px; }
-        #glb-travel-fullpower {
-            margin-top: 14px;
-            padding: 14px 12px;
-            border-radius: 10px;
-            background: #050505;
-            border: 1px solid #9a7b2d;
-            box-shadow: 0 0 18px rgba(255, 200, 80, 0.06);
-        }
-        #glb-travel-fullpower .glb-fullpower-title {
-            margin: 0 0 10px;
-            font-size: 15px;
-            font-weight: 800;
-            letter-spacing: 0.06em;
-            color: #f3d78a;
-            text-shadow: 0 0 10px rgba(255, 210, 120, 0.35);
-        }
-        #glb-travel-fullpower-state {
-            margin: 0 0 12px;
-            font-size: 16px;
-            line-height: 1.45;
-            color: #f7eacb;
-            font-weight: 600;
-        }
-        #glb-travel-fullpower-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        #glb-travel-fullpower-actions .glb-fullpower-btn {
-            flex: 1 1 calc(33.333% - 8px);
-            min-width: min(140px, 100%);
-            padding: 12px 10px;
-            font-size: 15px;
-            font-weight: 700;
-            border-radius: 10px;
-            border: 1px solid #c9a545;
-            background: #12100a;
-            color: #fff4cc;
-            cursor: pointer;
-        }
-        #glb-travel-fullpower-actions .glb-fullpower-btn:active { opacity: 0.9; }
-        #glb-travel-fullpower-ore {
-            margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px solid #2a2418;
-            font-size: 11px;
-            line-height: 1.45;
-            color: #9a9a9a;
-        }
-        #glb-travel-fullpower.glb-travel-full-emergency {
-            border-color: #5c1818;
-            color: #f2f2f2;
-        }
-        #glb-travel-fullpower-hold {
-            margin-top: 8px;
-            font-size: 11px;
-            color: #c9a24a;
-            display: none;
-        }
         #tr-run.glb-main-btn {
             display: inline-block;
             width: auto;
@@ -719,13 +660,6 @@
         <p id="glb-travel-emergency" style="margin:0 0 8px; color:#ffdca1; font-size:11px; line-height:1.45;"></p>
         <ul id="glb-travel-next-actions" style="margin:0; padding-left:18px; color:#aaa; font-size:11px; line-height:1.45;"></ul>
         <p id="glb-travel-minimal-hint" style="margin:10px 0 0; font-size:11px; color:#8f8f8f;">Feature flag: NEXTBASE_TRAVEL_MODE_FULL</p>
-        <div id="glb-travel-fullpower" style="display:none;" aria-live="polite">
-            <p class="glb-fullpower-title">Full Power Travel（対話ガイド・準備版）</p>
-            <p id="glb-travel-fullpower-state"></p>
-            <div id="glb-travel-fullpower-actions"></div>
-            <p id="glb-travel-fullpower-hold">HOLD: 操作が多すぎます。いったん「戻る」でやり直してください。</p>
-            <div id="glb-travel-fullpower-ore" style="display:none;"></div>
-        </div>
     </section>
 
     <p id="app-brand-title" class="glb-footer-brand" translate="no">GLOBAL LANGUAGE BREAKER</p>
@@ -852,86 +786,6 @@
                 })
                 .catch(function () {
                     box.style.display = 'none';
-                });
-        }
-        function glbInitTravelFullPower() {
-            if (!NEXTBASE_TRAVEL_MODE_FULL) return;
-            var shell = document.getElementById('glb-travel-fullpower');
-            var stateEl = document.getElementById('glb-travel-fullpower-state');
-            var actionsEl = document.getElementById('glb-travel-fullpower-actions');
-            var holdEl = document.getElementById('glb-travel-fullpower-hold');
-            var oreEl = document.getElementById('glb-travel-fullpower-ore');
-            if (!shell || !stateEl || !actionsEl || !holdEl || !oreEl) return;
-            fetch('canonical/travel_mode_full.json', { cache: 'no-store' })
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
-                    var pr = data && data.privacy;
-                    if (!pr || pr.save_translation_text !== false || pr.save_personal_data !== false || pr.save_runtime_event_only !== true) {
-                        shell.style.display = 'none';
-                        return;
-                    }
-                    var dm = data.dialogue_mode;
-                    if (!dm || !Array.isArray(dm.states)) {
-                        shell.style.display = 'none';
-                        return;
-                    }
-                    var statesById = {};
-                    for (var si = 0; si < dm.states.length; si++) {
-                        var st0 = dm.states[si];
-                        if (st0 && st0.id) statesById[String(st0.id)] = st0;
-                    }
-                    var stateId = String(dm.initial_state || 'idle');
-                    var taps = 0;
-                    var maxTap = (data.ui_rules && typeof data.ui_rules.max_taps_soft_hold === 'number')
-                        ? data.ui_rules.max_taps_soft_hold
-                        : 3;
-                    var oreList = Array.isArray(data.ore_gated_capabilities) ? data.ore_gated_capabilities : [];
-                    var oreLines = [];
-                    for (var oi = 0; oi < oreList.length; oi++) {
-                        var oc = oreList[oi];
-                        if (!oc || !oc.requires_ore_approval || !oc.fail_closed) continue;
-                        if (oc.user_visible_summary_ja) oreLines.push(String(oc.user_visible_summary_ja));
-                    }
-                    if (oreLines.length) {
-                        oreEl.style.display = '';
-                        oreEl.textContent = 'ORE承認前（fail-closed）: ' + oreLines.join(' / ');
-                    } else {
-                        oreEl.style.display = 'none';
-                        oreEl.textContent = '';
-                    }
-                    function renderState() {
-                        var st = statesById[stateId];
-                        if (!st) return;
-                        stateEl.textContent = String(st.copy_ja || '');
-                        actionsEl.innerHTML = '';
-                        var sug = Array.isArray(st.next_suggestions) ? st.next_suggestions.slice(0, 3) : [];
-                        for (var j = 0; j < sug.length; j++) {
-                            var s1 = sug[j];
-                            var btn = document.createElement('button');
-                            btn.type = 'button';
-                            btn.className = 'glb-fullpower-btn';
-                            btn.textContent = String(s1.label_ja || '');
-                            (function (target, cost) {
-                                btn.addEventListener('click', function () {
-                                    taps += (typeof cost === 'number' && cost > 0) ? cost : 1;
-                                    holdEl.style.display = taps > maxTap ? '' : 'none';
-                                    if (taps > maxTap) {
-                                        try { glbTrackOpsEvent('travel_dialogue_hold', { reason: 'tap_budget', taps: taps }); } catch (eh) { /* ignore */ }
-                                    }
-                                    stateId = String(target || 'idle');
-                                    renderState();
-                                });
-                            })(String(s1.target_state || 'idle'), s1.tap_cost);
-                            actionsEl.appendChild(btn);
-                        }
-                        shell.classList.remove('glb-travel-full-emergency');
-                    }
-                    shell.style.display = 'block';
-                    renderState();
-                    try { glbTrackOpsEvent('travel_fullpower_entry', { schema: String(data.schema || '') }); } catch (ee) { /* ignore */ }
-                })
-                .catch(function () {
-                    shell.style.display = 'none';
                 });
         }
         (function glbSpeechSynthIosUnlock() {
@@ -2378,7 +2232,6 @@
             if (u) u.value = getStoredUiLang();
         })();
         glbInitTravelMinimal();
-        glbInitTravelFullPower();
         window.addEventListener('beforeunload', function () {
             var point = 'landing_only';
             if (GLB_SESSION_EVENTS.translated > 0) point = 'after_translation';
