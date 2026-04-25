@@ -228,6 +228,82 @@
             border: 1px solid rgba(255, 245, 180, 0.65);
         }
         .btn:active { filter: brightness(1.05); }
+        .glb-travel-top {
+            margin: 8px 0 16px;
+            padding: 14px 12px;
+            border: 1px solid rgba(255, 230, 100, 0.22);
+            border-radius: 12px;
+            background: rgba(18, 18, 18, 0.88);
+            box-shadow: 0 0 18px rgba(255, 210, 80, 0.06);
+            text-align: center;
+        }
+        .glb-travel-top-sub {
+            margin: 0 0 10px;
+            color: #d8ca9b;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .glb-travel-top-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        .glb-travel-top-btn {
+            display: block;
+            width: 100%;
+            border: 1px solid rgba(255, 230, 100, 0.5);
+            border-radius: 10px;
+            padding: 12px 10px;
+            background: #131107;
+            color: #fff7d2;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+        }
+        .glb-travel-top-btn small {
+            display: block;
+            margin-top: 3px;
+            font-size: 11px;
+            color: #b9af8a;
+            font-weight: 500;
+        }
+        .glb-travel-top-btn.is-active {
+            background: linear-gradient(180deg, #fff1a8 0%, #f2d568 100%);
+            color: #141108;
+            border-color: rgba(255, 240, 170, 0.85);
+        }
+        .glb-travel-top-btn.is-active small { color: #4a4022; }
+        .glb-show-emergency-strip {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(150, 40, 40, 0.45);
+            background: rgba(45, 8, 8, 0.45);
+            display: none;
+        }
+        .glb-show-emergency-strip p {
+            margin: 0 0 6px;
+            font-size: 11px;
+            color: #f0c9c9;
+            text-align: center;
+        }
+        .glb-show-emergency-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .glb-show-emergency-actions button {
+            border: 1px solid rgba(255, 120, 120, 0.5);
+            background: #2a0f0f;
+            color: #ffd8d8;
+            border-radius: 8px;
+            padding: 8px 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
         .footer { margin-top: 32px; padding-top: 16px; font-size: 11px; color: #666; border-top: 1px solid #222; }
         .footer a { color: #888; margin: 0 8px; text-decoration: none; }
         .legal-footer { margin-top: 40px; padding: 20px 8px 8px; border-top: 1px solid #2a2a2a; font-size: 12px; color: #888; text-align: center; }
@@ -771,8 +847,25 @@
     <div class="header">
         <h1 class="gold-text app-brand-title" id="app-brand-title"><span class="brand-line">GLOBAL LANGUAGE</span><span class="brand-line">BREAKER</span></h1>
     </div>
+    <section id="glb-travel-top" class="glb-travel-top" aria-label="Travel Pass mode menu">
+        <p class="glb-travel-top-sub">Travel Pass</p>
+        <div class="glb-travel-top-actions">
+            <button type="button" id="glb-mode-speak" class="glb-travel-top-btn">
+                Speak
+                <small>話す</small>
+            </button>
+            <button type="button" id="glb-mode-show" class="glb-travel-top-btn">
+                Show
+                <small>見せる</small>
+            </button>
+            <button type="button" id="glb-mode-essentials" class="glb-travel-top-btn">
+                Essentials
+                <small>必須カード</small>
+            </button>
+        </div>
+    </section>
 
-    <div class="glb-billboard">
+    <div id="glb-billboard-shell" class="glb-billboard">
         <div id="glb-result-stage" class="glb-result-stage">
             <div class="glb-split-stage">
                 <div class="glb-view-pane glb-view-pane--partner">
@@ -793,6 +886,13 @@
             <button type="button" class="glb-flip-btn" id="glb-quick-speak">Speak</button>
             <button type="button" class="glb-flip-btn" id="glb-quick-zoom">Zoom</button>
             <button type="button" class="glb-flip-btn" id="glb-quick-tts">TTS</button>
+        </div>
+        <div id="glb-show-emergency-strip" class="glb-show-emergency-strip" aria-live="polite">
+            <p>Emergency quick show</p>
+            <div class="glb-show-emergency-actions">
+                <button type="button" id="glb-show-emergency-help">Help</button>
+                <button type="button" id="glb-show-emergency-police">Call Police</button>
+            </div>
         </div>
         <p id="glb-travel-pass-hero" class="glb-travel-pass-hero" style="display:none; margin:8px 0 0;" role="status" aria-live="polite"></p>
     </div>
@@ -832,7 +932,7 @@
         </div>
     </div>
 
-    <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #2a2a2a; text-align: left;">
+    <div id="glb-translate-panel" style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #2a2a2a; text-align: left;">
         <div class="trans-section-head" id="t-trans-head">Translation</div>
         <details id="glb-lang-details" class="glb-lang-details">
         <summary id="glb-lang-details-summary" class="glb-lang-details-sum"></summary>
@@ -2461,9 +2561,14 @@
             var selfEl = document.getElementById('translate-measure-result');
             var partnerEl = document.getElementById('translate-partner-result');
             var stage = document.getElementById('glb-result-stage');
+            var inputEl = document.getElementById('tr-text');
             if (!selfEl || !partnerEl) return;
             function syncPartner() {
-                partnerEl.textContent = selfEl.textContent || '';
+                if (window.__GLB_TRAVEL_VIEW_MODE === 'speak') {
+                    partnerEl.textContent = (inputEl && inputEl.value) ? inputEl.value : (typeof T === 'function' ? T('idle') : 'Idle');
+                } else {
+                    partnerEl.textContent = selfEl.textContent || '';
+                }
                 if (stage) {
                     stage.classList.remove('is-flash');
                     void stage.offsetWidth;
@@ -2473,6 +2578,7 @@
             syncPartner();
             var obs = new MutationObserver(syncPartner);
             obs.observe(selfEl, { childList: true, characterData: true, subtree: true });
+            if (inputEl) inputEl.addEventListener('input', syncPartner);
         })();
 
         (function glbLangFlow() {
@@ -3254,6 +3360,127 @@ Emergency: ' + d.emergency;
                     if (ev.target === zoomOv) closeZoom();
                 });
             }
+        })();
+
+        (function initTravelTopModeMenu() {
+            var btnSpeak = document.getElementById('glb-mode-speak');
+            var btnShow = document.getElementById('glb-mode-show');
+            var btnEssentials = document.getElementById('glb-mode-essentials');
+            var billboard = document.getElementById('glb-billboard-shell');
+            var prep = document.getElementById('glb-travel-prep');
+            var six = document.getElementById('glb-travel-six');
+            var translatePanel = document.getElementById('glb-translate-panel');
+            var departure = document.getElementById('glb-travel-departure-band');
+            var subscribe = document.getElementById('subscribe-area');
+            var manage = document.getElementById('manage-subscription-wrap');
+            var pulse = document.getElementById('gateway-pulse');
+            var zoomBtn = document.getElementById('glb-quick-zoom');
+            var zoomClose = document.getElementById('glb-travel-zoom-close');
+            var partnerLabel = document.querySelector('.glb-view-pane--partner .glb-pane-label');
+            var selfLabel = document.querySelector('.glb-view-pane--self .glb-pane-label');
+            var emergencyStrip = document.getElementById('glb-show-emergency-strip');
+            var emergencyHelp = document.getElementById('glb-show-emergency-help');
+            var emergencyPolice = document.getElementById('glb-show-emergency-police');
+            var inputEl = document.getElementById('tr-text');
+            var runBtn = document.getElementById('tr-run');
+            var partnerResult = document.getElementById('translate-partner-result');
+
+            function setVisible(el, on) {
+                if (!el) return;
+                el.style.display = on ? '' : 'none';
+                el.setAttribute('aria-hidden', on ? 'false' : 'true');
+            }
+
+            function markActive(target) {
+                var list = [btnSpeak, btnShow, btnEssentials];
+                for (var i = 0; i < list.length; i++) {
+                    var b = list[i];
+                    if (!b) continue;
+                    if (b === target) b.classList.add('is-active');
+                    else b.classList.remove('is-active');
+                }
+            }
+
+            function setEmergencyPhrase(text) {
+                if (!inputEl || !runBtn) return;
+                inputEl.value = text || '';
+                runBtn.click();
+                try { if (zoomBtn) zoomBtn.click(); } catch (e0) { /* ignore */ }
+            }
+
+            function switchMode(mode) {
+                window.__GLB_TRAVEL_VIEW_MODE = mode;
+                if (mode === 'home') {
+                    setVisible(billboard, false);
+                    setVisible(prep, false);
+                    setVisible(six, false);
+                    setVisible(translatePanel, false);
+                    setVisible(departure, false);
+                    setVisible(subscribe, false);
+                    setVisible(manage, false);
+                    setVisible(pulse, false);
+                    setVisible(emergencyStrip, false);
+                    markActive(null);
+                    return;
+                }
+                if (mode === 'speak') {
+                    setVisible(billboard, true);
+                    setVisible(prep, false);
+                    setVisible(six, false);
+                    setVisible(translatePanel, true);
+                    setVisible(departure, false);
+                    setVisible(subscribe, true);
+                    setVisible(manage, true);
+                    setVisible(pulse, false);
+                    setVisible(emergencyStrip, false);
+                    if (partnerLabel) partnerLabel.textContent = 'YOU SAID';
+                    if (selfLabel) selfLabel.textContent = 'TRANSLATION';
+                    if (partnerResult) partnerResult.style.transform = 'none';
+                    markActive(btnSpeak);
+                    return;
+                }
+                if (mode === 'show') {
+                    setVisible(billboard, true);
+                    setVisible(prep, false);
+                    setVisible(six, false);
+                    setVisible(translatePanel, false);
+                    setVisible(departure, false);
+                    setVisible(subscribe, false);
+                    setVisible(manage, false);
+                    setVisible(pulse, false);
+                    setVisible(emergencyStrip, true);
+                    if (partnerLabel) partnerLabel.textContent = 'PARTNER VIEW';
+                    if (selfLabel) selfLabel.textContent = 'YOUR VIEW';
+                    if (partnerResult) partnerResult.style.transform = 'rotate(180deg)';
+                    markActive(btnShow);
+                    try { if (zoomBtn) zoomBtn.click(); } catch (e1) { /* ignore */ }
+                    return;
+                }
+                if (mode === 'essentials') {
+                    if (zoomClose) {
+                        try { zoomClose.click(); } catch (e2) { /* ignore */ }
+                    }
+                    setVisible(billboard, false);
+                    setVisible(prep, false);
+                    setVisible(six, true);
+                    setVisible(translatePanel, false);
+                    setVisible(departure, false);
+                    setVisible(subscribe, false);
+                    setVisible(manage, false);
+                    setVisible(pulse, false);
+                    setVisible(emergencyStrip, false);
+                    if (partnerResult) partnerResult.style.transform = 'rotate(180deg)';
+                    markActive(btnEssentials);
+                }
+            }
+
+            if (btnSpeak) btnSpeak.addEventListener('click', function () { switchMode('speak'); });
+            if (btnShow) btnShow.addEventListener('click', function () { switchMode('show'); });
+            if (btnEssentials) btnEssentials.addEventListener('click', function () { switchMode('essentials'); });
+            if (emergencyHelp) emergencyHelp.addEventListener('click', function () { setEmergencyPhrase('Help! I need help right now.'); });
+            if (emergencyPolice) emergencyPolice.addEventListener('click', function () { setEmergencyPhrase('Please call the police.'); });
+
+            switchMode('home');
         })();
     </script>
     <script>
