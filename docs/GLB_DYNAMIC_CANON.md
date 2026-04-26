@@ -1,10 +1,11 @@
 # GLB_DYNAMIC_CANON
 
 ## STATE
-GLB_REVENUE_FIRST / PROTECTED_ARCHITECTURE
+GLB_REVENUE_FIRST / PROTECTED_ARCHITECTURE / FEATURE_REDUCTION
 
 ## GOAL
-収益化と同時に、内部ロジック（無料枠・辞書・API削減）をブラックボックス化し、外部から推測されにくい構造を維持する。
+GLBを公開可能な収益プロダクトとして仕上げる。
+内部ロジック（無料枠・辞書・API削減）はブラックボックス化し、公開UIは初見5秒で理解できる状態まで削る。
 
 ## DISCLOSURE_POLICY
 
@@ -44,6 +45,44 @@ GLB_REVENUE_FIRST / PROTECTED_ARCHITECTURE
 - 内部キー名の露出
 - 判定コードの説明
 - API削減と無料枠の関係説明
+
+## FEATURE_REDUCTION_RULE
+
+公開前は機能を増やさない。
+出すために削る。
+初見ユーザーが5秒で理解できない機能は後回し。
+
+### 残す機能
+index.html:
+- 無料で1日10回翻訳
+- Core $2.99
+- Travel Pass $14.99
+- 価格導線
+
+index.next.html:
+- 翻訳入力
+- 翻訳結果
+- 言語選択
+- 音声/TTS
+- Core購入導線
+- Travel Pass導線
+
+travel.html:
+- 話す / Speak
+- 見せる / Show
+- 必須カード / Essentials
+- 戻る
+
+### 後回し・削ってよい機能
+- Stats
+- Referral
+- Share
+- 過剰な履歴
+- Scene prediction
+- 複雑なタブ
+- 多すぎる小ボタン
+- 説明しすぎるブロック
+- 過剰アニメーション
 
 ## API_REDUCTION_PROTECTION
 
@@ -89,6 +128,9 @@ GLBは
 
 公開するのは価値、条件、価格、使い方。
 隠すのは内部ロジック、原価構造、API削減、辞書、キャッシュ、判定処理。
+
+公開前は足さない。
+迷わせるものは削る。
 
 ## UPDATE_RULE
 このファイルは上書き更新のみ。
