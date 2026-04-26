@@ -19,361 +19,573 @@
   PORTAL_RETURN_URL 正本: index.next.html
   コード内の location.replace は相対パス可（同一オリジン）。Dashboard 設定のみ絶対URL必須。
 -->
+
 <html lang="en" class="notranslate" translate="no">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
-    <title>GLOBAL LANGUAGE BREAKER</title>
-    <style>
-        :root {
-            --gold: #ffe566;
-            --gold-deep: #e8b820;
-            --gold-glow: rgba(255, 230, 100, 0.95);
-            --gold-glow-mid: rgba(255, 200, 60, 0.55);
-            --gold-glow-soft: rgba(255, 210, 80, 0.28);
-            --bg: #0a0a0a;
-            --card: #1a1a1a;
-            --noir-red: #ff0000;
-        }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 0; padding-bottom: env(safe-area-inset-bottom, 0); text-align: center; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: rgba(255, 230, 100, 0.15); }
-        .cockpit { padding: 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(600px, 100%); margin: 0 auto; box-sizing: border-box; }
-        .header { margin-bottom: 22px; padding: 0 6px; }
-        .gold-text { color: var(--gold); letter-spacing: 4px; font-weight: bold; }
-        @keyframes glb-neon-title {
-            0%, 100% { text-shadow: 0 0 12px var(--gold-glow-soft), 0 0 28px var(--gold-glow-mid), 0 0 48px rgba(255, 180, 40, 0.22); filter: brightness(1.02); }
-            50% { text-shadow: 0 0 18px var(--gold-glow-soft), 0 0 40px var(--gold-glow-mid), 0 0 64px rgba(255, 200, 60, 0.32); filter: brightness(1.08); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            h1.gold-text.app-brand-title { animation: none; text-shadow: 0 0 14px var(--gold-glow-mid), 0 0 32px var(--gold-glow-soft); }
-        }
-        h1.gold-text.app-brand-title {
-            font-size: clamp(1.15rem, 4.8vw, 1.85rem);
-            letter-spacing: 0.1em;
-            line-height: 1.18;
-            font-weight: 800;
-            text-transform: uppercase;
-            max-width: 22em;
-            margin-left: auto;
-            margin-right: auto;
-            color: #fff8c8;
-            animation: glb-neon-title 3.2s ease-in-out infinite;
-        }
-        h1.gold-text.app-brand-title .brand-line {
-            display: block;
-            letter-spacing: 0.11em;
-        }
-        h1.gold-text.app-brand-title .brand-line + .brand-line {
-            margin-top: 0.08em;
-        }
-        .glb-billboard { width: 100%; max-width: min(560px, 100%); margin: 12px auto 18px; padding: 0; box-sizing: border-box; }
-        .glb-billboard-tools { display: flex; justify-content: flex-end; margin-bottom: 8px; }
-        .glb-flip-btn {
-            background: var(--card);
-            color: #fff8c8;
-            border: 1px solid var(--gold);
-            border-radius: 10px;
-            padding: 10px 16px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            cursor: pointer;
-            text-shadow: 0 0 12px var(--gold-glow-mid);
-            box-shadow: 0 0 14px var(--gold-glow-soft), inset 0 0 12px rgba(255, 220, 100, 0.06);
-        }
-        .glb-flip-btn:active { opacity: 0.92; filter: brightness(1.05); }
-        #glb-result-stage {
-            min-height: min(52dvh, 420px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px 18px;
-            background: radial-gradient(ellipse 120% 80% at 50% 40%, rgba(255, 210, 60, 0.07) 0%, #0d0d0d 55%);
-            border: 2px solid var(--gold);
-            border-radius: 16px;
-            box-sizing: border-box;
-            box-shadow:
-                0 0 20px var(--gold-glow-soft),
-                0 0 40px rgba(255, 190, 50, 0.12),
-                inset 0 0 32px rgba(255, 200, 60, 0.04);
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-        }
-        #glb-result-stage #translate-measure-result {
-            min-height: 0;
-            width: 100%;
-            max-width: 100%;
-            padding: 0;
-            margin: 0;
-            background: transparent;
-            border: none;
-            font-size: clamp(26px, 8.5vw, 48px);
-            line-height: 1.35;
-            font-weight: 700;
-            text-align: center;
-            color: #f2f2f2;
-            word-break: break-word;
-            transition: transform 0.28s ease;
-            transform: rotate(0deg);
-        }
-        /* 相手がいるとき：Flip で 180°（向かい側から読める向き） */
-        #glb-result-stage.is-flipped #translate-measure-result {
-            transform: rotate(180deg);
-        }
-        .free-quota-line {
-            font-size: 11px;
-            color: #aaa;
-            text-align: center;
-            margin: 10px 8px 0;
-            line-height: 1.5;
-            max-width: 100%;
-            word-break: break-word;
-        }
-        .free-quota-line.is-warn { color: #ffe08a; text-shadow: 0 0 10px var(--gold-glow-mid); }
-        .flipped-mode {
-            transform: rotate(180deg) !important;
-            font-size: 5rem !important;
-            transition: transform 0.3s ease;
-        }
-        .glb-subscribe-btn {
-            min-height: 48px;
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
-        }
-        input { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--gold); background: #111; color: #fff; font-size: 16px; margin-bottom: 12px; outline: none; box-sizing: border-box; box-shadow: 0 0 10px var(--gold-glow-soft); }
-        input:focus { box-shadow: 0 0 16px var(--gold-glow-mid); border-color: #fff4a8; }
-        .btn {
-            background: linear-gradient(180deg, #fff6a8 0%, var(--gold) 45%, var(--gold-deep) 100%);
-            color: #0a0a06;
-            padding: 16px;
-            border-radius: 30px;
-            font-weight: bold;
-            text-decoration: none;
-            display: block;
-            margin: 10px 0;
-            font-size: 16px;
-            box-shadow: 0 0 22px var(--gold-glow-mid), 0 0 40px var(--gold-glow-soft);
-            border: 1px solid rgba(255, 245, 180, 0.65);
-        }
-        .btn:active { filter: brightness(1.05); }
-        .footer { margin-top: 32px; padding-top: 16px; font-size: 11px; color: #666; border-top: 1px solid #222; }
-        .footer a { color: #888; margin: 0 8px; text-decoration: none; }
-        .legal-footer { margin-top: 40px; padding: 20px 8px 8px; border-top: 1px solid #2a2a2a; font-size: 12px; color: #888; text-align: center; }
-        .legal-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; line-height: 1.6; }
-        .legal-links a { color: #aaa; margin: 0; text-decoration: underline; text-underline-offset: 3px; }
-        .legal-links a:hover { color: var(--gold); }
-        .legal-sep { color: #444; user-select: none; }
-        .footer-copy { margin-top: 12px; font-size: 11px; color: #666; }
-        select.lang-select {
-            width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--gold);
-            background: #111; color: #fff; font-size: 14px; margin-bottom: 12px; outline: none; box-sizing: border-box;
-            box-shadow: 0 0 10px var(--gold-glow-soft);
-        }
-        select.lang-select:focus { box-shadow: 0 0 16px var(--gold-glow-mid); border-color: #fff4a8; }
-        .lang-hint { font-size: 11px; color: #777; text-align: left; margin: 0 0 8px; line-height: 1.4; }
-        .travel-toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12px; color: #aaa; text-align: left; }
-        .travel-toggle-row input[type="checkbox"] { width: auto; margin: 0; accent-color: var(--gold); }
-        .model-badge { display: none; }
-        @media (max-width: 420px) {
-            .model-badge { max-width: none; width: 100%; text-align: left; padding-top: 6px; }
-        }
-        .model-badge strong { color: #8a8; font-weight: 600; display: block; }
-        .stripe-hint { font-size: 10px; color: #555; margin-top: 8px; line-height: 1.4; }
-        .glb-travel-mini-row {
-            margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255, 230, 100, 0.12);
-            text-align: center;
-        }
-        .glb-travel-mini-link {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 700;
-            color: #c9b87a;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            padding: 4px 8px;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 230, 100, 0.25);
-            background: rgba(20, 20, 20, 0.9);
-        }
-        .glb-travel-mini-link:active { opacity: 0.9; filter: brightness(1.06); }
-        .glb-travel-mini-hint {
-            display: block;
-            font-size: 9px;
-            color: #666;
-            margin-top: 6px;
-            line-height: 1.35;
-            max-width: 28em;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .glb-travel-remaining {
-            margin: 0 0 10px;
-            font-size: 11px;
-            color: #a89860;
-            text-align: center;
-            line-height: 1.4;
-        }
-        .pricing-box { text-align: left; font-size: 12px; color: #ccc; line-height: 1.55; margin: 0 0 14px; padding: 12px 14px; background: #141414; border-radius: 10px; border: 1px solid #2a2a2a; }
-        .pricing-box h2 {
-            font-size: 14px;
-            color: #fff8c8;
-            margin: 0 0 10px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 12px var(--gold-glow-mid), 0 0 24px var(--gold-glow-soft);
-        }
-        .pricing-box ul { margin: 0; padding-left: 1.1em; }
-        .pricing-box li { margin-bottom: 8px; }
-        .pricing-box .ja { font-size: 11px; color: #777; display: block; margin-top: 4px; line-height: 1.45; }
-        .pricing-box .note { font-size: 10px; color: #666; margin-top: 10px; }
-        .maintenance-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            background: rgba(8, 8, 8, 0.96);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            box-sizing: border-box;
-        }
-        .maintenance-overlay.show { display: flex; }
-        .maintenance-card {
-            width: min(520px, 100%);
-            border: 1px solid #2a2a2a;
-            border-radius: 14px;
-            background: #121212;
-            box-shadow: 0 0 28px rgba(255, 220, 100, 0.08);
-            padding: 18px 16px;
-            text-align: left;
-        }
-        .maintenance-card h2 {
-            margin: 0 0 10px;
-            color: #fff8c8;
-            font-size: 18px;
-            letter-spacing: 0.03em;
-        }
-        .maintenance-card p {
-            margin: 0;
-            color: #d0d0d0;
-            line-height: 1.6;
-            font-size: 14px;
-        }
-        .maintenance-reload {
-            margin-top: 12px;
-            display: inline-block;
-            border: 1px solid #ffe566;
-            color: #fff8c8;
-            background: #1a1a1a;
-            border-radius: 999px;
-            padding: 10px 14px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .tr-run-wrap { text-align: center; margin-top: 10px; margin-bottom: 6px; }
-        #tr-run.glb-main-btn {
-            display: inline-block;
-            width: auto;
-            min-width: min(220px, 88vw);
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 18px 28px;
-            font-size: clamp(17px, 4.5vw, 20px);
-            font-weight: 800;
-            letter-spacing: 0.28em;
-            border-radius: 999px;
-            box-shadow: 0 0 26px var(--gold-glow), 0 0 52px var(--gold-glow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-        }
-        .trans-lang-grid { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
-        .trans-lang-grid > div { flex: 1 1 140px; min-width: 0; }
-        #lang-swap {
-            flex: 0 0 auto;
-            align-self: center;
-            background: var(--card);
-            color: #fff8c8;
-            border: 1px solid var(--gold);
-            border-radius: 10px;
-            padding: 12px 14px;
-            font-size: 18px;
-            line-height: 1;
-            cursor: pointer;
-            text-shadow: 0 0 10px var(--gold-glow-mid);
-            box-shadow: 0 0 14px var(--gold-glow-soft);
-        }
-        #lang-swap:active { opacity: 0.92; }
-        .trans-section-head {
-            font-size: 12px;
-            color: #fff8c8;
-            margin-bottom: 10px;
-            font-weight: 600;
-            text-shadow: 0 0 10px var(--gold-glow-mid);
-        }
-        @media (max-width: 480px) {
-            .cockpit { padding: 16px 14px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
-            .glb-billboard { margin-top: 8px; }
-            h1.gold-text.app-brand-title {
-                font-size: clamp(1.05rem, 5.8vw, 1.55rem);
-                letter-spacing: 0.08em;
-            }
-            #glb-result-stage {
-                min-height: min(44dvh, 340px);
-                padding: 18px 14px;
-            }
-            #glb-result-stage #translate-measure-result {
-                font-size: clamp(22px, 7.2vw, 40px);
-            }
-            #tr-run.glb-main-btn {
-                min-width: min(200px, 92vw);
-                min-height: 48px;
-                padding: 16px 20px;
-                letter-spacing: 0.2em;
-            }
-            .free-quota-line {
-                font-size: 12px;
-                margin-top: 12px;
-                padding: 0 4px;
-            }
-            .tr-run-wrap { margin-bottom: 4px; }
-        }
-        .glb-post-translate-nudge {
-            max-width: 100%;
-            margin: 14px auto 0;
-            padding: 16px 14px;
-            border: 1px solid rgba(255, 230, 100, 0.48);
-            border-radius: 12px;
-            background: rgba(255, 220, 80, 0.09);
-            text-align: center;
-            box-sizing: border-box;
-            box-shadow:
-                0 0 22px rgba(255, 200, 60, 0.14),
-                inset 0 1px 0 rgba(255, 245, 200, 0.1);
-        }
-        .glb-post-translate-nudge-line {
-            font-size: 13px;
-            color: #ece6d4;
-            margin: 0 0 14px;
-            line-height: 1.45;
-            font-weight: 600;
-        }
-        .glb-post-translate-nudge .glb-post-translate-nudge-btn {
-            margin: 0 auto;
-            max-width: min(420px, 100%);
-            font-weight: 800;
-            letter-spacing: 0.02em;
-        }
-        @media (max-width: 480px) {
-            .pricing-box { font-size: 13px; padding: 14px; }
-            .pricing-box h2 { font-size: 15px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<title>GLOBAL LANGUAGE BREAKER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #060606;
+  --black2: #0e0e0e;
+  --black3: #161616;
+  --gold: #ffe566;
+  --gold2: #e8b820;
+  --gold-glow: rgba(255,229,102,0.18);
+  --gold-glow-soft: rgba(255,220,80,0.08);
+  --white: #f5f2ed;
+  --muted: #666;
+  --border: #1e1e1e;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,220,80,0.06) 0%, transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: up 0.7s 0.1s ease forwards;
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(36px, 10vw, 80px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: up 0.7s 0.2s ease forwards;
+}
+
+.hero-title em {
+  font-style: normal;
+  color: var(--gold);
+}
+
+.hero-body {
+  font-size: clamp(15px, 3vw, 18px);
+  color: var(--muted);
+  line-height: 1.75;
+  max-width: 440px;
+  margin: 0 auto 40px;
+  opacity: 0;
+  animation: up 0.7s 0.3s ease forwards;
+}
+
+.hero-cta-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  opacity: 0;
+  animation: up 0.7s 0.45s ease forwards;
+}
+
+.btn-gold {
+  display: inline-block;
+  padding: 18px 48px;
+  background: linear-gradient(180deg, #fff8b0 0%, var(--gold) 50%, var(--gold2) 100%);
+  color: #08080a;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  border-radius: 999px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 32px rgba(255,220,80,0.3), 0 0 64px rgba(255,200,60,0.12);
+  transition: filter 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.btn-gold:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px rgba(255,220,80,0.4);
+}
+
+.btn-ghost {
+  display: inline-block;
+  padding: 16px 32px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-ghost:hover {
+  border-color: rgba(255,220,80,0.3);
+  color: var(--gold);
+}
+
+.hero-note {
+  font-size: 12px;
+  color: #444;
+  letter-spacing: 0.04em;
+}
+
+/* ── LANGUAGE SELECTOR ── */
+.lang-strip {
+  padding: 0 24px 56px;
+  text-align: center;
+}
+
+.lang-strip-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #444;
+  margin-bottom: 16px;
+}
+
+.lang-select-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 12px 20px;
+  background: var(--black2);
+}
+
+.lang-select-wrap select {
+  background: transparent;
+  border: none;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  padding-right: 20px;
+}
+
+.lang-arrow {
+  color: var(--gold);
+  font-size: 18px;
+  pointer-events: none;
+  margin-left: -16px;
+}
+
+/* ── SECTION ── */
+.section {
+  padding: 72px 24px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px, 6vw, 44px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+/* ── HOW IT WORKS ── */
+.steps {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.step {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+  opacity: 0;
+  transform: translateX(-16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.step:first-child { padding-top: 0; }
+.step:last-child { border-bottom: none; }
+.step.visible { opacity: 1; transform: translateX(0); }
+
+.step-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--gold);
+  line-height: 1;
+  min-width: 44px;
+  text-shadow: 0 0 20px rgba(255,220,80,0.3);
+}
+
+.step-body h3 {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.step-body p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* ── PRICING ── */
+.pricing-section {
+  padding: 72px 24px;
+  background: var(--black2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.pricing-inner {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.plans {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 520px) {
+  .plans { grid-template-columns: 1fr; }
+}
+
+.plan {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 24px;
+  background: var(--black3);
+  position: relative;
+  transition: border-color 0.2s;
+}
+
+.plan:hover { border-color: rgba(255,220,80,0.2); }
+
+.plan.featured {
+  border-color: rgba(255,220,80,0.35);
+  background: #0f0e00;
+}
+
+.plan-badge {
+  position: absolute;
+  top: -11px;
+  left: 20px;
+  background: var(--gold);
+  color: #08080a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 12px;
+  border-radius: 999px;
+}
+
+.plan-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.plan-price {
+  font-family: 'Syne', sans-serif;
+  font-size: 44px;
+  font-weight: 800;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 4px;
+  text-shadow: 0 0 24px rgba(255,220,80,0.2);
+}
+
+.plan-period {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 24px;
+  letter-spacing: 0.04em;
+}
+
+.plan-features {
+  list-style: none;
+  margin-bottom: 28px;
+}
+
+.plan-features li {
+  font-size: 13px;
+  color: #888;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  line-height: 1.5;
+}
+
+.plan-features li::before {
+  content: '—';
+  color: var(--gold);
+  font-size: 11px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.plan-note {
+  font-size: 11px;
+  color: #444;
+  line-height: 1.6;
+  margin-top: 10px;
+}
+
+/* ── TOOL SECTION ── */
+.tool-section {
+  padding: 72px 24px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.tool-box {
+  background: var(--black2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 24px;
+}
+
+.tool-lang-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.tool-lang-select {
+  flex: 1;
+  background: var(--black3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 11px 14px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.tool-lang-select:focus { border-color: rgba(255,220,80,0.4); }
+
+.tool-swap {
+  background: var(--black3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--gold);
+  font-size: 18px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.tool-swap:hover { border-color: rgba(255,220,80,0.3); }
+
+.tool-input {
+  width: 100%;
+  background: var(--black3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  padding: 14px 16px;
+  outline: none;
+  margin-bottom: 14px;
+  transition: border-color 0.2s;
+}
+
+.tool-input:focus { border-color: rgba(255,220,80,0.4); }
+.tool-input::placeholder { color: #444; }
+
+.tool-result {
+  min-height: 80px;
+  background: var(--black);
+  border: 1px solid rgba(255,220,80,0.15);
+  border-radius: 10px;
+  padding: 16px;
+  font-size: clamp(18px, 5vw, 26px);
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1.4;
+  margin-bottom: 16px;
+  word-break: break-word;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.tool-result.idle { color: #333; font-size: 14px; }
+
+.tool-quota {
+  font-size: 12px;
+  color: #444;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ── FOOTER CTA ── */
+.footer-cta {
+  padding: 96px 24px;
+  text-align: center;
+  background: var(--black);
+}
+
+.footer-cta h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 8vw, 64px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 36px;
+}
+
+.footer-cta h2 em {
+  font-style: normal;
+  color: var(--gold);
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 32px 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 12px;
+  color: #3a3a3a;
+}
+
+footer a {
+  color: #444;
+  text-decoration: none;
+  margin: 0 10px;
+  transition: color 0.2s;
+}
+
+footer a:hover { color: var(--gold); }
+
+@keyframes up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── maintenance (from index.html 正本) ── */
+.maintenance-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(8, 8, 8, 0.96);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+.maintenance-overlay.show { display: flex; }
+.maintenance-card {
+  width: min(520px, 100%);
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  background: #121212;
+  box-shadow: 0 0 28px rgba(255, 220, 100, 0.08);
+  padding: 18px 16px;
+  text-align: left;
+}
+.maintenance-card h2 {
+  margin: 0 0 10px;
+  color: #fff8c8;
+  font-size: 18px;
+  letter-spacing: 0.03em;
+}
+.maintenance-card p {
+  margin: 0;
+  color: #d0d0d0;
+  line-height: 1.6;
+  font-size: 14px;
+}
+.maintenance-reload {
+  margin-top: 12px;
+  display: inline-block;
+  border: 1px solid #ffe566;
+  color: #fff8c8;
+  background: #1a1a1a;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+</style>
 </head>
 <body>
+
     <div id="maintenance-overlay" class="maintenance-overlay" style="display:none;" aria-hidden="true" hidden aria-live="polite" aria-modal="true" role="dialog">
         <div class="maintenance-card">
             <h2>Maintenance</h2>
@@ -381,1457 +593,652 @@
             <button type="button" id="maintenance-reload" class="maintenance-reload" style="display:none;">Reload</button>
         </div>
     </div>
-    <div class="cockpit">
-    <div class="header">
-        <h1 class="gold-text app-brand-title" id="app-brand-title"><span class="brand-line">GLOBAL LANGUAGE</span><span class="brand-line">BREAKER</span></h1>
+    <p id="travel-status" style="display:none;margin:0;padding:0;height:0;overflow:hidden;" aria-hidden="true"></p>
+    <p id="core-access-active" style="display:none;margin:0;padding:0;height:0;overflow:hidden;" aria-hidden="true"></p>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">Global Language Breaker</p>
+  <h1 class="hero-title">Break the<br><em>language barrier.</em><br>Anywhere.</h1>
+  <p class="hero-body">
+    Speak or type — instant translation in 13 languages.<br>
+    For travel, work, or any moment words fail you.
+  </p>
+  <div class="hero-cta-group">
+    <a href="#tool" class="btn-gold">Try Free — 10 runs/day</a>
+    <a href="#pricing" class="btn-ghost">See plans ↓</a>
+    <p class="hero-note">No credit card · Works instantly</p>
+  </div>
+</section>
+
+<!-- LANGUAGE SELECTOR -->
+<div class="lang-strip">
+  <p class="lang-strip-label">Your language</p>
+  <div class="lang-select-wrap">
+    <select id="ui-lang-hero">
+      <option value="en" selected>English</option>
+      <option value="ja">日本語</option>
+      <option value="zh">中文</option>
+      <option value="ko">한국어</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+      <option value="it">Italiano</option>
+      <option value="ru">Русский</option>
+      <option value="th">ไทย</option>
+      <option value="vi">Tiếng Việt</option>
+      <option value="hi">हिन्दी</option>
+      <option value="pt">Português</option>
+    </select>
+    <span class="lang-arrow">▾</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section">
+  <p class="section-label">How it works</p>
+  <h2 class="section-title">3 steps.<br>That's it.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <h3>Pick your languages</h3>
+        <p>Choose from 13 languages. Set it once before you go.</p>
+      </div>
     </div>
-    <p id="travel-status" style="display:none; margin: 0 0 12px; color:#f5e6b8; font-size:12px; text-align:center;"></p>
-    <p id="core-access-active" style="display:none; margin: 0 0 12px; color:#f5e6b8; font-size:12px; text-align:center; font-weight:700;">Core Access Active</p>
-    <p id="travel-remaining-line" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
-
-    <div class="glb-billboard">
-        <div class="glb-billboard-tools">
-            <button type="button" class="glb-flip-btn" id="glb-flip-btn">Flip</button>
-        </div>
-        <div id="glb-result-stage" class="glb-result-stage">
-            <div id="translate-measure-result" data-i18n-idle="idle" aria-live="polite">Idle</div>
-        </div>
-        <div id="glb-post-translate-nudge" class="glb-post-translate-nudge" style="display:none;" role="region" aria-labelledby="glb-post-translate-nudge-line">
-            <p id="glb-post-translate-nudge-line" class="glb-post-translate-nudge-line"></p>
-            <a href="index.next.html#glb-core-subscribe-block" class="btn glb-subscribe-btn glb-post-translate-nudge-btn" style="font-size:16px; padding:14px 18px; border-radius:999px;" id="glb-post-translate-core-btn">Start GLB 2.99</a>
-        </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <h3>Speak or type</h3>
+        <p>Use the mic or keyboard. Translation appears instantly on screen.</p>
+      </div>
     </div>
-
-    <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #2a2a2a; text-align: left;">
-        <div class="trans-section-head" id="t-trans-head">Translation</div>
-        <label for="ui-lang" style="display:block; font-size: 11px; color: #888; margin-bottom: 6px;" id="label-ui-lang">Language</label>
-        <select id="ui-lang" class="lang-select" aria-label="App language">
-            <option value="en">English</option>
-            <option value="ja">日本語</option>
-            <option value="zh">中文</option>
-            <option value="ko">한국어</option>
-            <option value="es">Español</option>
-            <option value="fr">Français</option>
-            <option value="de">Deutsch</option>
-            <option value="it">Italiano</option>
-            <option value="ru">Русский</option>
-            <option value="th">ไทย</option>
-            <option value="vi">Tiếng Việt</option>
-            <option value="hi">हिन्दी</option>
-            <option value="pt">Português</option>
-        </select>
-        <div class="trans-lang-grid">
-            <div>
-                <label for="lang-from" style="display:block; font-size: 11px; color: #888; margin-bottom: 6px;" id="label-lang-from">From</label>
-                <select id="lang-from" class="lang-select" aria-label="Translate from"></select>
-            </div>
-            <button type="button" id="lang-swap" title="Swap direction">⇄</button>
-            <div>
-                <label for="lang-to" style="display:block; font-size: 11px; color: #888; margin-bottom: 6px;" id="label-lang-to">To</label>
-                <select id="lang-to" class="lang-select" aria-label="Translate to"></select>
-            </div>
-        </div>
-        <p style="font-size: 10px; color: #666; margin: 0 0 10px; line-height: 1.45;" id="t-lang-flow-hint"></p>
-        <input type="text" id="tr-text" placeholder="Text to translate (e.g. hello)" autocomplete="off">
-        <input type="hidden" id="tr-src" value="en">
-        <input type="hidden" id="tr-tgt" value="en">
-        <div style="display:none;" aria-hidden="true">
-            <label for="region-preset" id="label-region">Region</label>
-            <select id="region-preset" class="lang-select" aria-hidden="true">
-                <option value="US" selected>United States</option>
-                <option value="GB">United Kingdom</option>
-                <option value="CA">Canada</option>
-                <option value="AU">Australia</option>
-                <option value="NZ">New Zealand</option>
-                <option value="IE">Ireland</option>
-                <option value="SG">Singapore</option>
-                <option value="IN">India</option>
-                <option value="PH">Philippines</option>
-                <option value="ZA">South Africa</option>
-                <option value="NG">Nigeria</option>
-                <option value="KE">Kenya</option>
-                <option value="GH">Ghana</option>
-                <option value="JM">Jamaica</option>
-                <option value="TT">Trinidad and Tobago</option>
-                <option value="PK">Pakistan</option>
-                <option value="MY">Malaysia</option>
-                <option value="HK">Hong Kong</option>
-                <option value="BB">Barbados</option>
-                <option value="BS">Bahamas</option>
-            </select>
-        </div>
-        <div class="tr-run-wrap">
-            <button type="button" id="tr-run" class="btn glb-main-btn">Translate</button>
-            <p class="free-quota-line" id="t-free-quota" role="status"></p>
-        </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <h3>Show the screen</h3>
+        <p>Hand your phone to the other person. No app switching. One screen does it all.</p>
+      </div>
     </div>
+  </div>
+</section>
 
-    <div id="gateway-pulse" style="display:none;" aria-hidden="true" data-i18n-placeholder="apiChecking"></div>
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="pricing-inner">
+    <p class="section-label">Simple pricing</p>
+    <h2 class="section-title">Pay for what<br>you actually use.</h2>
+    <div class="plans">
 
-    <div id="subscribe-area" style="max-width: min(600px, 100%); margin: 0 auto 20px;">
-        <div id="glb-core-subscribe-block">
-            <div class="pricing-box">
-                <h2 id="t-pricing-h2">Core — $2.99/mo</h2>
-                <ul>
-                    <li id="t-pricing-li1">Translate free (10/day). One plan unlocks unlimited.</li>
-                </ul>
-                <p class="note" id="t-pricing-note"></p>
-            </div>
-            <!-- 課金は index.next.html の Stripe のみ（本ページは無料枠 → Core へ誘導） -->
-            <a href="index.next.html#glb-core-subscribe-block" class="btn glb-subscribe-btn" style="font-size:18px; padding:18px 20px; border-radius:999px; margin-top:4px;" id="t-btn-monthly">
-                Start GLB 2.99
-            </a>
-            <p class="stripe-hint" id="t-stripe-hint">Checkout lives on the Core page (Stripe).</p>
-        </div>
+      <div class="plan">
+        <p class="plan-name">Core</p>
+        <p class="plan-price">$2.99</p>
+        <p class="plan-period">/ month · cancel anytime</p>
+        <ul class="plan-features">
+          <li>Unlimited text translation</li>
+          <li>13 languages</li>
+          <li>Listen & read-aloud</li>
+          <li>One screen, no switching</li>
+        </ul>
+        <a href="https://nextbase-one-ha.github.io/nextbase-world/index.next.html#glb-core-subscribe-block" class="btn-gold" style="width:100%;text-align:center;display:block;padding:15px;">
+          Start Core
+        </a>
+        <p class="plan-note">Try free first — 10 runs/day, no card needed.</p>
+      </div>
+
+      <div class="plan featured">
+        <div class="plan-badge">Travel</div>
+        <p class="plan-name">Travel Pass</p>
+        <p class="plan-price">$14.99</p>
+        <p class="plan-period">30 days · one-time · no auto-renew</p>
+        <ul class="plan-features">
+          <li>Everything in Core</li>
+          <li>Travel mode — face-to-face UI</li>
+          <li>Large display for showing others</li>
+          <li>Auto-returns to Core after 30 days</li>
+        </ul>
+        <a href="https://nextbase-one-ha.github.io/nextbase-world/index.premium.html" class="btn-gold" style="width:100%;text-align:center;display:block;padding:15px;">
+          Get Travel Pass
+        </a>
+        <p class="plan-note">Buy only when you travel. No forgotten charges.</p>
+      </div>
+
     </div>
-    <div id="manage-subscription-wrap" style="display:none; max-width:min(600px, 100%); margin: 0 auto 20px;">
-        <button type="button" class="btn" id="manage-subscription-btn" style="font-size:16px; padding:14px 18px; border-radius:999px;">
-            Manage Subscription
-        </button>
-        <p id="manage-subscription-note" class="stripe-hint" style="margin-top:6px;">Open Stripe Customer Portal for plan management.</p>
+  </div>
+</section>
+
+<!-- LIVE TOOL -->
+<section class="tool-section" id="tool">
+  <p class="section-label">Try it now</p>
+  <h2 class="section-title" style="margin-bottom:32px;">Free. Right here.</h2>
+  <div class="tool-box">
+    <div class="tool-lang-row">
+      <select id="t-from" class="tool-lang-select"></select>
+      <button class="tool-swap" id="t-swap">⇄</button>
+      <select id="t-to" class="tool-lang-select"></select>
     </div>
+    <input type="text" id="t-input" class="tool-input" placeholder="Type something to translate…" autocomplete="off">
+    <div class="tool-result idle" id="t-result">Translation appears here</div>
+    <button class="btn-gold" id="t-btn" style="width:100%;text-align:center;">Translate</button>
+    <p class="tool-quota" id="t-quota">10 free runs per day</p>
+  </div>
+</section>
 
-    <footer class="footer legal-footer" id="glb-legal-footer" lang="en">
-        <div class="legal-links">
-            <a href="terms.html" id="link-terms">Terms of Service</a>
-            <span class="legal-sep" aria-hidden="true">|</span>
-            <a href="privacy.html" id="link-privacy">Privacy Policy</a>
-            <span class="legal-sep" aria-hidden="true">|</span>
-            <a href="legal.html" id="link-legal">Legal</a>
-            <span class="legal-sep" aria-hidden="true">|</span>
-            <a href="support.html" id="link-support">Support</a>
-            <span class="legal-sep" aria-hidden="true">|</span>
-            <a href="https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00" id="link-cancel-subscription">Cancel Subscription</a>
-        </div>
-        <p class="footer-copy" id="footer-copyright">&copy; 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending</p>
-    </footer>
-    </div>
+<!-- FOOTER CTA -->
+<section class="footer-cta">
+  <h2>Start speaking<br><em>every language.</em></h2>
+  <a href="https://nextbase-one-ha.github.io/nextbase-world/index.next.html#glb-core-subscribe-block" class="btn-gold">
+    Try GLB Free
+  </a>
+</section>
 
-    <script>
-        /** 公開URL正本（Dashboard・文書・Gate1 照合）。相対 redirect は同一デプロイ内で有効。 */
-        var GLB_PROJECT_PUBLIC_ROOT = './';
-        /** Translate /health: smile-friend-engine (us-central1) */
-        const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
-        var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-        const APP_VERSION = '2026.04.24.index.free-entry.1';
-        const MAINTENANCE_DEFAULT = 'We are currently enhancing the system for a better experience. Please check back shortly.';
-        const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
-        const LS_TRAVEL_PENDING = 'glb_travel_pending';
-        const LS_BILLING_STATE = 'glb_billing_state_v1';
-        const PLAN_CORE_299 = 'core_2_99';
-        const PLAN_TRAVEL_1499_30D = 'travel_14_99_30d';
-        const LS_PENDING_SESSION_ID = 'GLB_PENDING_SESSION_ID';
-        const SS_POST_TRANSLATE_CORE_NUDGE = 'glb_post_translate_core_nudge_v1';
-        var GLB_CORE_SUBSCRIBED = false;
-        var GLB_TRAVEL_ACTIVE = false;
-        var GLB_TRAVEL_EXPIRES_AT = null;
-        var GLB_SYSTEM_STATUS_CACHE = null;
-        var GLB_SYSTEM_STATUS_AT = 0;
-        var GLB_SYSTEM_STATUS_TTL = 30000;
-        var GLB_MAINTENANCE_ON = false;
+<footer>
+  <p style="margin-bottom:12px;">
+    <a href="https://nextbase-one-ha.github.io/nextbase-world/terms.html">Terms</a>
+    <a href="https://nextbase-one-ha.github.io/nextbase-world/privacy.html">Privacy</a>
+    <a href="https://nextbase-one-ha.github.io/nextbase-world/legal.html">Legal</a>
+    <a href="https://nextbase-one-ha.github.io/nextbase-world/support.html">Support</a>
+  </p>
+  <p>© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending</p>
+</footer>
 
-        (function glbFunnelInit() {
-            var EP = '';
-            try {
-                EP = (window.__GLB_METRICS_ENDPOINT__ && String(window.__GLB_METRICS_ENDPOINT__).trim()) || '';
-            } catch (e0) { EP = ''; }
-            var LS_AGG = 'glb_funnel_metrics_v1';
-            function bump(key) {
-                try {
-                    var o = JSON.parse(localStorage.getItem(LS_AGG) || '{}') || {};
-                    o[key] = (Number(o[key]) || 0) + 1;
-                    localStorage.setItem(LS_AGG, JSON.stringify(o));
-                } catch (e1) { /* ignore */ }
-            }
-            window.GLBFunnel = {
-                track: function (event, detail) {
-                    var payload = {
-                        t: Date.now(),
-                        v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '',
-                        path: (function () { try { return location.pathname; } catch (e) { return ''; } })(),
-                        event: event,
-                        detail: detail || {}
-                    };
-                    try {
-                        console.log('[GLB funnel]', JSON.stringify(payload));
-                    } catch (e2) { /* ignore */ }
-                    if (event === 'index_reach') bump('index_reach');
-                    if (event === 'translate_click') bump('translate_click');
-                    if (event === 'stripe_click') bump('stripe_click');
-                    if (event === 'checkout_success') bump('checkout_success');
-                    if (event === 'core_page_click') bump('core_page_click');
-                    if (EP) {
-                        try {
-                            fetch(EP, {
-                                method: 'POST',
-                                mode: 'cors',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload),
-                                keepalive: true
-                            }).catch(function () { /* ignore */ });
-                        } catch (e3) { /* ignore */ }
-                    }
-                },
-                summary: function () {
-                    try {
-                        return JSON.parse(localStorage.getItem(LS_AGG) || '{}');
-                    } catch (e4) {
-                        return {};
-                    }
-                }
+<script>
+/** 公開URL正本（Dashboard・文書・Gate1 照合）。相対 redirect は同一デプロイ内で有効。 */
+var GLB_PROJECT_PUBLIC_ROOT = './';
+/** Translate /health: smile-friend-engine (us-central1) */
+const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
+const NEXTBASE_APP = NEXTBASE_APP_ORIGIN;
+var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
+const APP_VERSION = '2026.04.24.index.free-entry.1';
+const MAINTENANCE_DEFAULT = 'We are currently enhancing the system for a better experience. Please check back shortly.';
+const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
+const LS_TRAVEL_PENDING = 'glb_travel_pending';
+const LS_BILLING_STATE = 'glb_billing_state_v1';
+const PLAN_CORE_299 = 'core_2_99';
+const PLAN_TRAVEL_1499_30D = 'travel_14_99_30d';
+const LS_PENDING_SESSION_ID = 'GLB_PENDING_SESSION_ID';
+const LS_GLB_QUOTA = 'glb_translate_quota_v1';
+var GLB_CORE_SUBSCRIBED = false;
+var GLB_TRAVEL_ACTIVE = false;
+var GLB_TRAVEL_EXPIRES_AT = null;
+var GLB_SYSTEM_STATUS_CACHE = null;
+var GLB_SYSTEM_STATUS_AT = 0;
+var GLB_SYSTEM_STATUS_TTL = 30000;
+var GLB_MAINTENANCE_ON = false;
+
+(function glbFunnelInit() {
+    var EP = '';
+    try {
+        EP = (window.__GLB_METRICS_ENDPOINT__ && String(window.__GLB_METRICS_ENDPOINT__).trim()) || '';
+    } catch (e0) { EP = ''; }
+    var LS_AGG = 'glb_funnel_metrics_v1';
+    function bump(key) {
+        try {
+            var o = JSON.parse(localStorage.getItem(LS_AGG) || '{}') || {};
+            o[key] = (Number(o[key]) || 0) + 1;
+            localStorage.setItem(LS_AGG, JSON.stringify(o));
+        } catch (e1) { /* ignore */ }
+    }
+    window.GLBFunnel = {
+        track: function (event, detail) {
+            var payload = {
+                t: Date.now(),
+                v: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '',
+                path: (function () { try { return location.pathname; } catch (e) { return ''; } })(),
+                event: event,
+                detail: detail || {}
             };
-            window.GLBFunnel.track('index_reach', { page: 'index.html' });
-        })();
-
-        function parseBillingState() {
-            try {
-                var raw = localStorage.getItem(LS_BILLING_STATE);
-                if (!raw) return null;
-                var o = JSON.parse(raw);
-                if (!o || typeof o !== 'object') return null;
-                return o;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function persistBillingState(patch) {
-            try {
-                var cur = parseBillingState() || {};
-                var next = {};
-                var k;
-                for (k in cur) {
-                    if (Object.prototype.hasOwnProperty.call(cur, k)) next[k] = cur[k];
-                }
-                for (k in patch) {
-                    if (Object.prototype.hasOwnProperty.call(patch, k)) next[k] = patch[k];
-                }
-                next.updatedAt = Date.now();
-                if (next.active === false) next.plan = null;
-                localStorage.setItem(LS_BILLING_STATE, JSON.stringify(next));
-            } catch (e) { /* ignore */ }
-        }
-
-        function clearBillingStateStorage() {
-            try {
-                localStorage.removeItem(LS_BILLING_STATE);
-                localStorage.removeItem('glb_subscribed');
-                localStorage.removeItem('glb_paid_lock_v1');
-            } catch (e) { /* ignore */ }
-        }
-
-        (function migrateLegacyBillingToState() {
-            try {
-                var cur = parseBillingState();
-                var hasState = !!(cur && typeof cur.active === 'boolean');
-                var legV = '';
-                var legLock = false;
+            try { console.log('[GLB funnel]', JSON.stringify(payload)); } catch (e2) { /* ignore */ }
+            if (event === 'index_reach') bump('index_reach');
+            if (event === 'translate_click') bump('translate_click');
+            if (event === 'stripe_click') bump('stripe_click');
+            if (event === 'checkout_success') bump('checkout_success');
+            if (event === 'core_page_click') bump('core_page_click');
+            if (EP) {
                 try {
-                    legV = localStorage.getItem('glb_subscribed') || '';
-                    legLock = localStorage.getItem('glb_paid_lock_v1') === '1';
-                } catch (e0) { /* ignore */ }
-                var legacyPaid = legV === '1' || legV === 'true' || legLock;
-                if (!hasState && legacyPaid) {
-                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'migration_legacy', updatedAt: Date.now() });
-                }
-                if (parseBillingState()) {
-                    localStorage.removeItem('glb_subscribed');
-                    localStorage.removeItem('glb_paid_lock_v1');
-                }
-            } catch (e) { /* ignore */ }
-        })();
-
-        function glbBillingPaidActive() {
-            var s = parseBillingState();
-            if (!s || s.active !== true) return false;
-            return s.plan === PLAN_CORE_299 || s.plan === PLAN_TRAVEL_1499_30D;
-        }
-
-        function glbIsPaidFlag() {
-            return glbBillingPaidActive();
-        }
-
-        (function primeBillingFromUrl() {
-            try {
-                var u = new URL(window.location.href);
-                var sid = (u.searchParams.get('session_id') || '').trim();
-                var subq = u.searchParams.get('subscribed');
-                if (sid) {
-                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'stripe_success', updatedAt: Date.now() });
-                } else if (subq === '1' || subq === 'true') {
-                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'url_subscribed', updatedAt: Date.now() });
-                }
-            } catch (e) { /* ignore */ }
-        })();
-
-        (function prehideLimitedUiWhenPaid() {
-            try {
-                if (!glbBillingPaidActive()) return;
-                var st = document.createElement('style');
-                st.id = 'glb-paid-mode-style';
-                st.textContent = '#t-free-quota,#subscribe-area,#glb-core-subscribe-block{display:none !important;}';
-                document.head.appendChild(st);
-            } catch (e) { /* ignore */ }
-        })();
-
-        /** 課金済みは無料UIへ留めない。?nori=admin のみ無料 index を許可（debug_free 単独は無効）。 */
-        (function guardPaidUsersRedirectToNext() {
-            try {
-                var u = new URL(window.location.href);
-                if ((u.searchParams.get('nori') || '') === 'admin') return;
-                if (!glbBillingPaidActive()) return;
-                window.location.replace(new URL('index.next.html', window.location.href).href);
-            } catch (e) { /* ignore */ }
-        })();
-
-        function compareVersion(a, b) {
-            var aa = String(a || '').split('.');
-            var bb = String(b || '').split('.');
-            var n = Math.max(aa.length, bb.length);
-            for (var i = 0; i < n; i++) {
-                var x = parseInt(aa[i] || '0', 10);
-                var y = parseInt(bb[i] || '0', 10);
-                if (x > y) return 1;
-                if (x < y) return -1;
+                    fetch(EP, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true }).catch(function () {});
+                } catch (e3) { /* ignore */ }
             }
-            return 0;
+        },
+        summary: function () {
+            try { return JSON.parse(localStorage.getItem(LS_AGG) || '{}'); } catch (e4) { return {}; }
         }
+    };
+    window.GLBFunnel.track('index_reach', { page: 'index.html' });
+})();
 
-        function setMaintenanceOverlay(on, message, forceReload) {
-            var ov = document.getElementById('maintenance-overlay');
-            var msg = document.getElementById('maintenance-message');
-            var btn = document.getElementById('maintenance-reload');
-            if (!ov || !msg || !btn) return;
-            GLB_MAINTENANCE_ON = !!on;
-            msg.textContent = message || MAINTENANCE_DEFAULT;
-            btn.style.display = forceReload ? '' : 'none';
-            ov.hidden = !on;
-            ov.setAttribute('aria-hidden', on ? 'false' : 'true');
-            ov.style.display = on ? 'flex' : 'none';
-            if (on) ov.classList.add('show');
-            else ov.classList.remove('show');
+function parseBillingState() {
+    try {
+        var raw = localStorage.getItem(LS_BILLING_STATE);
+        if (!raw) return null;
+        var o = JSON.parse(raw);
+        if (!o || typeof o !== 'object') return null;
+        return o;
+    } catch (e) { return null; }
+}
+
+function persistBillingState(patch) {
+    try {
+        var cur = parseBillingState() || {};
+        var next = {};
+        var k;
+        for (k in cur) { if (Object.prototype.hasOwnProperty.call(cur, k)) next[k] = cur[k]; }
+        for (k in patch) { if (Object.prototype.hasOwnProperty.call(patch, k)) next[k] = patch[k]; }
+        next.updatedAt = Date.now();
+        if (next.active === false) next.plan = null;
+        localStorage.setItem(LS_BILLING_STATE, JSON.stringify(next));
+    } catch (e) { /* ignore */ }
+}
+
+function clearBillingStateStorage() {
+    try {
+        localStorage.removeItem(LS_BILLING_STATE);
+        localStorage.removeItem('glb_subscribed');
+        localStorage.removeItem('glb_paid_lock_v1');
+    } catch (e) { /* ignore */ }
+}
+
+(function migrateLegacyBillingToState() {
+    try {
+        var cur = parseBillingState();
+        var hasState = !!(cur && typeof cur.active === 'boolean');
+        var legV = '';
+        var legLock = false;
+        try {
+            legV = localStorage.getItem('glb_subscribed') || '';
+            legLock = localStorage.getItem('glb_paid_lock_v1') === '1';
+        } catch (e0) { /* ignore */ }
+        var legacyPaid = legV === '1' || legV === 'true' || legLock;
+        if (!hasState && legacyPaid) {
+            persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'migration_legacy', updatedAt: Date.now() });
         }
-
-        function applySystemStatus(status) {
-            if (!status) return;
-            var forceReload = status.min_app_version && compareVersion(status.min_app_version, APP_VERSION) > 0;
-            if (forceReload) {
-                setMaintenanceOverlay(true, 'A new version is available. Please reload the page.', true);
-                return;
-            }
-            if (status.maintenance_mode) {
-                setMaintenanceOverlay(true, status.maintenance_message || MAINTENANCE_DEFAULT, false);
-                return;
-            }
-            setMaintenanceOverlay(false, '', false);
+        if (parseBillingState()) {
+            localStorage.removeItem('glb_subscribed');
+            localStorage.removeItem('glb_paid_lock_v1');
         }
+    } catch (e) { /* ignore */ }
+})();
 
-        function fetchSystemStatus(force) {
-            var now = Date.now();
-            if (!force && GLB_SYSTEM_STATUS_CACHE && (now - GLB_SYSTEM_STATUS_AT < GLB_SYSTEM_STATUS_TTL)) {
-                applySystemStatus(GLB_SYSTEM_STATUS_CACHE);
-                return Promise.resolve(GLB_SYSTEM_STATUS_CACHE);
-            }
-            return fetch(NEXTBASE_APP_ORIGIN + '/system-status', { method: 'GET', cache: 'no-store' })
-                .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-                .then(function (j) {
-                    GLB_SYSTEM_STATUS_CACHE = j;
-                    GLB_SYSTEM_STATUS_AT = Date.now();
-                    applySystemStatus(j);
-                    return j;
-                })
-                .catch(function () {
-                    try { setMaintenanceOverlay(false, '', false); } catch (e0) { /* ignore */ }
-                    return GLB_SYSTEM_STATUS_CACHE;
-                });
+function glbBillingPaidActive() {
+    var s = parseBillingState();
+    if (!s || s.active !== true) return false;
+    return s.plan === PLAN_CORE_299 || s.plan === PLAN_TRAVEL_1499_30D;
+}
+
+function glbIsPaidFlag() { return glbBillingPaidActive(); }
+
+(function primeBillingFromUrl() {
+    try {
+        var u = new URL(window.location.href);
+        var sid = (u.searchParams.get('session_id') || '').trim();
+        var subq = u.searchParams.get('subscribed');
+        if (sid) {
+            persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'stripe_success', updatedAt: Date.now() });
+        } else if (subq === '1' || subq === 'true') {
+            persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'url_subscribed', updatedAt: Date.now() });
         }
+    } catch (e) { /* ignore */ }
+})();
 
-        (function initSystemStatusWatcher() {
-            var reloadBtn = document.getElementById('maintenance-reload');
-            if (reloadBtn) reloadBtn.addEventListener('click', function () { location.reload(); });
-            fetchSystemStatus(true);
-            setInterval(function () { fetchSystemStatus(false); }, 30000);
-        })();
+(function prehideLimitedUiWhenPaid() {
+    try {
+        if (!glbBillingPaidActive()) return;
+        var st = document.createElement('style');
+        st.id = 'glb-paid-mode-style';
+        st.textContent = '#t-quota{display:none !important;}';
+        document.head.appendChild(st);
+    } catch (e) { /* ignore */ }
+})();
 
-        function cleanupUrlParams() {
-            try {
-                var url = new URL(window.location.href);
-                url.searchParams.delete('travel');
-                url.searchParams.delete('session_id');
-                url.searchParams.delete('subscribed');
-                history.replaceState({}, '', url.pathname + url.search + url.hash);
-            } catch (e) { /* ignore */ }
+/** 課金済みは無料LPへ留めない。?nori=admin のみ無料 index を許可。 */
+(function guardPaidUsersRedirectToNext() {
+    try {
+        var u = new URL(window.location.href);
+        if ((u.searchParams.get('nori') || '') === 'admin') return;
+        if (!glbBillingPaidActive()) return;
+        window.location.replace(new URL('index.next.html', window.location.href).href);
+    } catch (e) { /* ignore */ }
+})();
+
+function compareVersion(a, b) {
+    var aa = String(a || '').split('.');
+    var bb = String(b || '').split('.');
+    var n = Math.max(aa.length, bb.length);
+    for (var i = 0; i < n; i++) {
+        var x = parseInt(aa[i] || '0', 10);
+        var y = parseInt(bb[i] || '0', 10);
+        if (x > y) return 1;
+        if (x < y) return -1;
+    }
+    return 0;
+}
+
+function setMaintenanceOverlay(on, message, forceReload) {
+    var ov = document.getElementById('maintenance-overlay');
+    var msg = document.getElementById('maintenance-message');
+    var btn = document.getElementById('maintenance-reload');
+    if (!ov || !msg || !btn) return;
+    GLB_MAINTENANCE_ON = !!on;
+    msg.textContent = message || MAINTENANCE_DEFAULT;
+    btn.style.display = forceReload ? '' : 'none';
+    ov.hidden = !on;
+    ov.setAttribute('aria-hidden', on ? 'false' : 'true');
+    ov.style.display = on ? 'flex' : 'none';
+    if (on) ov.classList.add('show');
+    else ov.classList.remove('show');
+}
+
+function applySystemStatus(status) {
+    if (!status) return;
+    var forceReload = status.min_app_version && compareVersion(status.min_app_version, APP_VERSION) > 0;
+    if (forceReload) {
+        setMaintenanceOverlay(true, 'A new version is available. Please reload the page.', true);
+        return;
+    }
+    if (status.maintenance_mode) {
+        setMaintenanceOverlay(true, status.maintenance_message || MAINTENANCE_DEFAULT, false);
+        return;
+    }
+    setMaintenanceOverlay(false, '', false);
+}
+
+function fetchSystemStatus(force) {
+    var now = Date.now();
+    if (!force && GLB_SYSTEM_STATUS_CACHE && (now - GLB_SYSTEM_STATUS_AT < GLB_SYSTEM_STATUS_TTL)) {
+        applySystemStatus(GLB_SYSTEM_STATUS_CACHE);
+        return Promise.resolve(GLB_SYSTEM_STATUS_CACHE);
+    }
+    return fetch(NEXTBASE_APP_ORIGIN + '/system-status', { method: 'GET', cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+        .then(function (j) {
+            GLB_SYSTEM_STATUS_CACHE = j;
+            GLB_SYSTEM_STATUS_AT = Date.now();
+            applySystemStatus(j);
+            return j;
+        })
+        .catch(function () {
+            try { setMaintenanceOverlay(false, '', false); } catch (e0) { /* ignore */ }
+            return GLB_SYSTEM_STATUS_CACHE;
+        });
+}
+
+(function initSystemStatusWatcher() {
+    var reloadBtn = document.getElementById('maintenance-reload');
+    if (reloadBtn) reloadBtn.addEventListener('click', function () { location.reload(); });
+    fetchSystemStatus(true);
+    setInterval(function () { fetchSystemStatus(false); }, 30000);
+})();
+
+function cleanupUrlParams() {
+    try {
+        var url = new URL(window.location.href);
+        url.searchParams.delete('travel');
+        url.searchParams.delete('session_id');
+        url.searchParams.delete('subscribed');
+        history.replaceState({}, '', url.pathname + url.search + url.hash);
+    } catch (e) { /* ignore */ }
+}
+
+function showTravelStatus(message) {
+    var el = document.getElementById('travel-status');
+    if (!el) return;
+    if (!message) {
+        el.style.display = 'none';
+        el.textContent = '';
+        return;
+    }
+    el.textContent = message;
+    el.style.display = '';
+}
+
+function updateEntitlementState(data) {
+    var localSub = false;
+    try { localSub = glbBillingPaidActive(); } catch (e) { /* ignore */ }
+    GLB_CORE_SUBSCRIBED = !!(data && data.ok && data.core_subscribed === true) || localSub;
+    GLB_TRAVEL_ACTIVE = !!(data && data.ok && data.travel_active === true);
+    GLB_TRAVEL_EXPIRES_AT = (data && data.ok && data.travel_pass_expires_at) ? String(data.travel_pass_expires_at) : null;
+    var badge = document.getElementById('core-access-active');
+    if (badge) {
+        if (GLB_CORE_SUBSCRIBED || glbBillingPaidActive()) {
+            badge.textContent = '2.99 Unlimited Active';
+            badge.style.display = '';
+        } else {
+            badge.style.display = 'none';
         }
+    }
+    if (typeof updateQuotaDisplay === 'function') updateQuotaDisplay();
+}
 
-        function showTravelStatus(message) {
-            var el = document.getElementById('travel-status');
-            if (!el) return;
-            if (!message) {
-                el.style.display = 'none';
-                el.textContent = '';
-                return;
-            }
-            el.textContent = message;
-            el.style.display = '';
-        }
-
-        function updateEntitlementState(data) {
-            var localSub = false;
-            try { localSub = glbBillingPaidActive(); } catch (e) { /* ignore */ }
-            GLB_CORE_SUBSCRIBED = !!(data && data.ok && data.core_subscribed === true) || localSub;
-            GLB_TRAVEL_ACTIVE = !!(data && data.ok && data.travel_active === true);
-            GLB_TRAVEL_EXPIRES_AT = (data && data.ok && data.travel_pass_expires_at) ? String(data.travel_pass_expires_at) : null;
-            updatePaidStatusIndicator();
-            if (typeof refreshTravelRemainingLine === 'function') refreshTravelRemainingLine();
-        }
-
-        function updatePaidStatusIndicator() {
-            var badge = document.getElementById('core-access-active');
-            if (!badge) return;
-            if (GLB_CORE_SUBSCRIBED || isGlbUnlimited()) {
-                badge.textContent = '2.99 Unlimited Active';
-                badge.style.display = '';
+async function syncEntitlements() {
+    var url = new URL(window.location.href);
+    var sessionId = (url.searchParams.get('session_id') || '').trim();
+    var customerId = (localStorage.getItem(LS_CUSTOMER_ID) || '').trim();
+    var pendingSessionId = (localStorage.getItem(LS_PENDING_SESSION_ID) || '').trim();
+    var apiUrl = '';
+    if (sessionId) {
+        try { localStorage.setItem(LS_PENDING_SESSION_ID, sessionId); } catch (e) { /* ignore */ }
+    }
+    if (customerId) {
+        apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?customer_id=' + encodeURIComponent(customerId);
+    } else if (sessionId) {
+        apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?session_id=' + encodeURIComponent(sessionId);
+    } else if (pendingSessionId) {
+        apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?session_id=' + encodeURIComponent(pendingSessionId);
+    } else {
+        return null;
+    }
+    var res = await fetch(apiUrl, { cache: 'no-store' });
+    var data = await res.json();
+    if (data && data.ok && data.customer_id) {
+        localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
+        if (data.core_subscribed) {
+            persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'entitlements_api', updatedAt: Date.now() });
+        } else {
+            var st = parseBillingState();
+            var holdCheckout = st && st.active && (st.source === 'stripe_success' || st.source === 'url_subscribed');
+            if (holdCheckout) {
+                persistBillingState({ plan: PLAN_CORE_299, active: true, source: st.source, updatedAt: Date.now() });
             } else {
-                badge.style.display = 'none';
+                persistBillingState({ plan: null, active: false, source: 'entitlements_api', updatedAt: Date.now() });
             }
         }
+        try { localStorage.removeItem(LS_PENDING_SESSION_ID); } catch (e) { /* ignore */ }
+        updateEntitlementState(data);
+    }
+    return data;
+}
 
-        function refreshTravelRemainingLine() {
-            var el = document.getElementById('travel-remaining-line');
-            if (!el) return;
-            if (!GLB_TRAVEL_ACTIVE || !GLB_TRAVEL_EXPIRES_AT) {
-                el.style.display = 'none';
-                el.textContent = '';
-                return;
-            }
-            var exp = new Date(GLB_TRAVEL_EXPIRES_AT);
-            if (isNaN(exp.getTime())) {
-                el.style.display = 'none';
-                return;
-            }
-            var msLeft = exp.getTime() - Date.now();
-            var days = Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
-            var loc = (CURRENT_LANG === 'ja') ? 'ja-JP' : (CURRENT_LANG === 'zh' ? 'zh-CN' : 'en-US');
-            var dateStr = exp.toLocaleDateString(loc, { year: 'numeric', month: 'short', day: 'numeric' });
-            el.textContent = T('travelDaysLeft').replace(/\{\{n\}\}/g, String(days)).replace(/\{\{date\}\}/g, dateStr);
-            el.style.display = '';
-        }
-
-        async function syncEntitlements() {
-            var url = new URL(window.location.href);
-            var sessionId = (url.searchParams.get('session_id') || '').trim();
-            var customerId = (localStorage.getItem(LS_CUSTOMER_ID) || '').trim();
-            var pendingSessionId = (localStorage.getItem(LS_PENDING_SESSION_ID) || '').trim();
-            var apiUrl = '';
-            if (sessionId) {
-                try { localStorage.setItem(LS_PENDING_SESSION_ID, sessionId); } catch (e) { /* ignore */ }
-            }
-            if (customerId) {
-                apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?customer_id=' + encodeURIComponent(customerId);
-            } else if (sessionId) {
-                apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?session_id=' + encodeURIComponent(sessionId);
-            } else if (pendingSessionId) {
-                apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?session_id=' + encodeURIComponent(pendingSessionId);
+async function handleTravelActivationFlow() {
+    var url = new URL(window.location.href);
+    var isTravelRedirect = url.searchParams.get('travel') === '1';
+    var isCoreRedirect = url.searchParams.get('subscribed') === '1';
+    var hasSessionId = !!(url.searchParams.get('session_id') || '').trim();
+    if (hasSessionId) {
+        try { localStorage.setItem(LS_PENDING_SESSION_ID, (url.searchParams.get('session_id') || '').trim()); } catch (e) { /* ignore */ }
+    }
+    if (!isTravelRedirect && !isCoreRedirect) {
+        try { await syncEntitlements(); } catch (e) { /* ignore */ }
+        return;
+    }
+    localStorage.setItem(LS_TRAVEL_PENDING, 'true');
+    showTravelStatus(isCoreRedirect ? 'Activating Core Access...' : 'Activating Travel Pass...');
+    var timeoutId = setTimeout(function () {
+        if (localStorage.getItem(LS_TRAVEL_PENDING) === 'true') {
+            localStorage.removeItem(LS_TRAVEL_PENDING);
+            if (isCoreRedirect) {
+                showTravelStatus('Core access activation is taking longer than expected. Please try again shortly.');
             } else {
-                return null;
+                showTravelStatus('Travel pass activation is taking longer than expected. Base mode remains available.');
             }
-
-            var res = await fetch(apiUrl, { cache: 'no-store' });
-            var data = await res.json();
-            if (data && data.ok && data.customer_id) {
-                localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
-                if (data.core_subscribed) {
-                    persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'entitlements_api', updatedAt: Date.now() });
-                } else {
-                    var st = parseBillingState();
-                    var holdCheckout = st && st.active && (st.source === 'stripe_success' || st.source === 'url_subscribed');
-                    if (holdCheckout) {
-                        persistBillingState({ plan: PLAN_CORE_299, active: true, source: st.source, updatedAt: Date.now() });
-                    } else {
-                        persistBillingState({ plan: null, active: false, source: 'entitlements_api', updatedAt: Date.now() });
-                    }
-                }
-                try { localStorage.removeItem(LS_PENDING_SESSION_ID); } catch (e) { /* ignore */ }
-                updateEntitlementState(data);
-                if (typeof refreshFreeQuotaDisplay === 'function') refreshFreeQuotaDisplay();
-                if (typeof refreshSubscriptionUi === 'function') refreshSubscriptionUi();
-            }
-            return data;
+            cleanupUrlParams();
         }
-
-        async function handleTravelActivationFlow() {
-            var url = new URL(window.location.href);
-            var isTravelRedirect = url.searchParams.get('travel') === '1';
-            var isCoreRedirect = url.searchParams.get('subscribed') === '1';
-            var hasSessionId = !!(url.searchParams.get('session_id') || '').trim();
-            if (hasSessionId) {
-                try { localStorage.setItem(LS_PENDING_SESSION_ID, (url.searchParams.get('session_id') || '').trim()); } catch (e) { /* ignore */ }
-            }
-
-            if (!isTravelRedirect && !isCoreRedirect) {
-                try { await syncEntitlements(); } catch (e) { /* ignore */ }
-                return;
-            }
-
-            localStorage.setItem(LS_TRAVEL_PENDING, 'true');
-            showTravelStatus(isCoreRedirect ? 'Activating Core Access...' : 'Activating Travel Pass...');
-
-            var timeoutId = setTimeout(function () {
-                if (localStorage.getItem(LS_TRAVEL_PENDING) === 'true') {
-                    localStorage.removeItem(LS_TRAVEL_PENDING);
-                    if (isCoreRedirect) {
-                        showTravelStatus('Core access activation is taking longer than expected. Please try again shortly.');
-                    } else {
-                        showTravelStatus('Travel pass activation is taking longer than expected. Base mode remains available.');
-                    }
-                    cleanupUrlParams();
-                }
-            }, 60000);
-
-            try {
-                var ent = await syncEntitlements();
-                if (ent && ent.ok && isCoreRedirect && ent.core_subscribed) {
-                    localStorage.removeItem(LS_TRAVEL_PENDING);
-                    showTravelStatus('Core Access Active');
-                    cleanupUrlParams();
-                } else if (ent && ent.ok && ent.travel_active) {
-                    localStorage.removeItem(LS_TRAVEL_PENDING);
-                    showTravelStatus('Travel Pass Active');
-                    cleanupUrlParams();
-                }
-            } catch (e) {
-                /* ignore */
-            } finally {
-                clearTimeout(timeoutId);
-                if ((localStorage.getItem(LS_CUSTOMER_ID) || '').trim()) {
-                    cleanupUrlParams();
-                }
-            }
+    }, 60000);
+    try {
+        var ent = await syncEntitlements();
+        if (ent && ent.ok && isCoreRedirect && ent.core_subscribed) {
+            localStorage.removeItem(LS_TRAVEL_PENDING);
+            showTravelStatus('Core Access Active');
+            cleanupUrlParams();
+        } else if (ent && ent.ok && ent.travel_active) {
+            localStorage.removeItem(LS_TRAVEL_PENDING);
+            showTravelStatus('Travel Pass Active');
+            cleanupUrlParams();
         }
-
-        handleTravelActivationFlow();
-        /** App UI + translation hub languages (English pivot). */
-        var GLB_UI_LANGS = ['en', 'ja', 'zh', 'ko', 'vi', 'th', 'hi', 'pt', 'fr', 'es', 'de', 'it', 'ru'];
-
-        var CURRENT_LANG = 'en';
-        var GLB_FREE_DAILY = 10;
-        var LS_GLB_QUOTA = 'glb_translate_quota_v1';
-
-        /** false = ブラウザに 150k 辞書を配らない（サーバ ROUTES_CSV_PATH で照合）。パクり対策。開発時のみ localStorage glb_dev_csv=1 で従来のクライアント読込。 */
-        var GLB_CLIENT_DICTIONARY_PUBLIC = (function () {
-            try {
-                return localStorage.getItem('glb_dev_csv') === '1';
-            } catch (e) {
-                return false;
-            }
-        })();
-
-        /** 150k.csv: source,target,from,to — exact-match local routes (0 API). */
-        var GLB_ROUTE_INDEX = new Map();
-        var GLB_ROUTE_READY = false;
-        var GLB_TX_CACHE_PREFIX = 'glb_tx_v1_';
-
-        function normalizeRouteKey(text, lang) {
-            var t = (text || '').trim();
-            if (!t || !lang) return t;
-            var lowerLangs = { en: 1, es: 1, fr: 1, de: 1, it: 1, pt: 1, vi: 1, th: 1, ru: 1, hi: 1, ko: 1 };
-            if (lowerLangs[lang]) return t.toLowerCase();
-            return t;
+    } catch (e) { /* ignore */ }
+    finally {
+        clearTimeout(timeoutId);
+        if ((localStorage.getItem(LS_CUSTOMER_ID) || '').trim()) {
+            cleanupUrlParams();
         }
+    }
+}
 
-        function routeMapKey(from, to, text) {
-            return from + '\x01' + to + '\x01' + normalizeRouteKey(text, from);
+const LANGS = [
+  {c:'en',l:'English'},{c:'ja',l:'日本語'},{c:'zh',l:'中文'},
+  {c:'ko',l:'한국어'},{c:'es',l:'Español'},{c:'fr',l:'Français'},
+  {c:'de',l:'Deutsch'},{c:'it',l:'Italiano'},{c:'ru',l:'Русский'},
+  {c:'th',l:'ไทย'},{c:'vi',l:'Tiếng Việt'},{c:'hi',l:'हिन्दी'},{c:'pt',l:'Português'}
+];
+const FREE_LIMIT = 10;
+let uiLang = 'en';
+
+function glbTodayKey() {
+    var d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+}
+
+function getQuota() {
+    try {
+        var today = glbTodayKey();
+        var raw = localStorage.getItem(LS_GLB_QUOTA);
+        if (!raw) return { day: today, count: 0 };
+        var j = JSON.parse(raw);
+        if (j.day !== today) return { day: today, count: 0 };
+        return j;
+    } catch (e) { return { day: '', count: 0 }; }
+}
+
+function bumpQuota() {
+    if (glbBillingPaidActive()) return;
+    try {
+        var q = getQuota();
+        q.count = (q.count || 0) + 1;
+        localStorage.setItem(LS_GLB_QUOTA, JSON.stringify(q));
+    } catch (e) {}
+}
+
+function updateQuotaDisplay() {
+    var el = document.getElementById('t-quota');
+    if (!el) return;
+    if (glbBillingPaidActive() || GLB_CORE_SUBSCRIBED) {
+        el.textContent = 'Unlimited — Core or Travel active';
+        return;
+    }
+    var q = getQuota();
+    var left = Math.max(0, FREE_LIMIT - (q.count || 0));
+    el.textContent = left > 0 ? (left + ' free run' + (left !== 1 ? 's' : '') + ' remaining today') : 'Daily limit reached — open Core for unlimited';
+}
+
+function fillSelect(sel, exclude) {
+    sel.innerHTML = '';
+    LANGS.forEach(function (lang) {
+        if (lang.c === exclude) return;
+        var o = document.createElement('option');
+        o.value = lang.c; o.textContent = lang.l;
+        sel.appendChild(o);
+    });
+}
+
+function setResult(text, isError, isLoading) {
+    var el = document.getElementById('t-result');
+    if (!el) return;
+    el.textContent = text;
+    el.classList.remove('idle');
+    el.style.color = isError ? '#c99' : (isLoading ? '#555' : 'var(--white)');
+    el.style.fontSize = isLoading || isError ? '14px' : '';
+}
+
+async function runTranslate() {
+    if (GLB_MAINTENANCE_ON) return;
+    if (!glbBillingPaidActive() && !GLB_CORE_SUBSCRIBED) {
+        var q = getQuota();
+        if ((q.count || 0) >= FREE_LIMIT) {
+            setResult('Daily limit reached. Subscribe for unlimited →', true);
+            return;
         }
+    }
+    var textEl = document.getElementById('t-input');
+    var text = (textEl && textEl.value) ? textEl.value.trim() : '';
+    if (!text) return;
+    var from = document.getElementById('t-from').value;
+    var to = document.getElementById('t-to').value;
+    if (from === to) { setResult(text); return; }
+    setResult('Translating…', false, true);
+    try {
+        var r = await fetch(NEXTBASE_APP_ORIGIN + '/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text, source: from, target: to, caller_id: 'lp' }),
+            cache: 'no-store'
+        });
+        var raw = await r.text();
+        var out = raw;
+        try { var j = JSON.parse(raw); out = j.translatedText || raw; } catch (e) {}
+        setResult(out);
+        bumpQuota();
+        updateQuotaDisplay();
+        try { window.GLBFunnel.track('translate_click', { page: 'index.html' }); } catch (e) {}
+    } catch (e) {
+        setResult('Network error. Please try again.', true);
+    }
+}
 
-        function parseCsvRow4(line) {
-            var p = line.split(',');
-            if (p.length < 4) return null;
-            if (p.length === 4) {
-                return { src: p[0].trim(), tgt: p[1].trim(), from: p[2].trim(), to: p[3].trim() };
-            }
-            var to = p[p.length - 1].trim();
-            var from = p[p.length - 2].trim();
-            var tgt = p[p.length - 3].trim();
-            var src = p.slice(0, p.length - 3).join(',').trim();
-            return { src: src, tgt: tgt, from: from, to: to };
+function syncLang(val) {
+    uiLang = val;
+    var from = document.getElementById('t-from');
+    if (from) {
+        from.value = val;
+        var to = document.getElementById('t-to');
+        if (to && to.value === val) {
+            var alt = LANGS.map(function (x) { return x.c; }).filter(function (c) { return c !== val; })[0] || 'ja';
+            to.value = alt;
         }
+    }
+}
+
+function initTool() {
+    var from = document.getElementById('t-from');
+    var to = document.getElementById('t-to');
+    fillSelect(from, null);
+    fillSelect(to, null);
+    from.value = 'en';
+    to.value = 'ja';
+    var hero = document.getElementById('ui-lang-hero');
+    if (hero) {
+        hero.addEventListener('change', function () { syncLang(hero.value); });
+        if (hero.value) syncLang(hero.value);
+    }
+    document.getElementById('t-swap').addEventListener('click', function () {
+        var tmp = from.value;
+        from.value = to.value;
+        to.value = tmp;
+    });
+    document.getElementById('t-btn').addEventListener('click', runTranslate);
+    document.getElementById('t-input').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') runTranslate();
+    });
+}
+
+var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.step').forEach(function (s) { observer.observe(s); });
+
+initTool();
+updateQuotaDisplay();
+handleTravelActivationFlow();
+</script>
 
-        function simpleHash(str) {
-            var h = 5381;
-            for (var i = 0; i < str.length; i++) {
-                h = ((h << 5) + h) + str.charCodeAt(i);
-            }
-            return (h >>> 0).toString(16);
-        }
 
-        function readTxCache(text, source, target) {
-            try {
-                var ck = source + '|' + target + '|' + text;
-                var id = GLB_TX_CACHE_PREFIX + simpleHash(ck);
-                var raw = sessionStorage.getItem(id);
-                if (!raw) return null;
-                var o = JSON.parse(raw);
-                if (o.k !== ck) return null;
-                return o.v;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function writeTxCache(text, source, target, result) {
-            try {
-                var ck = source + '|' + target + '|' + text;
-                var id = GLB_TX_CACHE_PREFIX + simpleHash(ck);
-                sessionStorage.setItem(id, JSON.stringify({ k: ck, v: result }));
-            } catch (e) { /* ignore quota */ }
-        }
-
-        function tryLocalRoute(text, source, target, depth) {
-            if (!GLB_ROUTE_READY || text == null || text === '') return null;
-            depth = depth || 0;
-            if (depth > 3) return null;
-            var direct = GLB_ROUTE_INDEX.get(routeMapKey(source, target, text));
-            if (direct) return direct;
-            if (source !== 'en' && target !== 'en') {
-                var mid = tryLocalRoute(text, source, 'en', depth + 1);
-                if (mid) {
-                    var out = tryLocalRoute(mid, 'en', target, depth + 1);
-                    if (out) return out;
-                }
-            }
-            return null;
-        }
-
-        (function glbSubscriberFromQuery() {
-            try {
-                var u = new URL(window.location.href);
-                if (u.searchParams.get('subscribed') === '1') {
-                    u.searchParams.delete('subscribed');
-                    history.replaceState({}, '', u.pathname + u.search + u.hash);
-                }
-            } catch (e) { /* ignore */ }
-        })();
-
-        var I18N = {
-            en: {
-                labelUiLang: 'Language',
-                labelRegion: 'Region settings',
-                labelLangFrom: 'From',
-                labelLangTo: 'To',
-                langFlowHint: '',
-                pricingH2: 'Free — 10 text runs / day',
-                pricingLi1: 'Use this page to try GLB free (10 text translations per day). Open the Core page to subscribe ($2.99/mo) for unlimited text plus voice features.',
-                pricingNote: '',
-                linkTerms: 'Terms of Service',
-                linkPrivacy: 'Privacy Policy',
-                linkLegal: 'Legal',
-                linkSupport: 'Support',
-                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: 'Start GLB 2.99',
-                postTranslateNudgeLine: 'Want unlimited? Continue on the Core page.',
-                postTranslateNudgeBtn: 'Start GLB 2.99',
-                travelMiniLink: 'Travel · $14.99',
-                travelMiniHint: 'Travel tier is offered from the LIFE page after Core purchase.',
-                travelExtendLink: 'Extend +30 days',
-                travelExtendHint: 'Adds 30 days from your current expiry (stacking).',
-                travelDaysLeft: 'Travel add-on: {{n}} days left (through {{date}})',
-                stripeHint: 'Checkout is on the Core page (Stripe).',
-                dictPlaceholder: 'Search 150k dictionary…',
-                dictResult: 'Results appear here',
-                dictLoaded: '150k entries loaded.',
-                dictFail: 'Dictionary failed to load. Check path.',
-                noMatch: 'No match',
-                transHead: 'Translation',
-                phNormal: 'Text to translate (e.g. hello)',
-                sendBtn: 'Translate',
-                idle: 'Idle',
-                modelBadge: '',
-                apiChecking: '',
-                apiOk: '',
-                apiNoResponse: '',
-                sending: 'Translating…',
-                sendingPivot: '',
-                failHttp: "Couldn't complete that.",
-                netErr: 'Network error:',
-                title: 'GLOBAL LANGUAGE BREAKER',
-                btnFlip: 'Flip',
-                flipTitle: 'Rotate the result 180° for the person across from you. Tap again to restore.',
-                freeQuotaUnlimited: 'Ready.',
-                freeLeft: '{{n}} left today',
-                freeLimitExceeded: 'Higher tier — coming soon.'
-            },
-            ja: {
-                labelUiLang: '言語',
-                labelRegion: '地域設定',
-                labelLangFrom: '原文',
-                labelLangTo: '訳文',
-                langFlowHint: '',
-                pricingH2: '無料 — 1日10回まで',
-                pricingLi1: 'このページは無料お試し（文字翻訳・1日10回）。課金（月 $2.99）は Core ページで Stripe 決済。',
-                pricingNote: '',
-                linkTerms: '利用規約',
-                linkPrivacy: 'プライバシーポリシー',
-                linkLegal: '法的情報',
-                linkSupport: 'サポート',
-                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: 'GLB 2.99 を開始',
-                postTranslateNudgeLine: '無制限にしたい場合は Core ページへ。',
-                postTranslateNudgeBtn: 'GLB 2.99 を開始',
-                travelMiniLink: 'トラベル · $14.99',
-                travelMiniHint: 'トラベル層はコア購入後、LIFEページから案内します。',
-                travelExtendLink: '延長 +30日',
-                travelExtendHint: '現在の期限から30日追加（累積延長）。',
-                travelDaysLeft: 'トラベル: 残り{{n}}日（{{date}}まで）',
-                stripeHint: '決済は Core ページで Stripe。',
-                dictPlaceholder: '15万語辞書を検索…',
-                dictResult: '結果がここに表示されます',
-                dictLoaded: '15万語 読み込み完了',
-                dictFail: '辞書を読み込めませんでした。パスを確認してください。',
-                noMatch: '見つかりません',
-                transHead: '翻訳',
-                phNormal: '翻訳したい文（例: hello）',
-                sendBtn: '翻訳',
-                idle: '待機中',
-                modelBadge: '',
-                apiChecking: '',
-                apiOk: '',
-                apiNoResponse: '',
-                sending: '翻訳中…',
-                sendingPivot: '',
-                failHttp: '完了できませんでした。',
-                netErr: 'ネットワークエラー:',
-                title: 'GLOBAL LANGUAGE BREAKER',
-                btnFlip: '反転',
-                flipTitle: '向かいに相手がいるとき、結果を180°回転。もう一度押すと元に戻ります。',
-                freeQuotaUnlimited: '準備完了',
-                freeLeft: '本日 残り {{n}}',
-                freeLimitExceeded: '上位プラン準備中'
-            },
-            zh: {
-                labelUiLang: '界面语言', labelRegion: '地区', labelLangFrom: '原文', labelLangTo: '译文',
-                langFlowHint: '',
-                pricingH2: '$2.99 / 月', pricingLi1: '<strong>$2.99/月</strong> — 订阅后云端翻译无限制。免费每日最多 3 次（试用）。', pricingNote: '为手机优化；每日 3 次免费，需要无限制可订阅。',
-                linkTerms: '服务条款', linkPrivacy: '隐私政策', linkLegal: '法律信息', linkSupport: '支持',
-                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: '订阅（$2.99/月）', stripeHint: 'Stripe 安全支付',
-                dictPlaceholder: '词典搜索…', dictResult: '结果', dictLoaded: '已加载', dictFail: '加载失败', noMatch: '无',
-                transHead: '翻译', phNormal: '输入要翻译的文字', sendBtn: 'Translate', idle: '就绪',
-                apiChecking: '', apiOk: '', apiNoResponse: '', sending: '翻译中…', sendingPivot: '经英语…',
-                failHttp: '失败', netErr: '网络错误', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: '镜像',
-                flipTitle: '对面有人时把结果旋转180°；再按恢复。',
-                freeQuotaUnlimited: '订阅用户（无限制）',
-                freeLeft: '今日剩余 {{n}}',
-                freeLimitExceeded: '更高方案筹备中'
-            },
-            ko: {
-                labelUiLang: '앱 언어', labelRegion: '지역', labelLangFrom: '출발', labelLangTo: '도착',
-                langFlowHint: '',
-                pricingH2: '$2.99 / 월', pricingLi1: '<strong>$2.99/월</strong> — 구독 시 클라우드 번역 무제한. 무료는 하루 최대 3회.', pricingNote: '모바일 화면에 맞춤. 매일 3회 무료 → 무제한은 구독.',
-                linkTerms: '이용약관', linkPrivacy: '개인정보 처리방침', linkLegal: '법적 고지', linkSupport: '지원',
-                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: '구독 ($2.99/월)', stripeHint: 'Stripe 결제',
-                dictPlaceholder: '사전 검색…', dictResult: '결과', dictLoaded: '로드됨', dictFail: '실패', noMatch: '없음',
-                transHead: '번역', phNormal: '번역할 문장', sendBtn: 'Translate', idle: '대기',
-                apiChecking: '', apiOk: '', apiNoResponse: '', sending: '번역 중…', sendingPivot: '영어 경유…',
-                failHttp: '실패', netErr: '네트워크', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: '반전',
-                flipTitle: '맞은편에 있을 때 결과를 180° 회전. 다시 누르면 복원.',
-                freeQuotaUnlimited: '구독 중(무제한)',
-                freeLeft: '오늘 남은 {{n}}회',
-                freeLimitExceeded: '상위 플랜 준비 중'
-            },
-            es: {
-                labelUiLang: 'Idioma', labelRegion: 'Región', labelLangFrom: 'De', labelLangTo: 'A',
-                langFlowHint: '',
-                pricingH2: '$2.99 / mes', pricingLi1: '<strong>$2.99/mes</strong> — Ilimitado con suscripción. Gratis: hasta 3/día.', pricingNote: 'Pensado para móvil: 3 pruebas/día, luego $2.99/mes ilimitado.',
-                linkTerms: 'Términos', linkPrivacy: 'Privacidad', linkLegal: 'Legal', linkSupport: 'Soporte',
-                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: 'Suscribirse ($2.99/mes)', stripeHint: 'Pago con Stripe',
-                dictPlaceholder: 'Buscar…', dictResult: 'Resultados', dictLoaded: 'Listo', dictFail: 'Error', noMatch: 'Nada',
-                transHead: 'Traducción', phNormal: 'Texto a traducir', sendBtn: 'Translate', idle: 'Listo',
-                apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Traduciendo…', sendingPivot: 'Vía inglés…',
-                failHttp: 'Error', netErr: 'Red', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Espejo',
-                flipTitle: 'Gira el resultado 180° para quien está enfrente. Pulsa otra vez para volver.',
-                freeQuotaUnlimited: 'Ilimitado (suscriptor)',
-                freeLeft: '{{n}} gratis hoy',
-                freeLimitExceeded: 'Plan superior — pronto'
-            },
-            fr: {
-                labelUiLang: 'Langue', labelRegion: 'Région', labelLangFrom: 'De', labelLangTo: 'Vers',
-                langFlowHint: '',
-                pricingH2: '$2.99 / mois', pricingLi1: '<strong>$2.99/mois</strong> — Illimité avec abonnement. Gratuit : jusqu’à 3/jour.', pricingNote: 'Mobile : 3 essais/jour, puis abonnement illimité.',
-                linkTerms: 'Conditions', linkPrivacy: 'Confidentialité', linkLegal: 'Mentions légales', linkSupport: 'Assistance',
-                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: 'S’abonner ($2.99/mois)', stripeHint: 'Paiement Stripe',
-                dictPlaceholder: 'Recherche…', dictResult: 'Résultats', dictLoaded: 'Chargé', dictFail: 'Échec', noMatch: 'Rien',
-                transHead: 'Traduction', phNormal: 'Texte à traduire', sendBtn: 'Translate', idle: 'Prêt',
-                apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Traduction…', sendingPivot: 'Via anglais…',
-                failHttp: 'Échec', netErr: 'Réseau', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Miroir',
-                flipTitle: 'Tourne le résultat à 180° pour la personne en face. Re-tape pour revenir.',
-                freeQuotaUnlimited: 'Illimité (abonné)',
-                freeLeft: '{{n}} gratuits aujourd’hui',
-                freeLimitExceeded: 'Offre supérieure — bientôt'
-            },
-            de: {
-                labelUiLang: 'Sprache', labelRegion: 'Region', labelLangFrom: 'Von', labelLangTo: 'Nach',
-                langFlowHint: '',
-                pricingH2: '$2.99 / Monat', pricingLi1: '<strong>$2.99/Monat</strong> — Mit Abo unbegrenzt. Kostenlos: bis zu 3× pro Tag.', pricingNote: 'Fürs Handy: 3 Tests/Tag, dann Abo.',
-                linkTerms: 'AGB', linkPrivacy: 'Datenschutz', linkLegal: 'Impressum', linkSupport: 'Support',
-                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: 'Abonnieren ($2.99/Monat)', stripeHint: 'Stripe-Zahlung',
-                dictPlaceholder: 'Suche…', dictResult: 'Ergebnis', dictLoaded: 'Geladen', dictFail: 'Fehler', noMatch: 'Kein Treffer',
-                transHead: 'Übersetzung', phNormal: 'Text eingeben', sendBtn: 'Translate', idle: 'Bereit',
-                apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Übersetzen…', sendingPivot: 'Über Englisch…',
-                failHttp: 'Fehler', netErr: 'Netz', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Spiegeln',
-                flipTitle: 'Ergebnis um 180° drehen für die Person gegenüber. Erneut tippen zum Zurück.',
-                freeQuotaUnlimited: 'Unbegrenzt (Abonnent)',
-                freeLeft: 'Heute noch {{n}}',
-                freeLimitExceeded: 'Höheres Paket — demnächst'
-            },
-            th: {
-                labelUiLang: 'ภาษา', labelRegion: 'ภูมิภาค', labelLangFrom: 'จาก', labelLangTo: 'เป็น',
-                langFlowHint: '',
-                pricingH2: '$2.99 / เดือน', pricingLi1: '<strong>$2.99/เดือน</strong> — สมาชิกแปลไม่จำกัด ฟรีวันละสูงสุด 3 ครั้ง', pricingNote: 'ออกแบบให้มือถือ — ฟรี 3 ครั้ง/วัน แล้วสมัครได้',
-                linkTerms: 'ข้อกำหนด', linkPrivacy: 'ความเป็นส่วนตัว', linkLegal: 'กฎหมาย', linkSupport: 'ช่วยเหลือ',
-                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: 'สมัคร ($2.99/เดือน)', stripeHint: 'ชำระด้วย Stripe',
-                dictPlaceholder: 'ค้นหา…', dictResult: 'ผลลัพธ์', dictLoaded: 'โหลดแล้ว', dictFail: 'ล้มเหลว', noMatch: 'ไม่พบ',
-                transHead: 'แปล', phNormal: 'ข้อความที่จะแปล', sendBtn: 'Translate', idle: 'พร้อม',
-                apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'กำลังแปล…', sendingPivot: 'ผ่านอังกฤษ…',
-                failHttp: 'ล้มเหลว', netErr: 'เครือข่าย', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'พลิก',
-                flipTitle: 'หมุนผลลัพธ์ 180° ให้คนที่นั่งตรงข้าม — กดอีกครั้งเพื่อกลับ',
-                freeQuotaUnlimited: 'ไม่จำกัด (สมาชิก)',
-                freeLeft: 'วันนี้เหลือ {{n}}',
-                freeLimitExceeded: 'แพ็กระดับสูง — เร็วๆ นี้'
-            },
-            vi: {
-                labelUiLang: 'Ngôn ngữ', labelRegion: 'Khu vực', labelLangFrom: 'Từ', labelLangTo: 'Sang',
-                langFlowHint: '',
-                pricingH2: '$2.99 / tháng', pricingLi1: '<strong>$2.99/tháng</strong> — Thuê bao thì không giới hạn. Miễn phí tối đa 3 lần/ngày.', pricingNote: 'Tối ưu cho điện thoại — 3 lần miễn phí/ngày, sau đó đăng ký.',
-                linkTerms: 'Điều khoản', linkPrivacy: 'Riêng tư', linkLegal: 'Pháp lý', linkSupport: 'Hỗ trợ',
-                footerCopyright: '© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending',
-                btnMonthly: 'Đăng ký ($2.99/tháng)', stripeHint: 'Thanh toán Stripe',
-                dictPlaceholder: 'Tìm…', dictResult: 'Kết quả', dictLoaded: 'Đã tải', dictFail: 'Lỗi', noMatch: 'Không có',
-                transHead: 'Dịch', phNormal: 'Nhập văn bản', sendBtn: 'Translate', idle: 'Sẵn sàng',
-                apiChecking: '', apiOk: '', apiNoResponse: '', sending: 'Đang dịch…', sendingPivot: 'Qua tiếng Anh…',
-                failHttp: 'Lỗi', netErr: 'Mạng', title: 'GLOBAL LANGUAGE BREAKER', btnFlip: 'Lật',
-                flipTitle: 'Xoay kết quả 180° cho người đối diện. Bấm lại để trở về.',
-                freeQuotaUnlimited: 'Không giới hạn (đã đăng ký)',
-                freeLeft: 'Hôm nay còn {{n}}',
-                freeLimitExceeded: 'Gói cao hơn — sắp có'
-            },
-            hi: {},
-            pt: {},
-            it: {},
-            ru: {}
-        };
-
-        var GLB_UI_LANG_KEY = 'glb_ui_lang_v2';
-
-        function getStoredUiLang() {
-            return 'en';
-        }
-
-        function T(k) {
-            var loc = I18N[CURRENT_LANG];
-            if (loc && Object.prototype.hasOwnProperty.call(loc, k)) return loc[k];
-            return I18N.en[k];
-        }
-
-        function escapeHtml(s) {
-            return String(s)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
-
-        function setBrandTitleHtml(rawTitle) {
-            var t = (rawTitle || '').trim();
-            var w = t.split(/\s+/).filter(Boolean);
-            if (w.length >= 2) {
-                var line1 = w.slice(0, -1).join(' ');
-                var line2 = w[w.length - 1];
-                return '<span class="brand-line">' + escapeHtml(line1) + '</span><span class="brand-line">' + escapeHtml(line2) + '</span>';
-            }
-            return '<span class="brand-line">' + escapeHtml(t) + '</span>';
-        }
-
-        function glbTodayKey() {
-            var d = new Date();
-            return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-        }
-
-        function getGlbQuotaState() {
-            try {
-                var raw = localStorage.getItem(LS_GLB_QUOTA);
-                if (!raw) return { day: glbTodayKey(), count: 0 };
-                var j = JSON.parse(raw);
-                if (j.day !== glbTodayKey()) return { day: glbTodayKey(), count: 0 };
-                return { day: j.day, count: j.count | 0 };
-            } catch (e) {
-                return { day: glbTodayKey(), count: 0 };
-            }
-        }
-
-        function isGlbUnlimited() {
-            try {
-                return glbBillingPaidActive();
-            } catch (e) {
-                return false;
-            }
-        }
-
-        function updateTravelOfferLabels() {
-            var travelActive = GLB_TRAVEL_ACTIVE;
-            var ttm = document.getElementById('t-btn-travel-mini');
-            var tth = document.getElementById('t-travel-mini-hint');
-            if (ttm) ttm.textContent = travelActive ? T('travelExtendLink') : T('travelMiniLink');
-            if (tth) tth.textContent = travelActive ? T('travelExtendHint') : T('travelMiniHint');
-        }
-
-        function refreshSubscriptionUi() {
-            var subscribeArea = document.getElementById('subscribe-area');
-            var manageWrap = document.getElementById('manage-subscription-wrap');
-            var coreBlk = document.getElementById('glb-core-subscribe-block');
-            var travelMini = document.getElementById('glb-travel-mini-row');
-            var coreBadge = document.getElementById('core-access-active');
-            var coreSubscribed = GLB_CORE_SUBSCRIBED || isGlbUnlimited();
-            var travelActive = GLB_TRAVEL_ACTIVE;
-            var pending = localStorage.getItem(LS_TRAVEL_PENDING) === 'true';
-            var showCoreOffer = !coreSubscribed;
-            if (pending && !coreSubscribed) showCoreOffer = false;
-
-            if (coreBlk) coreBlk.style.display = showCoreOffer ? '' : 'none';
-            if (travelMini) travelMini.style.display = coreSubscribed ? '' : 'none';
-            if (subscribeArea) subscribeArea.style.display = (showCoreOffer || coreSubscribed) ? '' : 'none';
-            if (manageWrap) manageWrap.style.display = coreSubscribed ? '' : 'none';
-            if (coreBadge) coreBadge.style.display = coreSubscribed ? '' : 'none';
-            var postNudge = document.getElementById('glb-post-translate-nudge');
-            if (postNudge && coreSubscribed) postNudge.style.display = 'none';
-            updateTravelOfferLabels();
-        }
-
-        function maybeShowPostTranslateCoreNudge() {
-            try {
-                if (sessionStorage.getItem(SS_POST_TRANSLATE_CORE_NUDGE) === '1') return;
-                if (isGlbUnlimited() || GLB_CORE_SUBSCRIBED) return;
-                var box = document.getElementById('glb-post-translate-nudge');
-                if (!box) return;
-                sessionStorage.setItem(SS_POST_TRANSLATE_CORE_NUDGE, '1');
-                var line = document.getElementById('glb-post-translate-nudge-line');
-                var btn = document.getElementById('glb-post-translate-core-btn');
-                if (line) line.textContent = T('postTranslateNudgeLine');
-                if (btn) btn.textContent = T('postTranslateNudgeBtn');
-                box.style.display = '';
-            } catch (e) { /* ignore */ }
-        }
-
-        async function openManageSubscription() {
-            var btn = document.getElementById('manage-subscription-btn');
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = 'Opening management page...';
-            }
-            var fallback = GLB_STRIPE_PORTAL_LOGIN_FALLBACK || 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-            function go(url) {
-                window.location.href = url;
-            }
-            try {
-                var customerId = (localStorage.getItem(LS_CUSTOMER_ID) || '').trim();
-                if (!customerId) {
-                    go(fallback);
-                    return;
-                }
-                var payload = JSON.stringify({ customer_id: customerId });
-                var headers = { 'Content-Type': 'application/json' };
-                var paths = ['/billing/portal', '/create-portal-session'];
-                for (var i = 0; i < paths.length; i++) {
-                    var res = await fetch(NEXTBASE_APP_ORIGIN + paths[i], { method: 'POST', headers: headers, body: payload });
-                    var ct = (res.headers.get('content-type') || '').toLowerCase();
-                    if (!res.ok || ct.indexOf('application/json') === -1) continue;
-                    var data = await res.json();
-                    if (data && data.url) {
-                        go(data.url);
-                        return;
-                    }
-                }
-                go(fallback);
-            } catch (e) {
-                go(fallback);
-            }
-        }
-
-        function canGlbTranslate() {
-            if (isGlbUnlimited()) return true;
-            var q = getGlbQuotaState();
-            return q.count < GLB_FREE_DAILY;
-        }
-
-        function recordGlbTranslateUse() {
-            if (isGlbUnlimited()) return;
-            var tk = glbTodayKey();
-            var q = getGlbQuotaState();
-            if (q.day !== tk) q = { day: tk, count: 0 };
-            q.count = (q.count | 0) + 1;
-            try {
-                localStorage.setItem(LS_GLB_QUOTA, JSON.stringify(q));
-            } catch (e) { /* ignore */ }
-        }
-
-        function refreshFreeQuotaDisplay() {
-            var el = document.getElementById('t-free-quota');
-            if (!el) return;
-            if (isGlbUnlimited()) {
-                el.textContent = '2.99 Unlimited Active';
-                el.style.display = 'none';
-                el.classList.remove('is-warn');
-                return;
-            }
-            el.style.display = '';
-            var q = getGlbQuotaState();
-            var left = Math.max(0, GLB_FREE_DAILY - q.count);
-            el.textContent = T('freeLeft').replace(/\{\{n\}\}/g, String(left));
-            el.classList.toggle('is-warn', left === 0);
-        }
-
-        function setResultText(line, color, busy) {
-            var el = document.getElementById('translate-measure-result');
-            if (!el) return;
-            el.textContent = line;
-            if (color) el.style.color = color;
-            if (busy !== undefined) el.dataset.busy = busy;
-        }
-
-        function applyUiLang() {
-            var sel = document.getElementById('ui-lang');
-            CURRENT_LANG = (sel && sel.value) ? sel.value : getStoredUiLang();
-            if (sel) sel.value = CURRENT_LANG;
-            try { localStorage.setItem(GLB_UI_LANG_KEY, CURRENT_LANG); } catch (e) { /* ignore */ }
-            document.documentElement.lang = CURRENT_LANG;
-            document.title = T('title');
-            var brandH = document.getElementById('app-brand-title');
-            if (brandH) brandH.innerHTML = setBrandTitleHtml(T('title'));
-            var flipB = document.getElementById('glb-flip-btn');
-            if (flipB) {
-                flipB.textContent = T('btnFlip');
-                flipB.title = T('flipTitle');
-            }
-
-            var lu = document.getElementById('label-ui-lang');
-            var lr = document.getElementById('label-region');
-            var lf = document.getElementById('label-lang-from');
-            var lt = document.getElementById('label-lang-to');
-            var lfh = document.getElementById('t-lang-flow-hint');
-            if (lu) lu.textContent = T('labelUiLang');
-            if (lr) lr.textContent = T('labelRegion');
-            if (lf) lf.textContent = T('labelLangFrom');
-            if (lt) lt.textContent = T('labelLangTo');
-            if (lfh) {
-                var flow = T('langFlowHint');
-                lfh.textContent = flow;
-                lfh.style.display = flow ? 'block' : 'none';
-            }
-
-            var h2 = document.getElementById('t-pricing-h2');
-            var li1 = document.getElementById('t-pricing-li1');
-            var note = document.getElementById('t-pricing-note');
-            if (h2) h2.textContent = T('pricingH2');
-            if (li1) li1.innerHTML = T('pricingLi1');
-            if (note) {
-                note.textContent = T('pricingNote') || '';
-                note.style.display = T('pricingNote') ? 'block' : 'none';
-            }
-
-            var bm = document.getElementById('t-btn-monthly');
-            var sh = document.getElementById('t-stripe-hint');
-            if (bm) bm.textContent = T('btnMonthly');
-            if (sh) sh.textContent = T('stripeHint');
-            var ptn = document.getElementById('glb-post-translate-nudge-line');
-            var ptb = document.getElementById('glb-post-translate-core-btn');
-            if (ptn) ptn.textContent = T('postTranslateNudgeLine');
-            if (ptb) ptb.textContent = T('postTranslateNudgeBtn');
-            updateTravelOfferLabels();
-
-            var th = document.getElementById('t-trans-head');
-            var trt = document.getElementById('tr-text');
-            var trb = document.getElementById('tr-run');
-            if (th) th.textContent = T('transHead');
-            if (trt) trt.placeholder = T('phNormal');
-            if (trb) trb.textContent = T('sendBtn');
-
-            var gp = document.getElementById('gateway-pulse');
-            if (gp && !gp.dataset.healthDone && T('apiChecking')) gp.textContent = T('apiChecking');
-
-            var idleEl = document.getElementById('translate-measure-result');
-            if (idleEl && (!idleEl.dataset.busy || idleEl.dataset.busy === '0')) {
-                setResultText(T('idle'), '#eaeaea', '0');
-            }
-
-            var lt = document.getElementById('link-terms');
-            var lpriv = document.getElementById('link-privacy');
-            var llg = document.getElementById('link-legal');
-            var lsup = document.getElementById('link-support');
-            var fcp = document.getElementById('footer-copyright');
-            var flf = document.getElementById('glb-legal-footer');
-            if (lt) lt.textContent = T('linkTerms');
-            if (lpriv) lpriv.textContent = T('linkPrivacy');
-            if (llg) llg.textContent = T('linkLegal');
-            if (lsup) lsup.textContent = T('linkSupport');
-            if (fcp) fcp.textContent = T('footerCopyright');
-            if (flf) flf.setAttribute('lang', CURRENT_LANG);
-
-            refreshFreeQuotaDisplay();
-            refreshSubscriptionUi();
-            if (typeof refreshTravelRemainingLine === 'function') refreshTravelRemainingLine();
-        }
-
-        (function syncUiLangSelect() {
-            var u = document.getElementById('ui-lang');
-            if (u) u.value = getStoredUiLang();
-        })();
-        applyUiLang();
-
-        (function bindUiLang() {
-            var u = document.getElementById('ui-lang');
-            if (!u) return;
-            u.addEventListener('change', function () {
-                applyUiLang();
-                runGatewayPulse();
-            });
-        })();
-
-        (function bindManageSubscription() {
-            var btn = document.getElementById('manage-subscription-btn');
-            if (!btn) return;
-            btn.addEventListener('click', function () {
-                openManageSubscription();
-            });
-        })();
-        (function bindCancelSubscriptionLockDrop() {
-            var cancel = document.getElementById('link-cancel-subscription');
-            if (!cancel) return;
-            cancel.addEventListener('click', function () {
-                try {
-                    clearBillingStateStorage();
-                } catch (e) { /* ignore */ }
-            });
-        })();
-
-        (function glbLoadRouteIndexFromCsv() {
-            if (!GLB_CLIENT_DICTIONARY_PUBLIC) {
-                GLB_ROUTE_READY = false;
-                return;
-            }
-            async function load() {
-                try {
-                    var res = await fetch('dictionary/150k.csv');
-                    var text = await res.text();
-                    var lines = text.split('\n');
-                    GLB_ROUTE_INDEX = new Map();
-                    for (var i = 0; i < lines.length; i++) {
-                        var line = lines[i];
-                        if (i === 0 || !line.trim()) continue;
-                        var row = parseCsvRow4(line);
-                        if (!row || !row.src || !row.from || !row.to || !row.tgt) continue;
-                        GLB_ROUTE_INDEX.set(routeMapKey(row.from, row.to, row.src), row.tgt);
-                    }
-                    GLB_ROUTE_READY = true;
-                } catch (e) {
-                    GLB_ROUTE_READY = false;
-                }
-            }
-            load();
-        })();
-
-        function runGatewayPulse() {
-            var el = document.getElementById('gateway-pulse');
-            if (el) {
-                el.style.display = 'none';
-                el.textContent = '';
-                el.dataset.healthDone = '1';
-            }
-        }
-        runGatewayPulse();
-
-        (function glbResultFlip() {
-            var btn = document.getElementById('glb-flip-btn');
-            var stage = document.getElementById('glb-result-stage');
-            if (!btn || !stage) return;
-            btn.setAttribute('aria-pressed', 'false');
-            btn.addEventListener('click', function () {
-                var result = document.getElementById('translate-measure-result');
-                stage.classList.toggle('is-flipped');
-                if (result) result.classList.toggle('flipped-mode', stage.classList.contains('is-flipped'));
-                btn.setAttribute('aria-pressed', stage.classList.contains('is-flipped') ? 'true' : 'false');
-            });
-        })();
-
-        (function glbLangFlow() {
-            var LANG_OPTS = [
-                { c: 'en', l: 'English' },
-                { c: 'ja', l: '日本語' },
-                { c: 'zh', l: '中文' },
-                { c: 'ko', l: '한국어' },
-                { c: 'es', l: 'Español' },
-                { c: 'fr', l: 'Français' },
-                { c: 'de', l: 'Deutsch' },
-                { c: 'it', l: 'Italiano' },
-                { c: 'ru', l: 'Русский' },
-                { c: 'th', l: 'ไทย' },
-                { c: 'vi', l: 'Tiếng Việt' },
-                { c: 'hi', l: 'हिन्दी' },
-                { c: 'pt', l: 'Português' }
-            ];
-            var fromEl = document.getElementById('lang-from');
-            var toEl = document.getElementById('lang-to');
-            var uiEl = document.getElementById('ui-lang');
-            var swapBtn = document.getElementById('lang-swap');
-            var hs = document.getElementById('tr-src');
-            var ht = document.getElementById('tr-tgt');
-            if (!fromEl || !toEl || !uiEl || !hs || !ht) return;
-
-            function fillSelect(sel) {
-                sel.innerHTML = '';
-                for (var i = 0; i < LANG_OPTS.length; i++) {
-                    var o = LANG_OPTS[i];
-                    var opt = document.createElement('option');
-                    opt.value = o.c;
-                    opt.textContent = o.l;
-                    sel.appendChild(opt);
-                }
-            }
-            fillSelect(fromEl);
-            fillSelect(toEl);
-
-            function defaultOther(code) {
-                return code === 'en' ? 'ja' : 'en';
-            }
-
-            function syncHidden() {
-                var a = (fromEl.value || '').trim();
-                var b = (toEl.value || '').trim();
-                if (a === b) {
-                    toEl.value = defaultOther(a);
-                    b = toEl.value;
-                }
-                hs.value = a;
-                ht.value = b;
-            }
-
-            function syncFromUiLang() {
-                fromEl.value = uiEl.value;
-                if (toEl.value === fromEl.value) toEl.value = defaultOther(fromEl.value);
-                syncHidden();
-            }
-
-            fromEl.addEventListener('change', function () {
-                syncHidden();
-                try { localStorage.setItem('glb_lang_to', toEl.value); } catch (e) { /* ignore */ }
-            });
-            toEl.addEventListener('change', function () {
-                syncHidden();
-                try { localStorage.setItem('glb_lang_to', toEl.value); } catch (e) { /* ignore */ }
-            });
-
-            uiEl.addEventListener('change', function () {
-                syncFromUiLang();
-            });
-
-            if (swapBtn) {
-                swapBtn.addEventListener('click', function () {
-                    var x = fromEl.value;
-                    fromEl.value = toEl.value;
-                    toEl.value = x;
-                    syncHidden();
-                    try { localStorage.setItem('glb_lang_to', toEl.value); } catch (e) { /* ignore */ }
-                });
-            }
-
-            try {
-                var savedTo = localStorage.getItem('glb_lang_to');
-                if (savedTo && toEl.querySelector('option[value="' + savedTo + '"]')) toEl.value = savedTo;
-            } catch (e) { /* ignore */ }
-            syncFromUiLang();
-        })();
-
-        (function glbCoreEntryClickMetrics() {
-            function wire(id, src) {
-                var a = document.getElementById(id);
-                if (!a) return;
-                a.addEventListener('click', function () {
-                    try {
-                        if (window.GLBFunnel) {
-                            window.GLBFunnel.track('core_page_click', { href: a.getAttribute('href') || '', source: src || id });
-                        }
-                    } catch (eS) { /* ignore */ }
-                });
-            }
-            wire('t-btn-monthly', 'subscribe_block');
-            wire('glb-post-translate-core-btn', 'post_translate_nudge');
-        })();
-
-        (function regionPreset() {
-            var sel = document.getElementById('region-preset');
-            if (!sel) return;
-            var KEY = 'glb_region_en';
-            function applyFromNavigator() {
-                var n = (navigator.language || '').toLowerCase();
-                var map = { 'en-gb': 'GB', 'en-au': 'AU', 'en-ca': 'CA', 'en-nz': 'NZ', 'en-in': 'IN', 'en-sg': 'SG', 'en-ph': 'PH', 'en-za': 'ZA', 'en-ng': 'NG', 'en-ie': 'IE' };
-                if (map[n]) return map[n];
-                return null;
-            }
-            try {
-                var saved = localStorage.getItem(KEY);
-                if (saved && sel.querySelector('option[value="' + saved + '"]')) sel.value = saved;
-                else {
-                    var guess = applyFromNavigator();
-                    if (guess) sel.value = guess;
-                }
-            } catch (e) { /* ignore */ }
-            sel.addEventListener('change', function () {
-                try { localStorage.setItem(KEY, sel.value); } catch (e) { /* ignore */ }
-            });
-        })();
-
-        (function translateMeasure() {
-            var out = document.getElementById('translate-measure-result');
-            var btn = document.getElementById('tr-run');
-            if (!btn || !out) return;
-
-            function parseResponse(x) {
-                if (x.status >= 200 && x.status < 300) {
-                    try {
-                        var j = JSON.parse(x.body);
-                        var line = j.translatedText != null ? String(j.translatedText) : x.body;
-                        return { ok: true, text: line };
-                    } catch (e) {
-                        return { ok: true, text: x.body };
-                    }
-                }
-                return { ok: false, status: x.status, body: x.body };
-            }
-
-            function fetchTranslate(text, source, target) {
-                var payload = { text: text, source: source, target: target, caller_id: 'prod' };
-                return fetch(NEXTBASE_APP_ORIGIN + '/translate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    cache: 'no-store'
-                }).then(function (r) {
-                    return r.text().then(function (t) {
-                        return { status: r.status, body: t };
-                    });
-                });
-            }
-
-            function applyError(x) {
-                setResultText(T('failHttp'), '#c99', '0');
-            }
-
-            btn.addEventListener('click', function () {
-                if (GLB_MAINTENANCE_ON) return;
-                var lf = document.getElementById('lang-from');
-                var lt = document.getElementById('lang-to');
-                var hs = document.getElementById('tr-src');
-                var ht = document.getElementById('tr-tgt');
-                if (lf && lt && hs && ht) {
-                    hs.value = lf.value.trim();
-                    ht.value = lt.value.trim();
-                }
-                var text = (document.getElementById('tr-text') && document.getElementById('tr-text').value) || '';
-                text = text.trim();
-                var source = ((document.getElementById('tr-src') && document.getElementById('tr-src').value) || 'en').trim();
-                var target = ((document.getElementById('tr-tgt') && document.getElementById('tr-tgt').value) || 'ja').trim();
-
-                if (text) {
-                    try {
-                        if (window.GLBFunnel) window.GLBFunnel.track('translate_click', { source: source, target: target });
-                    } catch (eT) { /* ignore */ }
-                }
-
-                if (!text) {
-                    setResultText(T('idle'), '#eaeaea', '0');
-                    return;
-                }
-
-                if (source === target) {
-                    setResultText(text, '#eaeaea', '0');
-                    recordGlbTranslateUse();
-                    refreshFreeQuotaDisplay();
-                    maybeShowPostTranslateCoreNudge();
-                    return;
-                }
-
-                var cached = readTxCache(text, source, target);
-                if (cached != null && cached !== '') {
-                    setResultText(cached, '#eaeaea', '0');
-                    refreshFreeQuotaDisplay();
-                    maybeShowPostTranslateCoreNudge();
-                    return;
-                }
-
-                var localOut = tryLocalRoute(text, source, target);
-                if (localOut != null && localOut !== '') {
-                    setResultText(localOut, '#eaeaea', '0');
-                    writeTxCache(text, source, target, localOut);
-                    refreshFreeQuotaDisplay();
-                    maybeShowPostTranslateCoreNudge();
-                    return;
-                }
-
-                if (!isGlbUnlimited() && !canGlbTranslate()) {
-                    setResultText(T('freeLimitExceeded'), '#c99', '0');
-                    refreshFreeQuotaDisplay();
-                    return;
-                }
-
-                var pivot = (source !== 'en' && target !== 'en');
-
-                function finishOk(line) {
-                    setResultText(line, '#eaeaea', '0');
-                    writeTxCache(text, source, target, line);
-                    recordGlbTranslateUse();
-                    refreshFreeQuotaDisplay();
-                    maybeShowPostTranslateCoreNudge();
-                }
-
-                setResultText(T('sending'), '#eaeaea', '1');
-
-                if (!pivot) {
-                    fetchTranslate(text, source, target)
-                        .then(function (x) {
-                            var p = parseResponse(x);
-                            if (p.ok) finishOk(p.text);
-                            else applyError(x);
-                        })
-                        .catch(function (err) {
-                            setResultText(T('netErr'), '#c99', '0');
-                        });
-                    return;
-                }
-
-                fetchTranslate(text, source, 'en')
-                    .then(function (x1) {
-                        var p1 = parseResponse(x1);
-                        if (!p1.ok) {
-                            applyError(x1);
-                            return null;
-                        }
-                        setResultText(T('sending'), '#eaeaea', '1');
-                        return fetchTranslate(p1.text, 'en', target);
-                    })
-                    .then(function (x2) {
-                        if (x2 == null) return;
-                        var p2 = parseResponse(x2);
-                        if (p2.ok) finishOk(p2.text);
-                        else applyError(x2);
-                    })
-                    .catch(function (err) {
-                        setResultText(T('netErr'), '#c99', '0');
-                    });
-            });
-        })();
-    </script>
 </body>
 </html>
