@@ -855,18 +855,18 @@
     <div class="header">
         <h1 class="gold-text app-brand-title" id="app-brand-title"><span class="brand-line">GLOBAL LANGUAGE</span><span class="brand-line">BREAKER</span></h1>
     </div>
-    <section id="glb-travel-top" class="glb-travel-top" aria-label="Travel Pass mode menu" style="background:#0a0a0a; color:#fff;">
+    <section id="glb-travel-home" class="glb-travel-top" aria-label="Travel Pass mode menu" style="background:#0a0a0a; color:#fff;">
         <p class="glb-travel-top-sub">Travel Pass</p>
         <div class="glb-travel-top-actions">
-            <button type="button" id="glb-mode-speak" class="glb-travel-top-btn" style="display:block; width:100%; min-height:120px; padding:24px; border:1px solid #D4AF37; border-radius:18px; background:#111; color:#fff; font-size:30px; font-weight:800;">
+            <button type="button" id="glb-mode-speak" data-mode="speak" class="glb-travel-top-btn" style="display:block; width:100%; min-height:120px; padding:24px; border:1px solid #D4AF37; border-radius:18px; background:#111; color:#fff; font-size:30px; font-weight:800;">
                 話す / Speak
                 <small>声で翻訳する</small>
             </button>
-            <button type="button" id="glb-mode-show" class="glb-travel-top-btn" style="display:block; width:100%; min-height:120px; padding:24px; border:1px solid #D4AF37; border-radius:18px; background:#111; color:#fff; font-size:30px; font-weight:800;">
+            <button type="button" id="glb-mode-show" data-mode="show" class="glb-travel-top-btn" style="display:block; width:100%; min-height:120px; padding:24px; border:1px solid #D4AF37; border-radius:18px; background:#111; color:#fff; font-size:30px; font-weight:800;">
                 見せる / Show
                 <small>相手に画面を見せる</small>
             </button>
-            <button type="button" id="glb-mode-essentials" class="glb-travel-top-btn" style="display:block; width:100%; min-height:120px; padding:24px; border:1px solid #D4AF37; border-radius:18px; background:#111; color:#fff; font-size:30px; font-weight:800;">
+            <button type="button" id="glb-mode-essentials" data-mode="essentials" class="glb-travel-top-btn" style="display:block; width:100%; min-height:120px; padding:24px; border:1px solid #D4AF37; border-radius:18px; background:#111; color:#fff; font-size:30px; font-weight:800;">
                 必須カード / Essentials
                 <small>よく使う文を見せる</small>
             </button>
@@ -3542,6 +3542,82 @@ Emergency: ' + d.emergency;
         document.body.style.opacity = '1';
     }, 0);
 })();
+    </script>
+    <script>
+        (function bindTravelModeV2() {
+            function onReady(fn) {
+                if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+                else fn();
+            }
+            onReady(function () {
+                var home = document.getElementById('glb-travel-home');
+                var billboard = document.getElementById('glb-billboard-shell');
+                var translatePanel = document.getElementById('glb-translate-panel');
+                var essentialsPanel = document.getElementById('glb-travel-six');
+                var subscribe = document.getElementById('subscribe-area');
+                var manage = document.getElementById('manage-subscription-wrap');
+                var emergency = document.getElementById('glb-show-emergency-strip');
+                if (!home || !billboard || !translatePanel || !essentialsPanel) return;
+
+                var modeMap = {
+                    speak: [billboard, translatePanel, subscribe, manage],
+                    show: [billboard, emergency],
+                    essentials: [essentialsPanel]
+                };
+
+                function setVisible(el, on) {
+                    if (!el) return;
+                    el.style.display = on ? '' : 'none';
+                    el.setAttribute('aria-hidden', on ? 'false' : 'true');
+                }
+
+                function hideAllModes() {
+                    var keys = Object.keys(modeMap);
+                    for (var i = 0; i < keys.length; i++) {
+                        var list = modeMap[keys[i]];
+                        for (var j = 0; j < list.length; j++) setVisible(list[j], false);
+                    }
+                }
+
+                function switchTravelModeV2(mode) {
+                    hideAllModes();
+                    if (mode === 'home') {
+                        setVisible(home, true);
+                        return;
+                    }
+                    setVisible(home, false);
+                    var list = modeMap[mode] || [];
+                    for (var i = 0; i < list.length; i++) setVisible(list[i], true);
+                }
+
+                function addBackButton(host, mode) {
+                    if (!host) return;
+                    var id = 'glb-mode-back-' + mode;
+                    if (document.getElementById(id)) return;
+                    var btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.id = id;
+                    btn.textContent = '戻る';
+                    btn.style.cssText = 'display:block;margin:12px auto 0;padding:10px 16px;border:1px solid #D4AF37;border-radius:12px;background:#111;color:#fff;cursor:pointer;';
+                    btn.addEventListener('click', function () { switchTravelModeV2('home'); });
+                    host.appendChild(btn);
+                }
+
+                var cards = home.querySelectorAll('button[data-mode]');
+                for (var i = 0; i < cards.length; i++) {
+                    cards[i].addEventListener('click', function (ev) {
+                        var mode = ev.currentTarget.getAttribute('data-mode');
+                        switchTravelModeV2(mode);
+                    });
+                }
+
+                addBackButton(translatePanel, 'speak');
+                addBackButton(billboard, 'show');
+                addBackButton(essentialsPanel, 'essentials');
+                switchTravelModeV2('home');
+                window.glbSwitchTravelModeV2 = switchTravelModeV2;
+            });
+        })();
     </script>
 </body>
 </html>
