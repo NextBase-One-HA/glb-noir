@@ -1,27 +1,33 @@
 # GLB_DYNAMIC_CANON
 
 ## STATE
-GLB_RELEASE_CANDIDATE / PROTECTED_ARCHITECTURE / FEATURE_REDUCTION
+GLB_RELEASE_CANDIDATE / POSITIVE_TRAVEL_SUPPORT / FEATURE_REDUCTION
 
 ## GOAL
 GLBを公開可能な収益プロダクトとしてリリースする。
-内部ロジック（無料枠・辞書・API削減）はブラックボックス化し、公開UIは初見5秒で理解できる状態を維持する。
+内部ロジックは隠し、公開UIは初見5秒で理解できる状態を維持する。
 
 ## RELEASE_DECISION
 Soft Launch は GO。
 フル拡散は、実機で翻訳・Core導線・Travel導線・Stripe着地を確認後に進める。
 
 勝算:
-- UIと価格導線は成立している
 - Free / Core / Travel の階段が自然
-- 旅行時だけ $14.99 という設計に差別化がある
-- 内部コスト構造を外に出さないため守りもある
+- Travel Pass $14.99 は旅行時だけ買う設計で差別化がある
+- UIと価格導線は成立している
+- 内部コスト構造を外に出さない
 
-リスク:
-- 翻訳1回目の体感速度
-- Stripe成功後の着地
-- iPhone実機の音声/TTS
-- travel.html のボタン迷い
+## AI_TEAM_WORKFLOW
+- Claude = UI原案 / 文案 / 初見レビュー
+- GPT-5.5 = 採用判断 / 削る判断 / 正本照合 / GitHub更新 / リリース制御
+- Cursor = 実装補助
+- NORI-san = 最終判断
+
+禁止:
+- Claudeに採用判断を任せない
+- Claudeコードをそのまま貼らない
+- AI同士を直接対話させない
+- NORI-sanを飛ばして不可逆判断しない
 
 ## PUBLIC_RELEASE_RULE
 公開前は足さない。
@@ -37,119 +43,70 @@ Soft Launch は GO。
 6. travel.html で Speak / Show / Essentials が迷わず使える
 7. Stripe success URL が正しい
 
+## POSITIVE_TRAVEL_SUPPORT_RULE
+Travel Pass は「困った時」だけでなく「旅を良くする」体験として見せる。
+比率はポジティブ70%、トラブル対応30%。
+
+公開OK:
+- 現地で喜ばれる一言
+- チップや支払いの目安
+- レストラン、タクシー、ホテル、空港の自然なフレーズ
+- 会話の糸口
+- 知っていると得する現地マナー
+
+注意:
+- 怖がらせない
+- 緊急訴求を前面に出しすぎない
+- Emergency は必要時に使える位置に置く
+
+後回し:
+- カメラ翻訳
+- 位置情報連動
+- 複雑な観光ガイド
+
 ## DISCLOSURE_POLICY
+外に出すもの:
+- 翻訳結果
+- UI体験
+- 価格
+- 無料で1日10回翻訳
+- 一部オフライン対応などの体験表現
 
-### 外に出すもの（公開OK）
-- 翻訳結果（Friendレイヤー）
-- UI（Speak / Show / Travel体験）
-- 価格（Free / $2.99 / $14.99）
-- 機能説明（音声・翻訳・旅行モード）
-- 「無料で1日10回翻訳」
-- 「オフラインでも一部使える」などの体験表現
-
-### 絶対に出さないもの（非公開）
-- 無料枠の内部判定ロジック
-- API削減ロジックの優先順位
-- 辞書ヒット判定アルゴリズム
+出さないもの:
+- 無料枠の内部判定
+- API削減ロジック
+- 辞書構造
 - キャッシュ構造
-- pivot翻訳ロジック
-- Smile Friend Engineの内部仕様
-- 課金状態判定の仕組み
-- localStorageキー設計
-
-ユーザーには体験と条件だけ見せる。
-内部実装はDev以外には説明しない。
+- Smile Friend Engine内部仕様
+- 課金判定の仕組み
 
 ## FREE_TRIAL_RULE
-公開仕様:
 - 無料枠は1日10回翻訳
-- 表現は「無料で1日10回翻訳」に統一
 - 英語は "Try Free — 10 translations/day" を推奨
-
-内部仕様:
-- 日次回数判定は内部処理
-- 判定方法、保存場所、リセット方法は非公開
-- Core誘導は自然文で行う
-
-禁止:
-- 内部キー名の露出
-- 判定コードの説明
-- API削減と無料枠の関係説明
+- 内部判定方法は非公開
 
 ## FEATURE_REDUCTION_RULE
 公開前は機能を増やさない。
-出すために削る。
-初見ユーザーが5秒で理解できない機能は後回し。
+初見5秒で理解できない機能は後回し。
 
-### 残す機能
-index.html:
-- 無料で1日10回翻訳
-- Core $2.99
-- Travel Pass $14.99
-- 価格導線
+残す:
+- index.html: 無料10回 / Core $2.99 / Travel $14.99
+- index.next.html: 翻訳入力 / 結果 / 言語選択 / 音声 / 購入導線
+- travel.html: Speak / Show / Essentials / Back
 
-index.next.html:
-- 翻訳入力
-- 翻訳結果
-- 言語選択
-- 音声/TTS
-- Core購入導線
-- Travel Pass導線
-
-travel.html:
-- 話す / Speak
-- 見せる / Show
-- 必須カード / Essentials
-- 戻る
-
-### 後回し・削ってよい機能
+後回し:
 - Stats
 - Referral
 - Share
 - 過剰な履歴
-- Scene prediction
 - 複雑なタブ
 - 多すぎる小ボタン
-- 説明しすぎるブロック
 - 過剰アニメーション
 
-## API_REDUCTION_PROTECTION
-公開表現:
-- "高速翻訳"
-- "一部オフライン対応"
-
-内部実態（非公開）:
-- 辞書 → キャッシュ → API の優先順
-- 完全一致 / 近似一致ロジック
-- セッションキャッシュキー
-
-ルール:
-- APIを呼ばない理由はUIに出さない
-- 速度は"速い"で統一
-
-## ON_DEVICE_ABSTRACTION
-公開:
-- "オフラインでも一部使える"
-
-非公開:
-- 辞書構造
-- カテゴリ設計
-- phrase優先処理
-
-## SMILE_FRIEND_RULE
-- 出口は常にFriend
-- 内部処理は完全遮断
-
-NG:
-- 内部処理の説明
-
-OK:
-- ユーザーに伝わる表現のみ
-
 ## FINAL_RULE
-GLBは "考えなくていい体験" として提供する。
+GLBは「考えなくていい体験」として提供する。
 公開するのは価値、条件、価格、使い方。
-隠すのは内部ロジック、原価構造、API削減、辞書、キャッシュ、判定処理。
+隠すのは内部ロジック、原価構造、辞書、キャッシュ、判定処理。
 
 もう作り足さない。
 磨く。削る。出す。
