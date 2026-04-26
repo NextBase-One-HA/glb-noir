@@ -261,6 +261,7 @@
             font-weight: 700;
             text-align: left;
             cursor: pointer;
+            transition: box-shadow 0.1s ease, filter 0.1s ease;
         }
         .glb-travel-top-btn small {
             display: block;
@@ -275,6 +276,10 @@
             border-color: rgba(255, 240, 170, 0.85);
         }
         .glb-travel-top-btn.is-active small { color: #4a4022; }
+        .glb-travel-top-btn:active {
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.36);
+            filter: brightness(1.04);
+        }
         .glb-show-emergency-strip {
             margin-top: 8px;
             padding: 8px;
@@ -851,21 +856,21 @@
         <p class="glb-travel-top-sub">Travel Pass</p>
         <div class="glb-travel-top-actions">
             <button type="button" id="glb-mode-speak" class="glb-travel-top-btn">
-                Speak
-                <small>話す</small>
+                話す / Speak
+                <small>声で翻訳する</small>
             </button>
             <button type="button" id="glb-mode-show" class="glb-travel-top-btn">
-                Show
-                <small>見せる</small>
+                見せる / Show
+                <small>相手に画面を見せる</small>
             </button>
             <button type="button" id="glb-mode-essentials" class="glb-travel-top-btn">
-                Essentials
-                <small>必須カード</small>
+                必須カード / Essentials
+                <small>よく使う文を見せる</small>
             </button>
         </div>
     </section>
 
-    <div id="glb-billboard-shell" class="glb-billboard">
+    <div id="glb-billboard-shell" class="glb-billboard" style="display:none;" aria-hidden="true">
         <div id="glb-result-stage" class="glb-result-stage">
             <div class="glb-split-stage">
                 <div class="glb-view-pane glb-view-pane--partner">
@@ -898,7 +903,7 @@
     </div>
 
     <!-- 現地で：「注意」ではなくスマートな振る舞いのコツ（PHASE_TRAVEL_UI + MARKETING） -->
-    <details class="glb-travel-prep" id="glb-travel-prep">
+    <details class="glb-travel-prep" id="glb-travel-prep" style="display:none;" aria-hidden="true">
         <summary>この国でスマートに振る舞うコツ<span class="glb-travel-prep-sum-sub">Smart tips for a smooth trip — not warnings.</span></summary>
         <div class="glb-travel-prep-body">
             <p>Focus on comfort, ease, and sounding natural. Manners, tipping, and small cultural differences are framed as <strong>smart ways to enjoy your time</strong>, not fear of mistakes.</p>
@@ -907,7 +912,7 @@
     </details>
 
     <!-- PHASE_TRAVEL_UI_30DAY_PLAN_03: 6カテゴリ即用タイル（順: Restaurant → Taxi → Hotel → Airport → Immigration → Emergency） -->
-    <section id="glb-travel-six" class="glb-travel-six" aria-labelledby="glb-travel-six-heading">
+    <section id="glb-travel-six" class="glb-travel-six" aria-labelledby="glb-travel-six-heading" style="display:none;" aria-hidden="true">
         <div id="glb-travel-six-heading" class="glb-travel-six-title">Travel mode — natural phrases for a great trip</div>
         <div id="glb-travel-six-grid" class="glb-travel-six-grid" role="navigation" aria-label="Six travel categories"></div>
     </section>
@@ -932,7 +937,7 @@
         </div>
     </div>
 
-    <div id="glb-translate-panel" style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #2a2a2a; text-align: left;">
+    <div id="glb-translate-panel" style="display:none; margin-top: 8px; padding-top: 12px; border-top: 1px solid #2a2a2a; text-align: left;" aria-hidden="true">
         <div class="trans-section-head" id="t-trans-head">Translation</div>
         <details id="glb-lang-details" class="glb-lang-details">
         <summary id="glb-lang-details-summary" class="glb-lang-details-sum"></summary>
@@ -1013,7 +1018,7 @@
 
     <div id="gateway-pulse" style="display:none;" aria-hidden="true" data-i18n-placeholder="apiChecking"></div>
 
-    <div id="subscribe-area" style="max-width: min(600px, 100%); margin: 0 auto 20px;">
+    <div id="subscribe-area" style="display:none; max-width: min(600px, 100%); margin: 0 auto 20px;" aria-hidden="true">
         <div id="glb-coreflow-entry-cta" style="display:none;">
             <p class="note" id="t-entry-cta-text" style="text-align:left; line-height:1.5; margin:0 0 12px;"></p>
         </div>
@@ -1029,14 +1034,14 @@
             </div>
         </div>
     </div>
-    <div id="manage-subscription-wrap" style="display:none; max-width:min(600px, 100%); margin: 0 auto 20px;">
+    <div id="manage-subscription-wrap" style="display:none; max-width:min(600px, 100%); margin: 0 auto 20px;" aria-hidden="true">
         <button type="button" class="btn" id="manage-subscription-btn" style="font-size:16px; padding:14px 18px; border-radius:999px;">
             Manage Purchase
         </button>
         <p id="manage-subscription-note" class="stripe-hint" style="margin-top:6px;">30-day access from purchase — one-time, not recurring. For receipts or billing help, use Purchase Help (footer) or Manage Purchase (Stripe Customer Billing).</p>
     </div>
 
-    <section class="glb-travel-departure-band" id="glb-travel-departure-band" aria-label="Travel Pass status and pre-departure guide">
+    <section class="glb-travel-departure-band" id="glb-travel-departure-band" aria-label="Travel Pass status and pre-departure guide" style="display:none;" aria-hidden="true">
         <p id="travel-status" style="display:none; margin: 0 0 10px; color:#f5e6b8; font-size:12px; text-align:center;"></p>
         <p id="core-access-active" style="display:none; margin: 0 0 10px; color:#f5e6b8; font-size:12px; text-align:center; font-weight:700;">Core Access Active</p>
         <p id="travel-remaining-line" class="glb-travel-remaining" style="display:none;" role="status" aria-live="polite"></p>
@@ -3093,7 +3098,7 @@
         var GLB_PREDEP_COUNTRY_DATA = {
             us: { label: 'United States', tip: 'レストランは目安15–20%。', currency: 'USD / 米ドル', voltage: '120V / A,B', culture: '明るい挨拶と短い自己紹介が有効。', emergency: '911' },
             kr: { label: 'South Korea', tip: '基本はチップ不要。高級店はサービス料確認。', currency: 'KRW / ウォン', voltage: '220V / C,F', culture: '受け渡しは両手だと丁寧。', emergency: '112(警察) / 119(救急)' },
-            th: { label: 'Thailand', tip: '少額チップは歓迎される。', currency: 'THB / バーツ', voltage: '220V / A,C,O', culture: '穏やかな態度と笑顔が有効。', emergency: '191(警察) / 1669(救急)' },
+            th: { label: 'Thailand', tip: '少額チップは歓迎される。', currency: 'THB / バーツ', voltage: '220V / A,C,O', culture: '穏やかで丁寧な態度が有効。', emergency: '191(警察) / 1669(救急)' },
             tw: { label: 'Taiwan', tip: 'チップ習慣は限定的。明細のサービス料を確認。', currency: 'TWD / 台湾ドル', voltage: '110V / A,B', culture: '軽い会釈と謝意が好印象。', emergency: '110(警察) / 119(救急)' },
             fr: { label: 'France', tip: 'サービス料込みが多く端数調整で十分。', currency: 'EUR / ユーロ', voltage: '230V / C,E', culture: '最初にBonjourで挨拶すると円滑。', emergency: '112' },
             uk: { label: 'United Kingdom', tip: 'サービス料込みなら追加不要なことが多い。', currency: 'GBP / ポンド', voltage: '230V / G', culture: '列に並ぶ文化を尊重。', emergency: '999 / 112' }
