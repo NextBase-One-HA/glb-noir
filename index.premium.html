@@ -2,9 +2,9 @@
 <!--
   PROJECT_PUBLIC_ROOT: https://nextbase-one-ha.github.io/nextbase-world/
   本ファイル: .../index.premium.html（14.99 Travel Pass 専用LP・cancel 着地）。
-  Core 正本: index.2.99.html。Travel 本体: index.14.99.html。index.coreflow.html 廃止。
+  Core 正本: index.next.html。index.coreflow.html 廃止。Stripe / PORTAL 注記は index.html / index.next.html DOCTYPE と同一正本。
   PHASE_TRAVEL_MARKETING_01: ポジティブ訴求LP（#glb-travel-lp-hero）。30日買い切り・自動更新なし・Core（$2.99/月）とは別商品であることを明記。
-  Stripe 14.99 success 正: .../index.14.99.html?travel=1&session_id={CHECKOUT_SESSION_ID}（Dashboard 絶対URL）。
+  Stripe 14.99 success 正: .../index.14.99.html?session_id={CHECKOUT_SESSION_ID}&travel=1（Dashboard 絶対URL）。
 -->
 <html lang="en" class="notranslate" translate="no">
 <head>
@@ -16,18 +16,54 @@
     <title>GLOBAL LANGUAGE BREAKER — Travel Pass</title>
     <style>
         :root {
-            --gold: #ffe566;
-            --gold-deep: #e8b820;
-            --gold-glow: rgba(255, 230, 100, 0.95);
-            --gold-glow-mid: rgba(255, 200, 60, 0.55);
-            --gold-glow-soft: rgba(255, 210, 80, 0.28);
-            --bg: #0a0a0a;
-            --card: #1a1a1a;
+            --gold: #f0c93a;
+            --gold-deep: #c98a0a;
+            --gold-glow: rgba(240, 201, 58, 0.95);
+            --gold-glow-mid: rgba(240, 190, 60, 0.5);
+            --gold-glow-soft: rgba(240, 201, 58, 0.22);
+            --bg: #050913;
+            --card: #121b2c;
             --noir-red: #ff0000;
         }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 0; padding-bottom: env(safe-area-inset-bottom, 0); text-align: center; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: rgba(255, 230, 100, 0.15); transition: opacity 0.35s ease; }
+        body {
+            background:
+                radial-gradient(ellipse 100% 60% at 50% -10%, rgba(33, 70, 110, 0.65) 0%, transparent 62%),
+                radial-gradient(ellipse 120% 80% at 50% 100%, rgba(16, 33, 58, 0.58) 0%, transparent 70%),
+                var(--bg);
+            color: #f1f4fb;
+            font-family: -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            text-align: center;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: rgba(240, 201, 58, 0.15);
+            transition: opacity 0.35s ease;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(1px 1px at 18% 20%, rgba(255,255,255,.48) 0%, transparent 100%),
+                radial-gradient(1px 1px at 80% 14%, rgba(255,255,255,.35) 0%, transparent 100%),
+                radial-gradient(1px 1px at 34% 72%, rgba(255,255,255,.32) 0%, transparent 100%),
+                radial-gradient(1px 1px at 70% 86%, rgba(255,255,255,.28) 0%, transparent 100%);
+            z-index: 0;
+            opacity: .5;
+        }
         .hidden { display: none !important; }
-        .cockpit { padding: 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(600px, 100%); margin: 0 auto; box-sizing: border-box; }
+        .cockpit {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            max-width: min(700px, 100%);
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
         .header { margin-bottom: 22px; padding: 0 6px; }
         .gold-text { color: var(--gold); letter-spacing: 4px; font-weight: bold; }
         @keyframes glb-neon-title {
@@ -146,8 +182,10 @@
             font-size: 16px;
             box-shadow: 0 0 22px var(--gold-glow-mid), 0 0 40px var(--gold-glow-soft);
             border: 1px solid rgba(255, 245, 180, 0.65);
+            transition: transform .15s, filter .2s, box-shadow .2s;
         }
-        .btn:active { filter: brightness(1.05); }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 0 30px var(--gold-glow-mid), 0 0 48px var(--gold-glow-soft); }
+        .btn:active { filter: brightness(1.05); transform: translateY(0); }
         .footer { margin-top: 32px; padding-top: 16px; font-size: 11px; color: #666; border-top: 1px solid #222; }
         .footer a { color: #888; margin: 0 8px; text-decoration: none; }
         .legal-footer { margin-top: 40px; padding: 20px 8px 8px; border-top: 1px solid #2a2a2a; font-size: 12px; color: #888; text-align: center; }
@@ -204,43 +242,43 @@
         .glb-travel-lp-hero {
             text-align: left;
             margin: 0 0 18px;
-            padding: 16px 14px 18px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 230, 100, 0.38);
-            background: radial-gradient(ellipse 110% 90% at 50% 0%, rgba(255, 215, 90, 0.09) 0%, #101010 55%);
-            box-shadow: 0 0 22px rgba(255, 200, 60, 0.1);
+            padding: 20px 16px 20px;
+            border-radius: 18px;
+            border: 1px solid rgba(240, 201, 58, 0.32);
+            background: radial-gradient(ellipse 120% 95% at 50% 0%, rgba(33, 70, 110, 0.34) 0%, rgba(18,27,44,0.92) 56%);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32), 0 0 22px rgba(240, 201, 58, 0.08);
         }
         .glb-travel-lp-hero h2 {
             margin: 0 0 10px;
-            font-size: clamp(1.05rem, 4vw, 1.25rem);
+            font-size: clamp(1.15rem, 4.3vw, 1.45rem);
             font-weight: 800;
             color: #fff8dc;
             letter-spacing: 0.03em;
-            line-height: 1.4;
+            line-height: 1.35;
         }
         .glb-travel-lp-lead {
             margin: 0 0 12px;
-            font-size: 11px;
-            color: #a09878;
-            line-height: 1.5;
+            font-size: 12px;
+            color: #b8c4d9;
+            line-height: 1.55;
         }
         .glb-travel-lp-merits {
             margin: 0 0 14px;
             padding-left: 1.15em;
             font-size: 12px;
-            color: #d5d0c0;
+            color: #dbe4f3;
             line-height: 1.55;
         }
         .glb-travel-lp-merits li { margin-bottom: 10px; }
-        .glb-travel-lp-merits strong { color: #ffe566; font-weight: 800; }
+        .glb-travel-lp-merits strong { color: #f0c93a; font-weight: 800; }
         .glb-travel-lp-reassure {
             margin: 0 0 14px;
             padding: 10px 12px;
             border-radius: 10px;
-            border: 1px solid #2a2a2a;
-            background: #141414;
+            border: 1px solid rgba(255,255,255,.1);
+            background: rgba(11, 18, 31, 0.85);
             font-size: 11px;
-            color: #9a9588;
+            color: #a9b7cf;
             line-height: 1.5;
         }
         .glb-travel-lp-cta {
@@ -254,7 +292,7 @@
             display: block;
             margin-top: 8px;
             font-size: 10px;
-            color: #6a6658;
+            color: #a4b2ca;
             line-height: 1.45;
         }
         .glb-travel-remaining {
@@ -322,6 +360,118 @@
             font-weight: 700;
             cursor: pointer;
         }
+        .faq-section {
+            margin: 20px 0 10px;
+            padding: 10px 4px 0;
+            text-align: left;
+        }
+        .faq-section h3 {
+            margin: 0 0 10px;
+            font-size: 14px;
+            color: #f2df9a;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .faq-item {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 24px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .faq-item.open {
+            background: linear-gradient(to right, rgba(255,255,255,0.02), transparent);
+        }
+        .faq-q {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            letter-spacing: 0.02em;
+            color: #f1f4fb;
+            opacity: 0.92;
+            font-weight: 600;
+        }
+        .faq-icon {
+            font-size: 18px;
+            color: #97a5bf;
+            flex-shrink: 0;
+            transition: transform .3s;
+        }
+        .faq-item.open .faq-icon { transform: rotate(45deg); }
+        .faq-a {
+            display: none;
+            margin-top: 12px;
+            font-weight: 300;
+            color: #a9b7cf;
+            line-height: 1.8;
+            padding-right: 20px;
+            font-size: 13px;
+        }
+        .faq-item.open .faq-a { display: block; }
+        .stripe-modal-bg {
+            position: fixed; inset: 0; z-index: 100000;
+            background: rgba(4, 4, 10, 0.92);
+            backdrop-filter: blur(16px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 24px;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .stripe-modal-bg.open { opacity: 1; pointer-events: all; }
+        .stripe-modal {
+            background: #0f0f1a;
+            border: 1px solid rgba(240, 201, 58, 0.3);
+            border-radius: 18px;
+            padding: 28px 24px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+        }
+        .stripe-modal-logo {
+            font-family: 'Instrument Serif', serif;
+            font-size: 28px;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+        .stripe-modal-title { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+        .stripe-modal-price {
+            font-family: 'Instrument Serif', serif;
+            font-size: 40px;
+            color: var(--gold);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .stripe-modal-period { font-size: 11px; color: #888; letter-spacing: .06em; margin-bottom: 20px; }
+        .stripe-modal-note { font-size: 11px; color: #888; line-height: 1.6; margin-bottom: 20px; }
+        .stripe-modal-btns { display: flex; flex-direction: column; gap: 10px; }
+        .stripe-confirm-btn {
+            padding: 15px;
+            background: linear-gradient(180deg, #fff5a0 0%, var(--gold) 50%, #c9960a 100%);
+            color: #07060a !important;
+            font-size: 14px;
+            font-weight: 800;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 24px rgba(240, 201, 58, 0.28);
+            text-decoration: none;
+            display: block;
+            transition: filter .2s;
+        }
+        .stripe-confirm-btn:hover { filter: brightness(1.06); }
+        .stripe-cancel-btn {
+            padding: 12px;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            color: #888;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color .2s, color .2s;
+        }
+        .stripe-cancel-btn:hover { border-color: var(--border-gold); color: var(--white); }
         .tr-run-wrap { text-align: center; margin-top: 10px; margin-bottom: 6px; }
         #tr-run.glb-main-btn {
             display: inline-block;
@@ -410,16 +560,16 @@
 
     <section id="glb-travel-lp-hero" class="glb-travel-lp-hero" aria-labelledby="glb-travel-lp-h2" lang="ja" data-phase="CORE_RELEASE_CLEANUP_01">
         <h2 id="glb-travel-lp-h2">注文も、移動も、ちょっとした会話も。</h2>
-        <p class="glb-travel-lp-lead">旅先でそのまま見せて通じる。</p>
+        <p class="glb-travel-lp-lead">旅先でそのまま見せて通じる。道に迷わず、会話をあきらめない30日間。</p>
         <ul class="glb-travel-lp-merits">
-            <li><strong>[30-day access]</strong> One-time purchase for 30 days of Travel mode — not a subscription.</li>
-            <li><strong>[Separate from Core]</strong> Core stays $2.99/month on its own plan; Travel Pass is an add-on window, not a replacement.</li>
-            <li><strong>[Fast start]</strong> After checkout you return to Travel with your session — pick languages and go.</li>
+            <li><strong>[30-day pass]</strong> One payment opens full Travel mode for 30 days. No auto-renew.</li>
+            <li><strong>[Clear billing]</strong> Travel Pass is separate from Core ($2.99/mo). No hidden overlap.</li>
+            <li><strong>[Start in seconds]</strong> Finish checkout, come back here, pick your language, and go.</li>
         </ul>
-        <p class="glb-travel-lp-reassure">Billing questions? Use Purchase Help (footer) — this pass is a single 30-day access purchase, not a recurring plan.</p>
-        <a class="btn glb-travel-lp-cta" id="glb-travel-lp-cta-btn" href="https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v">Get Travel Pass — $14.99</a>
-        <p class="glb-travel-lp-en" style="margin:10px 0 0; font-size:11px; color:#a09678;">One-time checkout · 30-day access · Not recurring</p>
-        <p class="glb-travel-lp-en" style="margin:6px 0 0; font-size:11px; color:#a09678;">Core continues separately at $2.99/month — keep both paths distinct at checkout.</p>
+        <p class="glb-travel-lp-reassure">Billing is simple: one 30-day purchase. For receipts or changes, open Purchase Help in the footer anytime.</p>
+        <a class="btn glb-travel-lp-cta" id="glb-travel-lp-cta-btn" href="javascript:void(0)" onclick="openTravelStripeConfirm(event)">Get Travel Pass — $14.99</a>
+        <p class="glb-travel-lp-en" style="margin:10px 0 0; font-size:11px; color:#a4b2ca;">One-time checkout · 30-day access · Not recurring</p>
+        <p class="glb-travel-lp-en" style="margin:6px 0 0; font-size:11px; color:#a4b2ca;">After 30 days, you return to Core mode automatically.</p>
     </section>
 
     <div class="glb-billboard" style="display:none;" aria-hidden="true">
@@ -516,10 +666,14 @@
     </div>
     <div id="manage-subscription-wrap" style="display:none; max-width:min(600px, 100%); margin: 0 auto 20px;">
         <button type="button" class="btn" id="manage-subscription-btn" style="font-size:16px; padding:14px 18px; border-radius:999px;">
-            Manage Purchase
+            Manage / Cancel plan
         </button>
-        <p id="manage-subscription-note" class="stripe-hint" style="margin-top:6px;">30-day access from purchase — one-time, not recurring. For receipts or billing help, use Purchase Help (footer) or Manage Purchase (Stripe Customer Billing).</p>
+        <p id="manage-subscription-note" class="stripe-hint" style="margin-top:6px;">30-day access from purchase — one-time, not recurring. For receipts or billing help, use Purchase Help (footer) or Manage / Cancel plan (Stripe Customer Billing).</p>
     </div>
+    <section class="faq-section" aria-labelledby="premium-faq-title">
+        <h3 id="premium-faq-title">Questions</h3>
+        <div id="premium-faq-list"></div>
+    </section>
 
     <footer class="footer legal-footer" id="glb-legal-footer" lang="en">
         <div class="legal-links">
@@ -536,10 +690,125 @@
         <p class="footer-copy" id="footer-copyright">&copy; 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending</p>
     </footer>
     </div>
+    <div class="stripe-modal-bg" id="travel-stripe-modal-bg" onclick="closeTravelStripeConfirm(event)">
+        <div class="stripe-modal">
+            <div class="stripe-modal-logo">GLB</div>
+            <div class="stripe-modal-title" id="travel-sm-title">Secure checkout</div>
+            <div class="stripe-modal-price">$14.99</div>
+            <div class="stripe-modal-period" id="travel-sm-period">/ 30 days · one-time purchase</div>
+            <div class="stripe-modal-note" id="travel-sm-note">You will be redirected to Stripe secure payment page.<br>Tax may be added at checkout depending on your country.</div>
+            <div class="stripe-modal-btns">
+                <a href="https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v" class="stripe-confirm-btn" id="travel-sm-confirm">Proceed to Stripe →</a>
+                <button class="stripe-cancel-btn" id="travel-sm-cancel" onclick="closeTravelStripeConfirm()">Cancel plan</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         if (typeof window.__GLB_PAGE_LAYER === 'undefined') window.__GLB_PAGE_LAYER = 'coreflow';
         var GLB_PROJECT_PUBLIC_ROOT = './';
+        var GLB_STRIPE_TRAVEL_URL = 'https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v';
+        const TRAVEL_STRIPE_MODAL_I18N = {
+            en: {
+                title: 'Secure checkout',
+                period: '/ 30 days · one-time purchase',
+                note: 'You will be redirected to Stripe secure payment page.<br><span style="color:#f0c93a;font-size:10px;">* Tax may be added at checkout depending on your country.</span>',
+                confirm: 'Proceed to Stripe →',
+                cancel: 'Cancel plan'
+            },
+            ja: {
+                title: 'Stripeで決済',
+                period: '/ 30日 · 買い切り',
+                note: 'Stripeのセキュアな決済ページに移動します。<br><span style="color:#f0c93a;font-size:10px;">※ お住まいの国によって税金が加算される場合があります。</span>',
+                confirm: 'Stripeへ進む →',
+                cancel: 'キャンセル'
+            }
+        };
+        function openTravelStripeConfirm(e) {
+            if (e) e.preventDefault();
+            var d = TRAVEL_STRIPE_MODAL_I18N[CURRENT_LANG] || TRAVEL_STRIPE_MODAL_I18N.en;
+            var set = function (id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; };
+            set('travel-sm-title', d.title);
+            set('travel-sm-period', d.period);
+            set('travel-sm-note', d.note);
+            var cta = document.getElementById('travel-sm-confirm');
+            if (cta) {
+                cta.textContent = d.confirm;
+                cta.setAttribute('href', GLB_STRIPE_TRAVEL_URL);
+            }
+            var cancel = document.getElementById('travel-sm-cancel');
+            if (cancel) cancel.textContent = d.cancel;
+            var bg = document.getElementById('travel-stripe-modal-bg');
+            if (bg) bg.classList.add('open');
+        }
+        function closeTravelStripeConfirm(e) {
+            if (e && e.target !== document.getElementById('travel-stripe-modal-bg')) return;
+            var bg = document.getElementById('travel-stripe-modal-bg');
+            if (bg) bg.classList.remove('open');
+        }
+        const FAQS = [
+            {
+                q: '30日間のパスとは、いわゆる「サブスク」ですか？',
+                a: 'いいえ、使い切りのチケットです。自動更新で勝手に翌月分が引き落とされる心配はありません。30日が経過すると自動的にCoreプランに戻るだけ。あなたの旅の期間だけ、贅沢に使い倒してください。'
+            },
+            {
+                q: '旅が終わった後、勝手にお金がかかることは？',
+                a: 'ありません。Travel Passは一度きりの決済です。30日後に「Coreモード（月額2.99ドル）」へ戻りますが、これは以前から継続している基本機能の維持であり、Travel Pass関連の追加請求が発生することはありません。'
+            },
+            {
+                q: '空港のWi-Fiがない場所でも使えますか？',
+                a: 'はい。レストランやホテルでよく使う「定番のフレーズ」は、あらかじめアプリ内に内蔵されています。電波の届かない地下の店や移動中でも、最低限のコミュニケーションはGLBが守ります。'
+            },
+            {
+                q: 'Coreプラン（月額）を契約していなくても買えますか？',
+                a: 'もちろんです。Travel Pass単体で購入でき、その30日間はCoreプランの全機能（無制限翻訳）もセットで解放されます。まずは今回の旅のためだけに使ってみてください。'
+            },
+            {
+                q: '領収書は発行されますか？',
+                a: 'はい。Stripeを通じて登録したメールアドレスへ即座に送信されます。経費精算や、後で旅の記録を確認する際もスムーズです。'
+            },
+            {
+                q: '13言語以外の国へ行く場合は？',
+                a: 'GLBが最も得意とするのは、英語・日本語・中国語をはじめとする主要13言語です。それ以外の言語でもテキスト翻訳は可能ですが、Travel Passの「見せて通じる」体験をフルに味わうなら、対応言語の国でのご利用を強くおすすめします。'
+            }
+        ];
+        function mountPremiumFaq() {
+            var list = document.getElementById('premium-faq-list');
+            if (!list) return;
+            list.innerHTML = '';
+            FAQS.forEach(function (faq) {
+                var item = document.createElement('div');
+                item.className = 'faq-item';
+                item.innerHTML =
+                    '<div class="faq-q"><span>' + faq.q + '</span><span class="faq-icon">+</span></div>' +
+                    '<div class="faq-a">' + faq.a + '</div>';
+                item.addEventListener('click', function () {
+                    item.classList.toggle('open');
+                });
+                list.appendChild(item);
+            });
+        }
+        function bindTravelStripeLoading() {
+            var cta = document.getElementById('travel-sm-confirm');
+            if (!cta) return;
+            cta.addEventListener('click', function (ev) {
+                ev.preventDefault();
+                var url = cta.getAttribute('href') || GLB_STRIPE_TRAVEL_URL;
+                var prev = cta.textContent;
+                var jp = (CURRENT_LANG || 'en') === 'ja';
+                cta.textContent = jp ? '安全な決済ページを準備中...' : 'Preparing secure checkout...';
+                cta.style.pointerEvents = 'none';
+                cta.style.opacity = '0.9';
+                setTimeout(function () { window.location.assign(url); }, 120);
+                setTimeout(function () {
+                    cta.textContent = prev;
+                    cta.style.pointerEvents = '';
+                    cta.style.opacity = '';
+                }, 3000);
+            });
+        }
+        mountPremiumFaq();
+        bindTravelStripeLoading();
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
         var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
         const APP_VERSION = '2026.04.22.core.cleanup.1';
@@ -1437,12 +1706,6 @@
         var GLB_UI_LANG_KEY = 'glb_ui_lang_v2';
 
         function getStoredUiLang() {
-            var USER_LANG = localStorage.getItem('glb_ui_lang') || 'en';
-            if (USER_LANG && GLB_UI_LANGS.indexOf(USER_LANG) !== -1) return USER_LANG;
-            try {
-                var raw = localStorage.getItem(GLB_UI_LANG_KEY);
-                if (raw && GLB_UI_LANGS.indexOf(raw) !== -1) return raw;
-            } catch (e) { /* ignore */ }
             return 'en';
         }
 

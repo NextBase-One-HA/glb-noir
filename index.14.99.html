@@ -17,26 +17,37 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --black: #060606;
-  --black2: #0e0e0e;
-  --gold: #ffe566;
-  --gold2: #e8b820;
-  --gold-glow: rgba(255,220,80,0.2);
-  --white: #f5f2ed;
-  --muted: #666;
-  --border: #1e1e1e;
+  --black: #0a0a10;
+  --black2: #121222;
+  --gold: #f3c623;
+  --gold2: #c98a0a;
+  --gold-glow: rgba(243,198,35,0.22);
+  --white: #f3f2fa;
+  --muted: #8e8ea7;
+  --border: rgba(255,255,255,0.09);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; }
 
 body {
-  background: var(--black);
+  background: radial-gradient(circle at top right, #1a1a2e, var(--black));
   color: var(--white);
   font-family: 'DM Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   padding-bottom: env(safe-area-inset-bottom, 0);
   overflow-x: hidden;
+}
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  opacity:.04;
+  background-image:radial-gradient(rgba(255,255,255,.34) .6px, transparent .6px);
+  background-size:3px 3px;
+  mix-blend-mode:soft-light;
 }
 
 /* ── HEADER ── */
@@ -45,6 +56,8 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
+  background: rgba(10,10,16,0.82);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
 }
 
@@ -53,7 +66,9 @@ body {
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.12em;
-  color: var(--gold);
+  background: linear-gradient(135deg, #fff 24%, var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   text-transform: uppercase;
 }
 
@@ -93,8 +108,12 @@ body {
   align-items: center;
   justify-content: center;
   padding: 28px 24px;
-  background: radial-gradient(ellipse 100% 70% at 50% 50%, rgba(255,210,60,0.05) 0%, transparent 65%);
+  margin: 12px;
+  border-radius: 20px;
+  background: radial-gradient(ellipse 110% 80% at 50% 35%, rgba(243,198,35,0.10) 0%, rgba(18,18,34,0.88) 62%);
   border-bottom: 1px solid var(--border);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.35);
   position: relative;
 }
 
@@ -108,13 +127,14 @@ body {
   word-break: break-word;
   max-width: 100%;
   transition: transform 0.3s ease;
+  text-shadow: 0 0 18px rgba(255,255,255,0.16);
 }
 
 .glb-result.idle {
   font-family: 'DM Sans', sans-serif;
   font-size: 15px;
-  font-weight: 300;
-  color: #333;
+  font-weight: 400;
+  color: #6f6f89;
 }
 
 .glb-result.flipped {
@@ -143,7 +163,7 @@ body {
 
 /* ── 3 MAIN BUTTONS ── */
 .glb-actions {
-  padding: 24px 20px 16px;
+  padding: 14px 20px 16px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
@@ -156,7 +176,7 @@ body {
   justify-content: center;
   gap: 8px;
   padding: 20px 10px;
-  background: var(--black2);
+  background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
   border-radius: 14px;
   cursor: pointer;
@@ -166,12 +186,12 @@ body {
 
 .glb-action-btn:active {
   transform: scale(0.97);
-  background: #141414;
+  background: rgba(255,255,255,0.08);
 }
 
 .glb-action-btn.active {
-  border-color: rgba(255,220,80,0.5);
-  background: #0f0e00;
+  border-color: rgba(243,198,35,0.55);
+  background: rgba(243,198,35,0.12);
 }
 
 .glb-action-icon {
@@ -184,7 +204,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #a3a3ba;
   text-align: center;
 }
 
@@ -203,21 +223,31 @@ body {
 .glb-mic-btn {
   width: 100%;
   padding: 20px;
-  background: linear-gradient(180deg, #fff8b0 0%, var(--gold) 50%, var(--gold2) 100%);
+  background: #ffffff;
   color: #08080a;
-  font-family: 'Syne', sans-serif;
-  font-size: 18px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  border-radius: 999px;
+  letter-spacing: 0.01em;
+  border-radius: 16px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 0 28px rgba(255,220,80,0.25);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
   transition: filter 0.2s, transform 0.1s;
 }
 
 .glb-mic-btn:active { filter: brightness(1.06); transform: scale(0.98); }
-.glb-mic-btn.recording { background: linear-gradient(180deg, #ff8080 0%, #cc2222 100%); color: #fff; }
+.glb-mic-btn.recording {
+  background: #ff3b30;
+  color: #fff;
+  box-shadow: 0 0 0 0 rgba(255,59,48,0.35);
+  animation: glbPulseRing 1.4s infinite;
+}
+@keyframes glbPulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(255,59,48,0.35); }
+  70% { box-shadow: 0 0 0 14px rgba(255,59,48,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); }
+}
 
 /* ── SHOW MODE ── */
 .glb-show-panel {
@@ -243,11 +273,12 @@ body {
 
 .glb-input:focus { border-color: rgba(255,220,80,0.35); }
 .glb-input::placeholder { color: #333; }
+.glb-input::placeholder { color: #70708c; }
 
 .glb-translate-btn {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(180deg, #fff8b0 0%, var(--gold) 50%, var(--gold2) 100%);
+  background: linear-gradient(180deg, #fff9b8 0%, var(--gold) 55%, var(--gold2) 100%);
   color: #08080a;
   font-family: 'DM Sans', sans-serif;
   font-size: 16px;
@@ -305,7 +336,7 @@ body {
 .glb-quota {
   text-align: center;
   font-size: 11px;
-  color: #333;
+  color: #7d7d99;
   padding: 8px 20px 20px;
   letter-spacing: 0.04em;
 }
@@ -318,11 +349,11 @@ body {
   justify-content: space-between;
   align-items: center;
   font-size: 11px;
-  color: #333;
+  color: #7d7d99;
 }
 
 .glb-footer a {
-  color: #444;
+  color: #9a9ab3;
   text-decoration: none;
 }
 
@@ -404,7 +435,7 @@ body {
 <!-- RESULT STAGE -->
 <div class="glb-stage">
   <button class="glb-flip-btn" id="flip-btn">Flip</button>
-  <div class="glb-result idle" id="glb-result">Ready</div>
+  <div class="glb-result idle" id="glb-result">Ready to help</div>
 </div>
 
 <!-- 3 MAIN BUTTONS -->
@@ -426,14 +457,14 @@ body {
 <!-- SPEAK PANEL -->
 <div class="glb-speak-panel" id="panel-speak">
   <button class="glb-mic-btn" id="mic-btn">
-    🎤 &nbsp; Tap to Speak
+    🎤 &nbsp; Tap to start conversation
   </button>
 </div>
 
 <!-- SHOW PANEL -->
 <div class="glb-show-panel" id="panel-show">
   <input type="text" id="show-input" class="glb-input" placeholder="Type to translate…" autocomplete="off">
-  <button class="glb-translate-btn">Translate</button>
+  <button class="glb-translate-btn" id="t-btn">Translate now</button>
 </div>
 
 <!-- ESSENTIALS PANEL -->
@@ -620,7 +651,7 @@ function forceRedirectToCore(reason) {
     try { window.location.replace(target); } catch (e0) { /* ignore */ }
     setTimeout(function () {
         try {
-            if (window.location.href.indexOf('/index.next.html') === -1) {
+            if (window.location.href.indexOf('/index.2.99.html') === -1) {
                 window.location.assign(target);
             }
         } catch (e1) { /* ignore */ }
@@ -1100,7 +1131,7 @@ document.getElementById('flip-btn').addEventListener('click', function () {
 
 function setResult(text, isIdle) {
     var el = document.getElementById('glb-result');
-    el.textContent = text;
+    el.textContent = text || 'Ready to help';
     el.classList.toggle('idle', !!isIdle);
 }
 
@@ -1109,12 +1140,12 @@ async function translate(text, from, to) {
     if (!isTravelUiUnlimited()) {
         var q = getQuota();
         if (q.count >= FREE_LIMIT) {
-            setResult('Daily limit reached.');
+            setResult('Today\'s free limit reached.');
             return null;
         }
     }
     try {
-        setResult('…');
+        setResult('Translating...');
         var r = await fetch(NEXTBASE_APP + '/translate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1129,7 +1160,7 @@ async function translate(text, from, to) {
         updateQuota();
         return out;
     } catch(e) {
-        setResult('Network error.', true);
+        setResult('Connection issue. Please try again.', true);
         return null;
     }
 }
@@ -1151,7 +1182,7 @@ document.getElementById('show-input').addEventListener('keydown', function (e) {
 function toggleMic() {
     if (GLB_MAINTENANCE_ON) return;
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        setResult('Voice not supported on this browser.', true);
+        setResult('Voice input is not available in this browser.', true);
         return;
     }
     if (isRecording) { stopMic(); return; }
@@ -1172,7 +1203,7 @@ function startMic() {
         stopMic();
     };
     recognition.onerror = function () {
-        setResult('Could not hear. Try again.', true);
+        setResult('I could not hear clearly. Please try again.', true);
         stopMic();
     };
     recognition.onend = function () { stopMic(); };
@@ -1189,7 +1220,7 @@ function stopMic() {
     isRecording = false;
     var btn = document.getElementById('mic-btn');
     btn.classList.remove('recording');
-    btn.innerHTML = '🎤 &nbsp; Tap to Speak';
+    btn.innerHTML = '🎤 &nbsp; Tap to start conversation';
 }
 
 async function renderEssentials() {

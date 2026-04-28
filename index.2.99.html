@@ -11,7 +11,7 @@
   Premium LP: .../index.premium.html
 
   Stripe Payment Link（Dashboard 絶対URL・index.html DOCTYPE と同一）:
-  - 2.99 success:  .../index.next.html?session_id={CHECKOUT_SESSION_ID}
+  - 2.99 success:  .../index.2.99.html?session_id={CHECKOUT_SESSION_ID}
   - 2.99 cancel:    .../index.html
   - 14.99 success:  .../index.14.99.html?travel=1&session_id={CHECKOUT_SESSION_ID}
   - 14.99 purchase/help 正本: .../index.premium.html
@@ -642,6 +642,9 @@
                 Start GLB 2.99
             </a>
             <p class="stripe-hint" id="t-stripe-hint">Secure checkout with Stripe.</p>
+            <a href="index.premium.html" class="btn glb-subscribe-btn" style="font-size:16px; padding:14px 18px; border-radius:999px; margin-top:10px; background:#1a1a1a; color:#fff8c8; border:1px solid rgba(255, 230, 100, 0.35); box-shadow:0 0 10px rgba(255, 210, 80, 0.18);" id="t-btn-travel-info">
+                Travel Mode Info
+            </a>
         </div>
     </div>
     <section id="glb-travel-minimal" style="display:none; max-width:min(600px,100%); margin:0 auto 16px; text-align:left; border:1px solid #2a2a2a; border-radius:10px; padding:12px 14px; background:#121212;">
@@ -1532,18 +1535,20 @@
                 }
                 if (GLB_CORE_SUBSCRIBED) {
                     cleanupUrlParams();
+                } else {
+                    window.location.replace('index.next.html');
                 }
                 return;
             }
 
             localStorage.setItem(LS_TRAVEL_PENDING, 'true');
-            showTravelStatus(isCoreRedirect ? 'Activating Core Access...' : 'Activating Travel Pass...');
+            showTravelStatus(isCoreRedirect ? 'Activating GLB Access...' : 'Activating Travel Pass...');
 
             var timeoutId = setTimeout(function () {
                 if (localStorage.getItem(LS_TRAVEL_PENDING) === 'true') {
                     localStorage.removeItem(LS_TRAVEL_PENDING);
                     if (isCoreRedirect) {
-                        showTravelStatus('Core access activation is taking longer than expected. Please try again shortly.');
+                        showTravelStatus('GLB access activation is taking longer than expected. Please try again shortly.');
                     } else {
                         showTravelStatus('Travel pass activation is taking longer than expected. Base mode remains available.');
                     }
@@ -1555,7 +1560,7 @@
                 var ent = await syncEntitlementsWithCheckoutRetry();
                 if (ent && ent.ok && isCoreRedirect && ent.core_subscribed) {
                     localStorage.removeItem(LS_TRAVEL_PENDING);
-                    showTravelStatus('Core Access Active');
+                    showTravelStatus('GLB Access Active');
                     clearTimeout(timeoutId);
                     cleanupUrlParams();
                     return;
