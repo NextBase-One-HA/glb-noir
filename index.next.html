@@ -3,17 +3,17 @@
   PROJECT_PUBLIC_ROOT（公開URL正本）:
   https://nextbase-one-ha.github.io/nextbase-world/
 
-  【ページ正本・CANONICAL_UNIFY_INDEX_NEXT】
-  Core 2.99 本体は本ファイル index.next.html のみ。index.coreflow.html は廃止（参照禁止）。
+  【ページ正本・CANONICAL_HOOK_ENTRY】
+  本ページは5回無料体験（HOOK）。Core本体は index.2.99.html。課金導線はここから Core に遷移。
   無料5回/日: .../index.html（課金ボタンなし → Core ページへ誘導）
   Core 本体・$2.99 Stripe: 本ファイル（未課金も閲覧可・同一クォータ）
-  Travel 14.99: .../travel.html
+  Travel 14.99: .../index.14.99.html
   Premium LP: .../index.premium.html
 
   Stripe Payment Link（Dashboard 絶対URL・index.html DOCTYPE と同一）:
   - 2.99 success:  .../index.next.html?session_id={CHECKOUT_SESSION_ID}
   - 2.99 cancel:    .../index.html
-  - 14.99 success:  .../travel.html?travel=1&session_id={CHECKOUT_SESSION_ID}
+  - 14.99 success:  .../index.14.99.html?travel=1&session_id={CHECKOUT_SESSION_ID}
   - 14.99 purchase/help 正本: .../index.premium.html
 
   PORTAL_RETURN_URL 正本: .../index.next.html
@@ -1523,12 +1523,17 @@
             var url = new URL(window.location.href);
             var isTravelRedirect = url.searchParams.get('travel') === '1';
             var isCoreRedirect = url.searchParams.get('subscribed') === '1';
+            var hasCoreSession = !!(url.searchParams.get('session_id') || '').trim() && !isTravelRedirect;
 
             if (!isTravelRedirect && !isCoreRedirect) {
                 try {
                     await syncEntitlements();
                 } catch (e) {
                     /* ignore */
+                }
+                if (GLB_CORE_SUBSCRIBED && hasCoreSession) {
+                    window.location.replace('index.2.99.html?subscribed=1');
+                    return;
                 }
                 if (GLB_CORE_SUBSCRIBED) {
                     cleanupUrlParams();
@@ -1558,6 +1563,7 @@
                     showTravelStatus('Core Access Active');
                     clearTimeout(timeoutId);
                     cleanupUrlParams();
+                    window.location.replace('index.2.99.html?subscribed=1');
                     return;
                 } else if (ent && ent.ok && ent.travel_active) {
                     localStorage.removeItem(LS_TRAVEL_PENDING);
@@ -2426,7 +2432,8 @@
             }
 
             try {
-                var savedLang = localStorage.getItem('glb_ui_lang');
+                var USER_LANG = localStorage.getItem('glb_ui_lang') || 'en';
+                var savedLang = USER_LANG;
                 if (!savedLang) {
                     try {
                         savedLang = localStorage.getItem(GLB_UI_LANG_KEY);

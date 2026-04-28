@@ -2,9 +2,9 @@
 <!--
   PROJECT_PUBLIC_ROOT: https://nextbase-one-ha.github.io/nextbase-world/
   本ファイル: .../index.premium.html（14.99 Travel Pass 専用LP・cancel 着地）。
-  Core 正本: index.next.html。index.coreflow.html 廃止。Stripe / PORTAL 注記は index.html / index.next.html DOCTYPE と同一正本。
+  Core 正本: index.2.99.html。Travel 本体: index.14.99.html。index.coreflow.html 廃止。
   PHASE_TRAVEL_MARKETING_01: ポジティブ訴求LP（#glb-travel-lp-hero）。30日買い切り・自動更新なし・Core（$2.99/月）とは別商品であることを明記。
-  Stripe 14.99 success 正: .../travel.html?travel=1&session_id={CHECKOUT_SESSION_ID}（Dashboard 絶対URL）。
+  Stripe 14.99 success 正: .../index.14.99.html?travel=1&session_id={CHECKOUT_SESSION_ID}（Dashboard 絶対URL）。
 -->
 <html lang="en" class="notranslate" translate="no">
 <head>
@@ -1437,6 +1437,12 @@
         var GLB_UI_LANG_KEY = 'glb_ui_lang_v2';
 
         function getStoredUiLang() {
+            var USER_LANG = localStorage.getItem('glb_ui_lang') || 'en';
+            if (USER_LANG && GLB_UI_LANGS.indexOf(USER_LANG) !== -1) return USER_LANG;
+            try {
+                var raw = localStorage.getItem(GLB_UI_LANG_KEY);
+                if (raw && GLB_UI_LANGS.indexOf(raw) !== -1) return raw;
+            } catch (e) { /* ignore */ }
             return 'en';
         }
 

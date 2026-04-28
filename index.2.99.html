@@ -4,16 +4,16 @@
   https://nextbase-one-ha.github.io/nextbase-world/
 
   【ページ正本・CANONICAL_CORE_299】
-  Core 2.99 本体は本ファイル index.2.99.html のみ。index.next.html は旧互換/移行用として維持。index.coreflow.html は廃止（参照禁止）。
+  Core 2.99 本体は本ファイル。index.next.html は無料体験導線。課金後は必ず本ページへ着地。
   無料5回/日: .../index.html（課金ボタンなし → Core ページへ誘導）
   Core 本体・$2.99 Stripe: 本ファイル（未課金も閲覧可・同一クォータ）
-  Travel 14.99: .../travel.html
+  Travel 14.99: .../index.14.99.html
   Premium LP: .../index.premium.html
 
   Stripe Payment Link（Dashboard 絶対URL・index.html DOCTYPE と同一）:
   - 2.99 success:  .../index.next.html?session_id={CHECKOUT_SESSION_ID}
   - 2.99 cancel:    .../index.html
-  - 14.99 success:  .../travel.html?travel=1&session_id={CHECKOUT_SESSION_ID}
+  - 14.99 success:  .../index.14.99.html?travel=1&session_id={CHECKOUT_SESSION_ID}
   - 14.99 purchase/help 正本: .../index.premium.html
 
   PORTAL_RETURN_URL 正本: .../index.next.html
@@ -2426,7 +2426,8 @@
             }
 
             try {
-                var savedLang = localStorage.getItem('glb_ui_lang');
+                var USER_LANG = localStorage.getItem('glb_ui_lang') || 'en';
+                var savedLang = USER_LANG;
                 if (!savedLang) {
                     try {
                         savedLang = localStorage.getItem(GLB_UI_LANG_KEY);
