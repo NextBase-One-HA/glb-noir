@@ -1910,6 +1910,10 @@
         var GLB_UI_LANG_KEY = 'glb_ui_lang_v2';
 
         function getStoredUiLang() {
+            try {
+                var raw = localStorage.getItem('glb_ui_lang') || localStorage.getItem(GLB_UI_LANG_KEY);
+                if (raw && GLB_UI_LANGS.indexOf(raw) !== -1) return raw;
+            } catch (e) { /* ignore */ }
             return 'en';
         }
 
@@ -2422,10 +2426,27 @@
             }
 
             try {
-                var savedTo = localStorage.getItem('glb_lang_to');
-                if (savedTo && toEl.querySelector('option[value="' + savedTo + '"]')) toEl.value = savedTo;
+                var savedLang = localStorage.getItem('glb_ui_lang');
+                if (!savedLang) {
+                    try {
+                        savedLang = localStorage.getItem(GLB_UI_LANG_KEY);
+                    } catch (e2) { /* ignore */ }
+                }
+                if (!savedLang || !LANG_OPTS.some(function (l) {
+                    return l.c === savedLang;
+                })) {
+                    savedLang = 'en';
+                }
+                var userLang = savedLang;
+                var targetLang = (userLang === 'en') ? 'ja' : 'en';
+                if (uiEl.querySelector('option[value="' + userLang + '"]')) uiEl.value = userLang;
+                if (fromEl.querySelector('option[value="' + userLang + '"]')) fromEl.value = userLang;
+                if (toEl.querySelector('option[value="' + targetLang + '"]')) toEl.value = targetLang;
+                try {
+                    localStorage.setItem('glb_lang_to', toEl.value);
+                } catch (e3) { /* ignore */ }
             } catch (e) { /* ignore */ }
-            syncFromUiLang();
+            syncHidden();
         })();
 
         (function regionPreset() {
