@@ -8,10 +8,10 @@ It cannot override the immutable canonical.
 
 ```text
 STATE: HOLD
-GOAL: Make GLB work as the first revenue product inside NextBase OS with a dedicated AI Router.
-BLOCKER: Current live `nextbase-gateway-v1` still runs the old mixed gateway shape (`uvicorn smile_friend:app`).
-NEXT_ACTION: Deploy dedicated `ai_router/` as the real AI Router, prove `/health` and `/translate`, then switch Smile Friend Engine to it.
-OUTPUT: HOLD until real endpoint evidence passes.
+GOAL: Make GLB work as the first revenue product inside NextBase OS through the dedicated AI Router.
+BLOCKER: Smile Friend Engine is not yet proven connected to dedicated `ai-router`.
+NEXT_ACTION: Point Smile Friend Engine to dedicated `ai-router`, then verify quota and GLB flow.
+OUTPUT: HOLD until Smile Friend Engine route and GLB route pass live evidence.
 ```
 
 ## Correct production target
@@ -44,17 +44,18 @@ Smile Friend Engine:
   Region: us-central1
   Role: human-side entrance/exit, quota, entitlement, STELLA checks
 
-AI Router dedicated implementation:
+AI Router dedicated service:
   Repo path: ai_router/
-  Intended Cloud Run service: ai-router
+  Cloud Run service: ai-router
   Region: asia-northeast1
+  URL: https://ai-router-125142687526.asia-northeast1.run.app
   Role: AI-side routing, key resolution, model resolution, provider call
-  Status: CREATED IN REPO / NOT LIVE-PROVEN
+  Status: LIVE_PASS
 
 nextbase-gateway-v1:
   Current Cloud Run service exists.
-  Current build still appears to use old mixed entrypoint: uvicorn smile_friend:app.
-  Role after redesign: legacy compatibility until replaced by dedicated ai-router.
+  Legacy mixed gateway shape (`uvicorn smile_friend:app`).
+  Role after redesign: legacy compatibility / rollback only.
 
 translate:
   Cloud Run service: translate
@@ -73,12 +74,14 @@ NextBase API:
 
 ## Confirmed facts
 
-- Path mismatch between translate and AI Router was fixed.
-- translate `/health` returns gateway_v1_configured true.
-- translate POST reaches AI Router `/translate`.
-- Current old gateway returns provider-level API key expired.
-- Dedicated `ai_router/` implementation was added to repo, but is not yet proven live.
-- Current live `nextbase-gateway-v1` still builds with old `CMD [uvicorn, smile_friend:app]`.
+- Dedicated `ai_router/` implementation was added to repo.
+- `ai-router` Cloud Run service deployed successfully.
+- `ai-router /translate` returned HTTP 200.
+- `ai-router /translate` used `model=gemini-2.5-flash`.
+- `ai-router /translate` returned `key_source=NB_GATE_PROD`.
+- Provider returned `provider_status=200`.
+- Therefore dedicated AI Router is LIVE_PASS.
+- nextbase-gateway-v1 remains legacy compatibility, not primary production route.
 - NextBase API exists by user report, but is not yet proven usable.
 
 ## Model rule
@@ -93,7 +96,7 @@ Do not use `latest` aliases for production unless explicitly approved.
 HOLD until all pass:
 
 1. Dedicated AI Router `/health` returns HTTP 200.
-2. Dedicated AI Router `/translate` returns HTTP 200 with `key_source=NB_GATE_PROD` or equivalent evidence.
+2. Dedicated AI Router `/translate` returns HTTP 200 with `key_source=NB_GATE_PROD` or equivalent evidence. PASS.
 3. Smile Friend Engine is pointed to dedicated AI Router.
 4. Smile Friend Engine requests 1 to 5 return HTTP 200.
 5. Smile Friend Engine request 6 returns HTTP 429 with `FREE_LIMIT_REACHED`.
@@ -105,11 +108,11 @@ HOLD until all pass:
 ## Immediate technical priority
 
 ```text
-1. Add Dockerfile / requirements for ai_router/ if missing.
-2. Deploy ai_router/ to separate Cloud Run service `ai-router`.
-3. Set NB_GATE_PROD, NB_GATE_DEV, NB_GATE_ADMIN, NB_GATE_NOIR, GEMINI_MODEL.
-4. Test /health and /translate.
-5. Only after live proof, migrate Smile Friend Engine route.
+1. Identify Smile Friend Engine upstream env and endpoint shape.
+2. Point Smile Friend Engine to https://ai-router-125142687526.asia-northeast1.run.app/translate or equivalent.
+3. Verify Smile Friend Engine /translate live behavior.
+4. Verify quota: first 1-5 allowed, 6th FREE_LIMIT_REACHED.
+5. Then verify GLB UI route.
 ```
 
 ## Naming rule
@@ -140,9 +143,9 @@ GO candidate requires real endpoint evidence.
 ## Short form
 Immutable canonical points.
 Dynamic canonical moves.
-Current old gateway is legacy compatibility.
-Dedicated `ai_router/` is the new optimal design.
+Dedicated AI Router is LIVE_PASS.
+nextbase-gateway-v1 is legacy compatibility.
 translate is adapter only.
 Primary path is Smile Friend Engine -> dedicated AI Router.
 NextBase API exists but is HOLD until endpoint evidence proves usability and role.
-Current state is HOLD until endpoint proof passes.
+Current state is HOLD until Smile Friend Engine and GLB path pass endpoint proof.
