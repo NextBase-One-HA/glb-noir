@@ -2,6 +2,11 @@ import os
 
 ROLE_ENV = {
     "prod": "NB_GATE_PROD",
+    "travel": "NB_GATE_PROD",
+    "glb": "NB_GATE_PROD",
+    "essentials": "NB_GATE_PROD",
+    "show": "NB_GATE_PROD",
+    "speak": "NB_GATE_PROD",
     "dev": "NB_GATE_DEV",
     "admin": "NB_GATE_ADMIN",
     "noir": "NB_GATE_NOIR",
