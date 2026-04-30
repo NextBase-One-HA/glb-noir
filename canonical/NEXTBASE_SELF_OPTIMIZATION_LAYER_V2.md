@@ -1,7 +1,7 @@
 # NEXTBASE SELF OPTIMIZATION LAYER V2
 
 This file is the mandatory entry point for all NextBase AI work.
-It exists to prevent drift, old assumptions, and unsafe completion claims.
+It exists to prevent drift, old assumptions, time-axis drift, and unsafe completion claims.
 
 ## Core direction
 The source of truth controls the AI.
@@ -10,6 +10,7 @@ The AI does not control the source of truth.
 ```text
 Canonical files
   -> AI / agent
+  -> temporal correction
   -> preflight
   -> response gate
   -> execution
@@ -26,6 +27,24 @@ Every AI or agent must read these before important work:
 4. `ops/GATEWAY_CANONICAL_GATE.md`
 
 If chat memory conflicts with these files, these files win.
+
+## Temporal correction rule
+Before using anything that can become outdated, verify the current live state.
+
+This includes:
+
+- AI model names
+- Cloud Run revisions
+- API behavior
+- Stripe flow
+- library or SDK behavior
+- service environment variables
+- legal or billing behavior
+- public provider availability
+
+Do not rely on memory for current provider models.
+Do not assume old model names still work.
+If a provider returns unavailable, expired, deprecated, or not found, switch to HOLD and verify the current provider list or service configuration before continuing.
 
 ## Canonical names
 Use only these names in normal work:
@@ -102,6 +121,7 @@ Current GLB release remains HOLD until:
 
 ## Short command
 Read canonical first.
+Correct the time axis.
 Check real state.
 Show evidence.
 Stop on drift.
