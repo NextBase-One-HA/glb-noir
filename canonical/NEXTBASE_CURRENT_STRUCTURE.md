@@ -62,45 +62,60 @@ Not responsible for:
 - user-facing product identity
 
 ### AI Router
-Former name: NE Gateway / nextbase-gateway-v1.
+Former name: nextbase-gateway-v1.
 
 Responsible for:
 - AI provider routing
-- role-based key selection
+- role-based access selection
 - separating prod / dev / admin / noir roles
-- keeping provider keys behind server-side gates
+- keeping provider credentials behind server-side gates
 
-Do not call it NE Gateway in normal work.
-Use AI Router.
+Use AI Router as the working name.
 
 ## Role mapping
 ```text
-caller_id = noir  -> NB_GATE_NOIR
-caller_id = admin -> NB_GATE_ADMIN
-caller_id = dev   -> NB_GATE_DEV
-caller_id = prod  -> NB_GATE_PROD
+caller_id = noir  -> noir role credential
+caller_id = admin -> admin role credential
+caller_id = dev   -> dev role credential
+caller_id = prod  -> prod role credential
 ```
+
+## AI Router runtime configuration note
+Cloud Run has been configured with:
+
+- current model setting: gemini-2.5-flash
+- general provider credential variable
+- noir role credential
+- admin role credential
+- dev role credential
+- prod role credential
+- master public/private control variables
+
+Secret values must never be stored in this repository.
+
+Important: if runtime still calls an old model while the current model setting is configured, the deployed AI Router image may still contain hardcoded model logic. In that case, do not ask for credential re-entry first. Rebuild or redeploy the corrected AI Router image.
 
 ## Current release gate
 HOLD until all pass:
 
 1. translate /health returns gateway mode.
 2. translate POST /translate returns HTTP 200.
-3. smile-friend-engine requests 1 to 5 return HTTP 200.
-4. smile-friend-engine request 6 returns 429 FREE_LIMIT_REACHED.
+3. Smile Friend Engine requests 1 to 5 return HTTP 200.
+4. Smile Friend Engine request 6 returns 429 FREE_LIMIT_REACHED.
 5. payment flow still routes through modal.
-6. cancellation flow has explanation before Stripe.
+6. cancellation flow explains before external portal.
 
 ## Current known blocker
-If AI Router returns provider error such as expired prod key, do not change structure.
-Fix or rotate the prod key in AI Router first.
+If AI Router returns provider error such as expired prod credential, do not change structure.
+Fix or rotate the prod credential in AI Router first.
+If AI Router returns a model not found error for an old model while the current model setting is configured, rebuild the AI Router image so code reads the model setting.
 
 ## Forbidden
 - Do not rename GLB into Smile Friend.
 - Do not treat Smile Friend Engine as the product.
 - Do not bypass AI Router with direct provider calls.
 - Do not use admin role as prod fallback.
-- Do not request key re-entry before checking service env and route.
+- Do not request credential re-entry before checking service env and route.
 - Do not claim GO from local tests only.
 - Do not claim GO from deploy success only.
 
