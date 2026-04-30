@@ -1282,42 +1282,54 @@ async function renderEssentials() {
         transLine.className = 'glb-card-translated';
 
         var cacheKey = phrase.key + '_' + to;
-        if (essentialCache[cacheKey]) {
-            transLine.textContent = essentialCache[cacheKey];
-        } else {
-            transLine.textContent = '…';
-            (async function () {
-                if (!isTravelUiUnlimited()) {
-                    var q = getQuota();
-                    if (q.count >= FREE_LIMIT) { transLine.textContent = phrase.en; return; }
-                }
-                try {
-                    var r = await fetch(NEXTBASE_APP + '/translate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(glbTranslatePayloadTravel(phrase.en, 'en', to, 'essentials')),
-                        cache: 'no-store'
-                    });
-                    if (r.status === 429) {
-                        transLine.textContent = phrase.en;
-                        return;
-                    }
-                    var raw = await r.text();
-                    var out = raw;
-                    try { var j = JSON.parse(raw); out = j.translatedText || raw; } catch(e) {}
-                    essentialCache[cacheKey] = out;
-                    transLine.textContent = out;
-                    bumpQuota();
-                    updateQuota();
-                } catch(e) { transLine.textContent = phrase.en; }
-            })();
-        }
+        transLine.textContent = essentialCache[cacheKey] || 'Tap to translate';
 
         card.appendChild(enLine);
         card.appendChild(transLine);
-        card.addEventListener('click', function () {
-            setResult(transLine.textContent);
+
+        card.addEventListener('click', async function () {
+            if (essentialCache[cacheKey]) {
+                setResult(essentialCache[cacheKey]);
+                return;
+            }
+
+            if (!isTravelUiUnlimited()) {
+                var q = getQuota();
+                if (q.count >= FREE_LIMIT) {
+                    setResult('Today\\'s free limit reached.', true);
+                    return;
+                }
+            }
+
+            transLine.textContent = 'Translating...';
+            try {
+                var r = await fetch(NEXTBASE_APP + '/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(glbTranslatePayloadTravel(phrase.en, 'en', to, 'essentials')),
+                    cache: 'no-store'
+                });
+
+                if (r.status === 429) {
+                    transLine.textContent = phrase.en;
+                    setResult('Cloud daily limit reached. Subscribe to GLB for unlimited translation.', true);
+                    return;
+                }
+
+                var raw = await r.text();
+                var out = raw;
+                try { var j = JSON.parse(raw); out = j.translatedText || raw; } catch(e) {}
+                essentialCache[cacheKey] = out;
+                transLine.textContent = out;
+                setResult(out);
+                bumpQuota();
+                updateQuota();
+            } catch(e) {
+                transLine.textContent = phrase.en;
+                setResult('Connection issue. Please try again.', true);
+            }
         });
+
         container.appendChild(card);
     });
 }

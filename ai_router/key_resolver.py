@@ -12,7 +12,6 @@ ROLE_ENV = {
     "noir": "NB_GATE_NOIR",
 }
 
-
 def resolve_api_key_for_call(caller_id: str = "prod") -> str:
     caller = (caller_id or "prod").strip().lower()
     env_name = ROLE_ENV.get(caller)
@@ -24,7 +23,6 @@ def resolve_api_key_for_call(caller_id: str = "prod") -> str:
         raise RuntimeError(f"missing required env: {env_name}")
 
     return key
-
 
 def key_source_for_call(caller_id: str = "prod") -> str:
     caller = (caller_id or "prod").strip().lower()
