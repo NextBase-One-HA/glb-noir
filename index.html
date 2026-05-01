@@ -299,9 +299,10 @@ line-height:1.6;
 
 /* pricing quick */
 .ip-plans{
-display:grid;grid-template-columns:1fr 1fr;
+display:grid;grid-template-columns:1fr;
 gap:10px;
-margin-bottom:8px;
+margin:0 auto 8px;
+max-width:360px;
 }
 .ip-plan{
 background:var(–panel);
@@ -440,42 +441,24 @@ width:100%;max-width:400px;
     <span class="ip-val-icon">🔒</span>
     <div class="ip-val-text">
       <div class="ip-val-title" id="val3-t">No forgotten charges.</div>
-      <div class="ip-val-desc" id="val3-d">Cancel before your next billing date. Travel Pass is one-time only — 30 days, then back to Core automatically.</div>
+      <div class="ip-val-desc" id="val3-d">Cancel before your next billing date. No surprise charges on Core — you control renewal in Stripe.</div>
     </div>
   </div>
 </div>
 
-<!-- 30-day room -->
-<div class="ip-room">
-  <div class="ip-room-tag" id="room-tag">Travel Pass</div>
-  <h2 class="ip-room-title" id="room-title">Create a <em>30-day</em><br>translation room.</h2>
-  <p class="ip-room-desc" id="room-desc">Share a code. Your person joins from anywhere. Every message translates instantly between your languages. The room disappears after 30 days — but the conversations stay with you.</p>
-  <div class="ip-room-pills">
-    <span class="ip-pill gold" id="pill1">Core users can join</span>
-    <span class="ip-pill" id="pill2">No phonebook</span>
-    <span class="ip-pill" id="pill3">Code only</span>
-    <span class="ip-pill" id="pill4">30-day limit</span>
-  </div>
-</div>
-
-<!-- Plans -->
+<!-- Plans: Core only on onboarding (Travel via index.premium from Core app) -->
 <div class="ip-plans">
   <div class="ip-plan">
     <div class="ip-plan-price">$2.99</div>
     <div class="ip-plan-name" id="plan1-name">GLB Core</div>
     <div class="ip-plan-desc" id="plan1-desc">Unlimited translation · 13 languages · Cancel anytime</div>
   </div>
-  <div class="ip-plan featured">
-    <div class="ip-plan-price">$14.99</div>
-    <div class="ip-plan-name" id="plan2-name">Travel Pass</div>
-    <div class="ip-plan-desc" id="plan2-desc">30 days · Create rooms · Full travel UI · One-time</div>
-  </div>
 </div>
 
 <!-- CTAs -->
 <div class="ip-ctas" style="margin-top:20px;">
   <a href="index.next.html" class="cta-primary" id="ip-cta1">Try free — 5 translations/day</a>
-  <a href="index.premium.html" class="cta-ghost" id="ip-cta2">Travel Pass — $14.99</a>
+  <a href="javascript:void(0)" onclick="openStripeConfirm(event)" class="cta-ghost" id="ip-cta2">GLB Core — $2.99</a>
 </div>
 <p class="ip-hint" id="ip-hint">No credit card · Works instantly · Cancel anytime</p>
 ```
@@ -547,15 +530,10 @@ const I18N = {
     val2t:'Gets faster, the more you use it.',
     val2d:'GLB remembers your language pair on this device. Phrases you use often come back instantly.',
     val3t:'No forgotten charges.',
-    val3d:'Cancel before your next billing date. Travel Pass is 30 days then Core automatically.',
-    roomTag:'Travel Pass',
-    roomTitle:'Create a <em>30-day</em><br>translation room.',
-    roomDesc:'Share a code. Your person joins from anywhere. Every message translates instantly between your languages. The room disappears after 30 days — but the conversations stay with you.',
-    pill1:'Core users can join',pill2:'No phonebook',pill3:'Code only',pill4:'30-day limit',
+    val3d:'Cancel before your next billing date. Core renews monthly only if you keep it — manage anytime in Stripe.',
     plan1n:'GLB Core',plan1d:'Unlimited translation · 13 languages · Cancel anytime',
-    plan2n:'Travel Pass',plan2d:'30 days · Create rooms · Full travel UI · One-time',
     cta1:'Try free — 5 translations/day',
-    cta2:'Travel Pass — $14.99',
+    cta2:'GLB Core — $2.99',
     hint:'No credit card · Works instantly · Cancel anytime',
     modalTitle:'Change language',
     smTitle:'Secure checkout',smPeriod:'/ month · cancel anytime',
@@ -571,15 +549,10 @@ const I18N = {
     val2t:'使うほど、速くなる。',
     val2d:'GLBはこの端末にあなたの言語ペアを記憶します。よく使うフレーズは瞬時に出てくる。',
     val3t:'課金し忘れ、ゼロ。',
-    val3d:'次の請求日前に解約すれば追加料金なし。Travel Passは30日の買い切り、その後は自動でCoreへ戻る。',
-    roomTag:'Travel Pass',
-    roomTitle:'30日間の<br>翻訳ルームを<em>作れる。</em>',
-    roomDesc:'コードをシェアするだけ。相手はどこからでも参加できる。メッセージは即座に両者の言語へ翻訳される。ルームは30日で消える — でも、そこで生まれた会話はずっと残る。',
-    pill1:'2.99ユーザーが参加可',pill2:'電話帳不要',pill3:'コードのみ',pill4:'30日間限定',
+    val3d:'次の請求日前に解約すれば追加料金なし。Coreは継続する場合のみ課金 — Stripeでいつでも管理できます。',
     plan1n:'GLB Core',plan1d:'翻訳無制限 · 13言語 · いつでも解約可',
-    plan2n:'Travel Pass',plan2d:'30日間 · ルーム作成 · 旅行UI · 買い切り',
     cta1:'無料で試す — 1日5回',
-    cta2:'Travel Pass — $14.99',
+    cta2:'GLB Core — $2.99',
     hint:'クレジットカード不要 · すぐ使える · いつでも解約',
     modalTitle:'言語を変更',
     smTitle:'Stripeで決済',smPeriod:'/ 月 · いつでも解約可能',
@@ -591,13 +564,9 @@ const I18N = {
     tagline:'随处<br><em>沟通无障碍。</em>',
     val1t:'13种语言，一个屏幕。',val1d:'说话或输入——翻译立即显示。把屏幕递给对方即可。',
     val2t:'越用越快。',val2d:'GLB在此设备上记住您的语言对。常用短语瞬间出现。',
-    val3t:'不担心忘记取消。',val3d:'在下次账单日前取消即可。旅行通行证30天后自动返回Core。',
-    roomTag:'旅行通行证',roomTitle:'创建<em>30天</em><br>翻译房间。',
-    roomDesc:'分享代码，对方从任何地方加入。每条消息即时翻译。房间30天后消失，但对话永远留存。',
-    pill1:'Core用户可加入',pill2:'无需通讯录',pill3:'仅限代码',pill4:'30天限制',
+    val3t:'不担心忘记取消。',val3d:'在下次账单日前取消即可。Core按月续订，仅在您保留时收费。',
     plan1n:'GLB Core',plan1d:'无限翻译 · 13种语言 · 随时取消',
-    plan2n:'旅行通行证',plan2d:'30天 · 创建房间 · 完整旅行UI · 一次性',
-    cta1:'免费试用 — 每天5次',cta2:'旅行通行证 — $14.99',
+    cta1:'免费试用 — 每天5次',cta2:'GLB Core — $2.99',
     hint:'无需信用卡 · 立即使用 · 随时取消',
     modalTitle:'更改语言',smTitle:'安全结账',smPeriod:'/ 月 · 随时取消',
     smNote:'您将被重定向到Stripe安全支付页面。',smGo:'前往Stripe →',smCancel:'取消'
@@ -607,13 +576,9 @@ const I18N = {
     tagline:'어디서든<br><em>통하는 말.</em>',
     val1t:'13개 언어, 화면 하나.',val1d:'말하거나 입력하면 번역이 즉시 표시됩니다.',
     val2t:'쓸수록 빨라집니다.',val2d:'GLB가 이 기기에서 언어 쌍을 기억합니다.',
-    val3t:'결제 걱정 없음.',val3d:'다음 청구일 전에 취소하면 추가 요금 없음.',
-    roomTag:'트래블 패스',roomTitle:'<em>30일</em> 번역 룸을<br>만드세요.',
-    roomDesc:'코드를 공유하세요. 상대방이 어디서든 참여합니다. 모든 메시지가 즉시 번역됩니다. 룸은 30일 후 사라지지만, 대화는 영원히 남습니다.',
-    pill1:'Core 사용자 참여 가능',pill2:'전화번호부 불필요',pill3:'코드만',pill4:'30일 제한',
+    val3t:'결제 걱정 없음.',val3d:'다음 청구일 전에 취소하면 추가 요금 없음. Core는 유지할 때만 월간 결제됩니다.',
     plan1n:'GLB Core',plan1d:'무제한 번역 · 13개 언어 · 언제든 취소',
-    plan2n:'트래블 패스',plan2d:'30일 · 룸 생성 · 여행 UI · 1회성',
-    cta1:'무료 체험 — 하루 5회',cta2:'트래블 패스 — $14.99',
+    cta1:'무료 체험 — 하루 5회',cta2:'GLB Core — $2.99',
     hint:'신용카드 불필요 · 즉시 사용 · 언제든 취소',
     modalTitle:'언어 변경',smTitle:'안전한 결제',smPeriod:'/ 월 · 언제든 취소',
     smNote:'Stripe 보안 결제 페이지로 이동합니다.',smGo:'Stripe로 이동 →',smCancel:'취소'
@@ -623,13 +588,9 @@ const I18N = {
     tagline:'Hazte entender.<br><em>En cualquier lugar.</em>',
     val1t:'13 idiomas. Una pantalla.',val1d:'Habla o escribe — la traducción aparece al instante.',
     val2t:'Mejora con el uso.',val2d:'GLB recuerda tu par de idiomas en este dispositivo.',
-    val3t:'Sin cargos olvidados.',val3d:'Cancela antes de tu próxima fecha de facturación.',
-    roomTag:'Travel Pass',roomTitle:'Crea una sala de<br>traducción de <em>30 días.</em>',
-    roomDesc:'Comparte un código. Tu persona se une desde cualquier lugar. La sala desaparece en 30 días — pero las conversaciones quedan contigo.',
-    pill1:'Usuarios Core pueden unirse',pill2:'Sin agenda',pill3:'Solo código',pill4:'Límite 30 días',
+    val3t:'Sin cargos olvidados.',val3d:'Cancela antes de tu próxima fecha de facturación. Core solo renueva si lo mantienes.',
     plan1n:'GLB Core',plan1d:'Traducción ilimitada · 13 idiomas · Cancela cuando quieras',
-    plan2n:'Travel Pass',plan2d:'30 días · Crear salas · UI de viaje · Pago único',
-    cta1:'Probar gratis — 5 al día',cta2:'Travel Pass — $14.99',
+    cta1:'Probar gratis — 5 al día',cta2:'GLB Core — $2.99',
     hint:'Sin tarjeta · Funciona al instante · Cancela cuando quieras',
     modalTitle:'Cambiar idioma',smTitle:'Pago seguro',smPeriod:'/ mes · cancela cuando quieras',
     smNote:'Serás redirigido a la página de pago seguro de Stripe.',smGo:'Ir a Stripe →',smCancel:'Cancelar'
@@ -680,6 +641,7 @@ function enterApp() {
   try {
     localStorage.setItem(LS_LANG, currentLang);
     localStorage.setItem(LS_BASE, currentLang);
+    localStorage.setItem('glb_ui_lang_v2', currentLang);
     // set default target lang
     const defaultTarget = currentLang === 'en' ? 'ja' : 'en';
     localStorage.setItem('glb_user_target_lang', defaultTarget);
@@ -702,13 +664,7 @@ function applyIntroLang(lang) {
   set('val1-t', t(lang, 'val1t')); set('val1-d', t(lang, 'val1d'));
   set('val2-t', t(lang, 'val2t')); set('val2-d', t(lang, 'val2d'));
   set('val3-t', t(lang, 'val3t')); set('val3-d', t(lang, 'val3d'));
-  set('room-tag', t(lang, 'roomTag'));
-  set('room-title', t(lang, 'roomTitle'));
-  set('room-desc', t(lang, 'roomDesc'));
-  set('pill1', t(lang, 'pill1')); set('pill2', t(lang, 'pill2'));
-  set('pill3', t(lang, 'pill3')); set('pill4', t(lang, 'pill4'));
   set('plan1-name', t(lang, 'plan1n')); set('plan1-desc', t(lang, 'plan1d'));
-  set('plan2-name', t(lang, 'plan2n')); set('plan2-desc', t(lang, 'plan2d'));
   const c1 = document.getElementById('ip-cta1'); if (c1) c1.textContent = t(lang, 'cta1');
   const c2 = document.getElementById('ip-cta2'); if (c2) c2.textContent = t(lang, 'cta2');
   set('ip-hint', t(lang, 'hint'));
@@ -720,7 +676,7 @@ function openLangModal() {
   document.getElementById('modal-title').textContent = t(currentLang, 'modalTitle');
   buildLangGrid('modal-grid', (code) => {
     currentLang = code;
-    try { localStorage.setItem(LS_LANG, code); localStorage.setItem(LS_BASE, code); } catch(e) {}
+    try { localStorage.setItem(LS_LANG, code); localStorage.setItem(LS_BASE, code); localStorage.setItem('glb_ui_lang_v2', code); } catch(e) {}
     applyIntroLang(currentLang);
     closeLangModal();
   });
