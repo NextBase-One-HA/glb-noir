@@ -159,7 +159,7 @@ function glbResolveApiOrigin() {
 const NEXTBASE_APP_ORIGIN = glbResolveApiOrigin();
 const NEXTBASE_APP = NEXTBASE_APP_ORIGIN;
 var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-const APP_VERSION = '2026.04.26.travel.ui.5';
+const APP_VERSION = '2026.04.26.travel.ui.6';
 const MAINTENANCE_DEFAULT = 'We are currently enhancing the system for a better experience. Please check back shortly.';
 const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
 const LS_GLB_CLIENT_ID = 'glb_client_id_v1';
@@ -848,17 +848,94 @@ function setResult(text, isIdle) {
 
 const GLB_PERSONAL_DICT = {
   _key: 'glb_personal_dict_v1',
+
   getAll: function () {
     try { return JSON.parse(localStorage.getItem(this._key)) || {}; }
     catch (e) { return {}; }
   },
+
   makeKey: function (text, from, to) {
     return [from, to, String(text || '').toLowerCase().trim()].join('|');
   },
-  match: function (text, from, to) {
-    try { return this.getAll()[this.makeKey(text, from, to)] || null; }
-    catch (e) { return null; }
+
+  normalizeTokens: function (text) {
+    var alias = {
+      luggage: 'bag',
+      suitcase: 'bag',
+      gone: 'lost',
+      missing: 'lost',
+      restroom: 'toilet',
+      bathroom: 'toilet',
+      taxi: 'cab',
+      physician: 'doctor'
+    };
+    var stop = { i:1, my:1, is:1, am:1, a:1, an:1, the:1, to:1, please:1 };
+    return String(text || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(function (w) { return alias[w] || w; })
+      .filter(function (w) { return !stop[w]; });
   },
+
+  hasNegation: function (text) {
+    return /\b(no|not|never|dont|don't|cannot|can't|isn't|wasn't)\b/i.test(String(text || ''));
+  },
+
+  fuzzyMatch: function (text, from, to) {
+    try {
+      if (this.hasNegation(text)) return null;
+      var q = this.normalizeTokens(text);
+      if (q.length < 2) return null;
+
+      var dict = this.getAll();
+      var best = null;
+      var bestScore = 0;
+
+      Object.keys(dict).forEach(function (k) {
+        var parts = k.split('|');
+        if (parts.length < 3) return;
+        if (parts[0] !== from || parts[1] !== to) return;
+
+        var src = parts.slice(2).join('|');
+        var t = GLB_PERSONAL_DICT.normalizeTokens(src);
+        if (t.length < 2) return;
+
+        var qs = {};
+        var ts = {};
+        q.forEach(function (x) { qs[x] = 1; });
+        t.forEach(function (x) { ts[x] = 1; });
+
+        var inter = 0;
+        var union = {};
+        Object.keys(qs).forEach(function (x) { union[x] = 1; if (ts[x]) inter++; });
+        Object.keys(ts).forEach(function (x) { union[x] = 1; });
+
+        var score = inter / Math.max(1, Object.keys(union).length);
+        if (score > bestScore) {
+          bestScore = score;
+          best = dict[k];
+        }
+      });
+
+      return bestScore >= 0.82 ? best : null;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  match: function (text, from, to) {
+    try {
+      var dict = this.getAll();
+      var exact = dict[this.makeKey(text, from, to)];
+      if (exact) return exact;
+      return this.fuzzyMatch(text, from, to);
+    } catch (e) {
+      return null;
+    }
+  },
+
   save: function (text, translated, from, to) {
     try {
       if (!text || !translated) return;
@@ -869,6 +946,7 @@ const GLB_PERSONAL_DICT = {
       localStorage.setItem(this._key, JSON.stringify(dict));
     } catch (e) {}
   },
+
   clear: function () {
     try { localStorage.removeItem(this._key); } catch (e) {}
   }
