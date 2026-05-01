@@ -95,8 +95,8 @@ body{
 </div>
 
 <div class="glb-stage" id="stage-area">
-  <span class="stage-label">Show this to someone</span>
-  <div class="glb-result idle" id="glb-result">Tap to start conversation</div>
+  <span class="stage-label">When words fail</span>
+  <div class="glb-result idle" id="glb-result">Be understood. Anywhere.</div>
   <button class="flip-action" id="flip-btn">🔄 Flip for them</button>
 </div>
 
@@ -142,7 +142,7 @@ function glbResolveApiOrigin() {
 const NEXTBASE_APP_ORIGIN = glbResolveApiOrigin();
 const NEXTBASE_APP = NEXTBASE_APP_ORIGIN;
 var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-const APP_VERSION = '2026.04.26.travel.ui.1';
+const APP_VERSION = '2026.04.26.travel.ui.2';
 const MAINTENANCE_DEFAULT = 'We are currently enhancing the system for a better experience. Please check back shortly.';
 const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
 const LS_GLB_CLIENT_ID = 'glb_client_id_v1';
@@ -909,7 +909,7 @@ function stopMic() {
     isRecording = false;
     var btn = document.getElementById('mic-btn');
     btn.classList.remove('recording');
-    btn.innerHTML = '🎤 &nbsp; Tap to start conversation';
+    btn.innerHTML = '🎤 &nbsp; Be understood. Anywhere.';
 }
 
 async function renderEssentials() {
@@ -1011,7 +1011,7 @@ handleTravelActivationFlow();
             return;
         }
         var left = Math.max(0, FREE_LIMIT - q.count);
-        el.textContent = left + ' free chats left today.';
+        el.textContent = left + ' chances left today. Stay understood anywhere.';
         prompt.style.display = left < 3 ? 'inline' : 'none';
         if (left === 0) {
             el.textContent = "Limit reached. Don't let language stop you.";
