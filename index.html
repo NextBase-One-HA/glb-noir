@@ -37,28 +37,28 @@ body{
 
 /* grain */
 body::before{
-content:’’;position:fixed;inset:0;
-background-image:url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.85’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’ opacity=‘0.03’/%3E%3C/svg%3E”);
+content:'';position:fixed;inset:0;
+background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
 pointer-events:none;z-index:0;opacity:.5;
 }
 
 /* ── GATE ── */
 #lang-gate{
 position:fixed;inset:0;z-index:9999;
-background:var(–bg);
+background:var(--bg);
 display:flex;flex-direction:column;align-items:center;justify-content:center;
-padding:48px 24px calc(48px + var(–safe));
+padding:48px 24px calc(48px + var(--safe));
 transition:opacity .5s ease,transform .5s ease;
 }
 #lang-gate.exit{opacity:0;transform:translateY(-24px);pointer-events:none;}
 
 .gate-logo{
-font-family:‘DM Serif Display’,serif;
+font-family:'DM Serif Display',serif;
 font-style:italic;
 font-size:clamp(52px,14vw,80px);
 line-height:1;
 letter-spacing:-0.02em;
-background:linear-gradient(135deg,var(–white) 0%,var(–gold) 60%);
+background:linear-gradient(135deg,var(--white) 0%,var(--gold) 60%);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
 background-clip:text;
@@ -67,36 +67,36 @@ text-align:center;
 }
 .gate-sub{
 font-size:10px;letter-spacing:.26em;text-transform:uppercase;
-color:var(–muted);margin-bottom:44px;
+color:var(--muted);margin-bottom:44px;
 }
 .gate-q{
 font-size:clamp(16px,4vw,20px);font-weight:500;
-color:var(–white);margin-bottom:28px;text-align:center;
+color:var(--white);margin-bottom:28px;text-align:center;
 }
 .lang-grid{
 display:grid;grid-template-columns:1fr 1fr 1fr;
 gap:8px;width:100%;max-width:400px;
 }
 .lang-opt{
-background:var(–panel);
+background:var(--panel);
 border:1px solid rgba(255,255,255,.06);
 border-radius:12px;
 padding:13px 6px;
-font-family:‘DM Sans’,sans-serif;
+font-family:'DM Sans',sans-serif;
 font-size:12px;font-weight:500;
-color:var(–white);
+color:var(--white);
 cursor:pointer;text-align:center;
 transition:all .18s ease;
 -webkit-tap-highlight-color:transparent;
 line-height:1.35;
 }
 .lang-opt:hover,.lang-opt.selected{
-border-color:var(–gold-ring);
-background:var(–gold-dim);
-color:var(–gold);
+border-color:var(--gold-ring);
+background:var(--gold-dim);
+color:var(--gold);
 }
 .gate-more{
-margin-top:14px;font-size:11px;color:var(–muted);
+margin-top:14px;font-size:11px;color:var(--muted);
 cursor:pointer;letter-spacing:.04em;border:none;background:none;
 text-decoration:underline;text-underline-offset:3px;
 }
@@ -104,13 +104,13 @@ text-decoration:underline;text-underline-offset:3px;
 /* ── INTRO PANEL ── */
 #intro-panel{
 position:fixed;inset:0;z-index:9998;
-background:var(–bg);
+background:var(--bg);
 display:none;
 flex-direction:column;
 align-items:center;
 justify-content:flex-start;
 overflow-y:auto;
-padding:0 0 calc(32px + var(–safe));
+padding:0 0 calc(32px + var(--safe));
 }
 #intro-panel.show{display:flex;}
 #intro-panel.exit{opacity:0;transform:translateY(-16px);pointer-events:none;transition:opacity .4s,transform .4s;}
@@ -121,7 +121,7 @@ width:100%;
 min-height:38svh;
 position:relative;
 overflow:hidden;
-background:linear-gradient(180deg,#0a0a18 0%,var(–bg) 100%);
+background:linear-gradient(180deg,#0a0a18 0%,var(--bg) 100%);
 display:flex;flex-direction:column;
 align-items:center;justify-content:flex-end;
 padding:0 24px 28px;
@@ -136,10 +136,10 @@ top:20%;left:50%;transform:translateX(-50%);
 pointer-events:none;
 }
 .ip-logo{
-font-family:‘DM Serif Display’,serif;
+font-family:'DM Serif Display',serif;
 font-style:italic;
 font-size:clamp(48px,13vw,72px);
-color:var(–gold);
+color:var(--gold);
 line-height:1;
 letter-spacing:-0.02em;
 margin-bottom:10px;
@@ -150,7 +150,7 @@ position:relative;z-index:1;
 .ip-tagline{
 font-size:clamp(15px,3.5vw,18px);
 font-weight:300;
-color:var(–white);
+color:var(--white);
 text-align:center;
 line-height:1.5;
 max-width:300px;
@@ -158,8 +158,8 @@ position:relative;z-index:1;
 }
 .ip-tagline em{
 font-style:italic;
-color:var(–gold);
-font-family:‘DM Serif Display’,serif;
+color:var(--gold);
+font-family:'DM Serif Display',serif;
 }
 
 /* body */
@@ -192,20 +192,20 @@ line-height:1;
 .ip-val-text{}
 .ip-val-title{
 font-size:13px;font-weight:600;
-color:var(–white);
+color:var(--white);
 margin-bottom:3px;
 line-height:1.3;
 }
 .ip-val-desc{
 font-size:12px;font-weight:300;
-color:var(–muted);
+color:var(--muted);
 line-height:1.65;
 }
 
 /* room card */
 .ip-room{
 background:linear-gradient(135deg,rgba(240,201,58,.06) 0%,rgba(240,201,58,.02) 100%);
-border:1px solid var(–gold-ring);
+border:1px solid var(--gold-ring);
 border-radius:16px;
 padding:18px 18px 16px;
 margin-bottom:24px;
@@ -213,7 +213,7 @@ position:relative;
 overflow:hidden;
 }
 .ip-room::before{
-content:’’;
+content:'';
 position:absolute;
 top:-40px;right:-40px;
 width:120px;height:120px;
@@ -223,26 +223,26 @@ pointer-events:none;
 }
 .ip-room-tag{
 font-size:9px;letter-spacing:.2em;text-transform:uppercase;
-color:var(–gold);font-weight:600;
+color:var(--gold);font-weight:600;
 margin-bottom:8px;
 display:flex;align-items:center;gap:6px;
 }
 .ip-room-tag::before{
-content:’’;width:16px;height:1px;
-background:var(–gold);opacity:.5;
+content:'';width:16px;height:1px;
+background:var(--gold);opacity:.5;
 }
 .ip-room-title{
-font-family:‘DM Serif Display’,serif;
+font-family:'DM Serif Display',serif;
 font-style:italic;
 font-size:clamp(20px,5vw,26px);
-color:var(–white);
+color:var(--white);
 line-height:1.2;
 margin-bottom:8px;
 }
-.ip-room-title em{color:var(–gold);}
+.ip-room-title em{color:var(--gold);}
 .ip-room-desc{
 font-size:12px;font-weight:300;
-color:var(–muted);
+color:var(--muted);
 line-height:1.7;
 }
 .ip-room-pills{
@@ -254,10 +254,10 @@ font-size:10px;font-weight:500;
 padding:4px 10px;
 border-radius:999px;
 border:1px solid rgba(255,255,255,.08);
-color:var(–muted);
+color:var(--muted);
 background:rgba(255,255,255,.02);
 }
-.ip-pill.gold{border-color:var(–gold-ring);color:var(–gold);}
+.ip-pill.gold{border-color:var(--gold-ring);color:var(--gold);}
 
 /* CTAs */
 .ip-ctas{
@@ -266,9 +266,9 @@ margin-bottom:24px;
 }
 .cta-primary{
 width:100%;padding:17px;
-background:linear-gradient(160deg,#ffe87a 0%,var(–gold) 45%,var(–gold2) 100%);
+background:linear-gradient(160deg,#ffe87a 0%,var(--gold) 45%,var(--gold2) 100%);
 color:#07060a;
-font-family:‘DM Sans’,sans-serif;
+font-family:'DM Sans',sans-serif;
 font-size:15px;font-weight:700;
 letter-spacing:.03em;
 border-radius:999px;border:none;cursor:pointer;
@@ -280,7 +280,7 @@ transition:filter .15s,transform .1s;
 .cta-ghost{
 width:100%;padding:14px;
 background:transparent;
-color:var(–muted);
+color:var(--muted);
 font-size:13px;font-weight:500;
 letter-spacing:.03em;
 border:1px solid rgba(255,255,255,.07);
@@ -288,10 +288,10 @@ border-radius:999px;cursor:pointer;
 text-decoration:none;display:block;text-align:center;
 transition:border-color .2s,color .2s;
 }
-.cta-ghost:hover{border-color:var(–gold-ring);color:var(–gold);}
+.cta-ghost:hover{border-color:var(--gold-ring);color:var(--gold);}
 
 .ip-hint{
-font-size:10px;color:var(–muted2);
+font-size:10px;color:var(--muted2);
 text-align:center;letter-spacing:.04em;
 margin-top:-4px;
 line-height:1.6;
@@ -305,27 +305,27 @@ margin:0 auto 8px;
 max-width:360px;
 }
 .ip-plan{
-background:var(–panel);
+background:var(--panel);
 border:1px solid rgba(255,255,255,.06);
 border-radius:14px;
 padding:16px 14px;
 }
 .ip-plan.featured{
-border-color:var(–gold-ring);
+border-color:var(--gold-ring);
 background:rgba(240,201,58,.04);
 }
 .ip-plan-price{
-font-family:‘DM Serif Display’,serif;
-font-size:24px;color:var(–gold);
+font-family:'DM Serif Display',serif;
+font-size:24px;color:var(--gold);
 line-height:1;margin-bottom:4px;
 }
 .ip-plan-name{
 font-size:11px;font-weight:700;
-color:var(–white);
+color:var(--white);
 margin-bottom:6px;letter-spacing:.04em;
 }
 .ip-plan-desc{
-font-size:11px;color:var(–muted);line-height:1.6;
+font-size:11px;color:var(--muted);line-height:1.6;
 }
 
 /* footer mini */
@@ -337,8 +337,8 @@ text-align:center;
 .ip-footer a{
 font-size:10px;color:#333;text-decoration:none;margin:0 8px;letter-spacing:.04em;
 }
-.ip-footer a:hover{color:var(–gold);}
-.ip-footer p{font-size:9px;color:var(–muted2);margin-top:10px;letter-spacing:.04em;}
+.ip-footer a:hover{color:var(--gold);}
+.ip-footer p{font-size:9px;color:var(--muted2);margin-top:10px;letter-spacing:.04em;}
 
 /* ── STRIPE MODAL ── */
 .stripe-modal-bg{
@@ -353,20 +353,20 @@ transition:opacity .25s ease;
 .stripe-modal-bg.open{opacity:1;pointer-events:all;}
 .stripe-modal{
 background:#0d0d18;
-border:1px solid var(–gold-ring);
+border:1px solid var(--gold-ring);
 border-radius:20px;
 padding:28px 22px;
 width:100%;max-width:340px;
 text-align:center;
 }
-.sml{font-family:‘DM Serif Display’,serif;font-style:italic;font-size:26px;color:var(–gold);margin-bottom:4px;}
-.sm-title{font-size:14px;font-weight:600;color:var(–white);margin-bottom:10px;}
-.sm-price{font-family:‘DM Serif Display’,serif;font-size:42px;color:var(–gold);line-height:1;}
-.sm-period{font-size:11px;color:var(–muted);letter-spacing:.05em;margin-bottom:16px;}
-.sm-note{font-size:11px;color:var(–muted);line-height:1.65;margin-bottom:18px;}
+.sml{font-family:'DM Serif Display',serif;font-style:italic;font-size:26px;color:var(--gold);margin-bottom:4px;}
+.sm-title{font-size:14px;font-weight:600;color:var(--white);margin-bottom:10px;}
+.sm-price{font-family:'DM Serif Display',serif;font-size:42px;color:var(--gold);line-height:1;}
+.sm-period{font-size:11px;color:var(--muted);letter-spacing:.05em;margin-bottom:16px;}
+.sm-note{font-size:11px;color:var(--muted);line-height:1.65;margin-bottom:18px;}
 .sm-go{
 display:block;padding:14px;
-background:linear-gradient(160deg,#ffe87a 0%,var(–gold) 45%,var(–gold2) 100%);
+background:linear-gradient(160deg,#ffe87a 0%,var(--gold) 45%,var(--gold2) 100%);
 color:#07060a;font-size:14px;font-weight:700;
 border-radius:999px;border:none;cursor:pointer;
 text-decoration:none;margin-bottom:8px;
@@ -374,10 +374,10 @@ text-decoration:none;margin-bottom:8px;
 .sm-cancel{
 padding:10px;background:none;
 border:1px solid rgba(255,255,255,.07);border-radius:999px;
-color:var(–muted);font-size:12px;cursor:pointer;width:100%;
+color:var(--muted);font-size:12px;cursor:pointer;width:100%;
 transition:border-color .18s,color .18s;
 }
-.sm-cancel:hover{border-color:var(–gold-ring);color:var(–white);}
+.sm-cancel:hover{border-color:var(--gold-ring);color:var(--white);}
 
 /* ── LANG MODAL ── */
 .lang-modal-bg{
@@ -389,11 +389,11 @@ opacity:0;pointer-events:none;transition:opacity .3s;
 }
 .lang-modal-bg.open{opacity:1;pointer-events:all;}
 .lang-modal{
-background:var(–bg2);border:1px solid rgba(255,255,255,.07);
+background:var(--bg2);border:1px solid rgba(255,255,255,.07);
 border-radius:16px;padding:28px 20px;
 width:100%;max-width:400px;
 }
-.lang-modal-title{font-size:15px;font-weight:600;margin-bottom:18px;color:var(–white);}
+.lang-modal-title{font-size:15px;font-weight:600;margin-bottom:18px;color:var(--white);}
 </style>
 
 </head>
@@ -420,7 +420,6 @@ width:100%;max-width:400px;
 
   <div class="ip-body">
 
-```
 <!-- 3 value lines -->
 <div class="ip-values">
   <div class="ip-val">
@@ -457,11 +456,10 @@ width:100%;max-width:400px;
 
 <!-- CTAs -->
 <div class="ip-ctas" style="margin-top:20px;">
-  <a href="index.next.html" class="cta-primary" id="ip-cta1">Try free — 5 translations/day</a>
-  <a href="javascript:void(0)" onclick="openStripeConfirm(event)" class="cta-ghost" id="ip-cta2">GLB Core — $2.99</a>
+  <a href="index.next.html" class="cta-primary" id="ip-cta1">Try free</a>
+  <a href="javascript:void(0)" onclick="openStripeConfirm(event)" class="cta-ghost" id="ip-cta2">GLB Core $2.99</a>
 </div>
 <p class="ip-hint" id="ip-hint">No credit card · Works instantly · Cancel anytime</p>
-```
 
   </div>
 
@@ -532,8 +530,8 @@ const I18N = {
     val3t:'No forgotten charges.',
     val3d:'Cancel before your next billing date. Core renews monthly only if you keep it — manage anytime in Stripe.',
     plan1n:'GLB Core',plan1d:'Unlimited translation · 13 languages · Cancel anytime',
-    cta1:'Try free — 5 translations/day',
-    cta2:'GLB Core — $2.99',
+    cta1:'Try free',
+    cta2:'GLB Core $2.99',
     hint:'No credit card · Works instantly · Cancel anytime',
     modalTitle:'Change language',
     smTitle:'Secure checkout',smPeriod:'/ month · cancel anytime',
@@ -551,8 +549,8 @@ const I18N = {
     val3t:'課金し忘れ、ゼロ。',
     val3d:'次の請求日前に解約すれば追加料金なし。Coreは継続する場合のみ課金 — Stripeでいつでも管理できます。',
     plan1n:'GLB Core',plan1d:'翻訳無制限 · 13言語 · いつでも解約可',
-    cta1:'無料で試す — 1日5回',
-    cta2:'GLB Core — $2.99',
+    cta1:'無料で試す',
+    cta2:'GLB Core $2.99',
     hint:'クレジットカード不要 · すぐ使える · いつでも解約',
     modalTitle:'言語を変更',
     smTitle:'Stripeで決済',smPeriod:'/ 月 · いつでも解約可能',
@@ -566,7 +564,7 @@ const I18N = {
     val2t:'越用越快。',val2d:'GLB在此设备上记住您的语言对。常用短语瞬间出现。',
     val3t:'不担心忘记取消。',val3d:'在下次账单日前取消即可。Core按月续订，仅在您保留时收费。',
     plan1n:'GLB Core',plan1d:'无限翻译 · 13种语言 · 随时取消',
-    cta1:'免费试用 — 每天5次',cta2:'GLB Core — $2.99',
+    cta1:'免费试用',cta2:'GLB Core $2.99',
     hint:'无需信用卡 · 立即使用 · 随时取消',
     modalTitle:'更改语言',smTitle:'安全结账',smPeriod:'/ 月 · 随时取消',
     smNote:'您将被重定向到Stripe安全支付页面。',smGo:'前往Stripe →',smCancel:'取消'
@@ -578,7 +576,7 @@ const I18N = {
     val2t:'쓸수록 빨라집니다.',val2d:'GLB가 이 기기에서 언어 쌍을 기억합니다.',
     val3t:'결제 걱정 없음.',val3d:'다음 청구일 전에 취소하면 추가 요금 없음. Core는 유지할 때만 월간 결제됩니다.',
     plan1n:'GLB Core',plan1d:'무제한 번역 · 13개 언어 · 언제든 취소',
-    cta1:'무료 체험 — 하루 5회',cta2:'GLB Core — $2.99',
+    cta1:'무료 체험',cta2:'GLB Core $2.99',
     hint:'신용카드 불필요 · 즉시 사용 · 언제든 취소',
     modalTitle:'언어 변경',smTitle:'안전한 결제',smPeriod:'/ 월 · 언제든 취소',
     smNote:'Stripe 보안 결제 페이지로 이동합니다.',smGo:'Stripe로 이동 →',smCancel:'취소'
@@ -590,7 +588,7 @@ const I18N = {
     val2t:'Mejora con el uso.',val2d:'GLB recuerda tu par de idiomas en este dispositivo.',
     val3t:'Sin cargos olvidados.',val3d:'Cancela antes de tu próxima fecha de facturación. Core solo renueva si lo mantienes.',
     plan1n:'GLB Core',plan1d:'Traducción ilimitada · 13 idiomas · Cancela cuando quieras',
-    cta1:'Probar gratis — 5 al día',cta2:'GLB Core — $2.99',
+    cta1:'Probar gratis',cta2:'GLB Core $2.99',
     hint:'Sin tarjeta · Funciona al instante · Cancela cuando quieras',
     modalTitle:'Cambiar idioma',smTitle:'Pago seguro',smPeriod:'/ mes · cancela cuando quieras',
     smNote:'Serás redirigido a la página de pago seguro de Stripe.',smGo:'Ir a Stripe →',smCancel:'Cancelar'
