@@ -124,21 +124,6 @@ body{
   </div>
 
   
-<div class="glb-paywall" style="padding:18px 20px 22px;text-align:center;">
-  <div style="font-size:14px;color:#bbb;line-height:1.45;">
-    Never get stuck again.<br>Even when it matters most.
-  </div>
-  <div style="margin-top:14px;font-size:16px;font-weight:800;color:#f3c623;">
-    30-Day Travel Pass
-  </div>
-  <button id="start-pass-btn" style="margin-top:12px;width:100%;padding:18px;border-radius:999px;border:none;font-size:16px;font-weight:800;background:linear-gradient(180deg,#fff9b8 0%,#f3c623 60%,#c98a0a 100%);color:#08080a;cursor:pointer;">
-    Start my travel pass
-  </button>
-  <div style="margin-top:8px;font-size:12px;color:#888;">
-    Cancel anytime · Instant access
-  </div>
-</div>
-
 <div class="quota-banner" id="glb-quota-container">
     <span id="glb-quota"></span>
     <span id="upgrade-prompt" class="upgrade-link" style="display:none;" onclick="location.href='index.premium.html'">Keep it unlimited</span>
@@ -159,7 +144,7 @@ function glbResolveApiOrigin() {
 const NEXTBASE_APP_ORIGIN = glbResolveApiOrigin();
 const NEXTBASE_APP = NEXTBASE_APP_ORIGIN;
 var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-const APP_VERSION = '2026.04.26.travel.ui.6';
+const APP_VERSION = '2026.04.26.travel.ui.7';
 const MAINTENANCE_DEFAULT = 'We are currently enhancing the system for a better experience. Please check back shortly.';
 const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
 const LS_GLB_CLIENT_ID = 'glb_client_id_v1';
@@ -1163,15 +1148,7 @@ handleTravelActivationFlow();
 })();
 
 
-<script>
-(function wireTravelPassCheckout(){
-  var btn = document.getElementById('start-pass-btn');
-  if (!btn) return;
-  btn.addEventListener('click', function () {
-    window.location.href = 'https://buy.stripe.com/14AcN7c7z0e46ZpfuDasg0v';
-  });
-})();
-</script>
+
 
 </script>
 
