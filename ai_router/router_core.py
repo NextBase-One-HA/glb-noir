@@ -1,6 +1,7 @@
 from .key_resolver import resolve_api_key_for_call, key_source_for_call
 from .model_resolver import resolve_model
 from .provider_client import call_gemini
+from .cost_optimizer import local_translate
 import json
 
 
@@ -14,7 +15,20 @@ def extract_text(provider_body: str) -> str:
 
 def handle_translate(req: dict) -> dict:
     text = req.get("text", "")
+    target = req.get("target", "")
     caller_id = req.get("caller_id", "prod")
+
+    # --- Cost Optimizer (API bypass) ---
+    cached = local_translate(text, target)
+    if cached:
+        return {
+            "ok": True,
+            "model": "local-cache",
+            "key_source": "LOCAL_CACHE",
+            "provider_status": 200,
+            "translatedText": cached,
+            "optimizer": "local_cache",
+        }
 
     api_key = resolve_api_key_for_call(caller_id)
     model = resolve_model()
