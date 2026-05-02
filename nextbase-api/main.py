@@ -1,12 +1,8 @@
 """
-NextBase mandatory gateway (執行官プロトコル): every request re-attaches the latest CANONICAL
-to the prompt head. Upstream: TRANSLATE_UPSTREAM_URL only (no TRANSLATE_PROXY_URL).
+NextBase mandatory gateway: stateless canonical + inventory injection per request.
+Upstream: TRANSLATE_UPSTREAM_URL -> POST .../gateway only. No header-token gate; no proxy URL.
 
-Load order:
-  1) NEXTBASE_CANONICAL_URL (optional external / dynamic GET)
-  2) Internal static: NEXTBASE_SYSTEM_CANONICAL.md + SYSTEM_INVENTORY.md
-
-Fail-safe: any load failure => securityLevel=1 and HOLD (process keeps running; no crash-loop).
+Room/TTL: not handled here. No ai-router server-side state; forward is stateless HTTP only.
 """
 from __future__ import annotations
 
@@ -14,38 +10,36 @@ import os
 from pathlib import Path
 
 import httpx
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict
-
-# Optional gate headers — values only from environment (never committed).
-NB_GATE_HEADER_NAME = os.getenv("NB_GATE_HEADER_NAME", "X-NB-Gate-Token")
-NB_GATE_TOKEN = os.getenv("NB_GATE_TOKEN", "")
 
 CANONICAL_FETCH_TIMEOUT = float(os.getenv("NEXTBASE_CANONICAL_FETCH_TIMEOUT", "15"))
 
 
-def _canonical_docs_paths() -> tuple[Path, Path]:
-    """Resolve repo `docs/` (monorepo) or `docs/` next to this file (container)."""
+def _docs_base_dir() -> Path:
     here = Path(__file__).resolve().parent
     monorepo_docs = here.parent / "docs"
     local_docs = here / "docs"
     if (monorepo_docs / "NEXTBASE_SYSTEM_CANONICAL.md").is_file():
-        base = monorepo_docs
-    elif (local_docs / "NEXTBASE_SYSTEM_CANONICAL.md").is_file():
-        base = local_docs
-    else:
-        base = monorepo_docs
-    return (
-        base / "NEXTBASE_SYSTEM_CANONICAL.md",
-        base / "SYSTEM_INVENTORY.md",
-    )
+        return monorepo_docs
+    if (local_docs / "NEXTBASE_SYSTEM_CANONICAL.md").is_file():
+        return local_docs
+    return monorepo_docs
 
 
-async def load_canonical_context() -> tuple[str | None, str | None]:
+def _path_canonical_local() -> Path:
+    return _docs_base_dir() / "NEXTBASE_SYSTEM_CANONICAL.md"
+
+
+def _path_inventory_local() -> Path:
+    return _docs_base_dir() / "SYSTEM_INVENTORY.md"
+
+
+async def canonical_loader() -> tuple[str | None, str | None]:
     """
-    Merge canonical from URL (if set) then internal static files.
-    Returns (text, error). If error is set => gateway must HOLD (securityLevel=1); no exception.
+    NEXTBASE_CANONICAL_URL (optional) then local NEXTBASE_SYSTEM_CANONICAL.md.
+    Returns (text, error). Error => gateway HOLD; never log body or secrets.
     """
     parts: list[str] = []
     url = (os.getenv("NEXTBASE_CANONICAL_URL") or "").strip()
@@ -54,36 +48,40 @@ async def load_canonical_context() -> tuple[str | None, str | None]:
             async with httpx.AsyncClient(timeout=CANONICAL_FETCH_TIMEOUT) as client:
                 r = await client.get(url)
             if r.status_code != 200:
-                return None, f"NEXTBASE_CANONICAL_URL HTTP {r.status_code}"
+                return None, "canonical_url_http_error"
             parts.append(r.text)
-        except Exception as e:
-            return None, f"NEXTBASE_CANONICAL_URL fetch failed: {e!s}"
+        except Exception:
+            return None, "canonical_url_fetch_error"
 
-    p1, p2 = _canonical_docs_paths()
-    for p in (p1, p2):
-        if not p.is_file():
-            return None, f"CANONICAL MISSING (required): {p}"
-        parts.append(p.read_text(encoding="utf-8"))
-
+    local = _path_canonical_local()
+    if not local.is_file():
+        return None, "canonical_local_missing"
+    parts.append(local.read_text(encoding="utf-8"))
     return "\n\n---\n\n".join(parts), None
 
 
-def _hold_inventory() -> dict:
-    return {
-        "status": "HOLD",
-        "securityLevel": 1,
-        "message": "Physical inventory mismatch detected. Action required by NORI.",
-        "required_action": "Update environment variables or rotate keys.",
-    }
+async def inventory_loader() -> tuple[str | None, str | None]:
+    """Local SYSTEM_INVENTORY.md only."""
+    p = _path_inventory_local()
+    if not p.is_file():
+        return None, "inventory_local_missing"
+    return p.read_text(encoding="utf-8"), None
 
 
-def _hold_load(reason: str) -> dict:
-    return {
-        "status": "HOLD",
-        "securityLevel": 1,
-        "message": "Canonical load failure — execution halted.",
-        "required_action": reason,
-    }
+def security_level_hold(combined_audit_text: str) -> bool:
+    """True => HOLD (no upstream forward)."""
+    if "STATE: HOLD" in combined_audit_text:
+        return True
+    if "STATE: INVALID" in combined_audit_text:
+        return True
+    return False
+
+
+def _hold(*, reason: str) -> dict:
+    out: dict = {"status": "HOLD", "securityLevel": 1}
+    if reason:
+        out["reason"] = reason
+    return out
 
 
 app = FastAPI(title="NextBase API — Mandatory Gateway", version="1.0.0")
@@ -122,42 +120,35 @@ async def forward_to_ai_router(enforced_prompt: str, payload: GatewayPayload) ->
     try:
         data = r.json()
     except Exception:
-        data = {"raw": r.text, "upstream_status": r.status_code}
+        data = {"upstream_status": r.status_code}
     if r.is_success:
         return data
     raise HTTPException(status_code=r.status_code, detail=data)
 
 
-def _check_gate(request: Request) -> None:
-    if not NB_GATE_TOKEN:
-        return
-    sent = request.headers.get(NB_GATE_HEADER_NAME) or ""
-    if sent != NB_GATE_TOKEN:
-        raise HTTPException(status_code=403, detail="Gateway token mismatch or missing")
-
-
 @app.post("/gateway")
-async def mandatory_gateway(request: Request, payload: GatewayPayload):
-    # Stateless: reload canonical every request (no trust in AI/history).
-    _check_gate(request)
-    canonical_text, load_err = await load_canonical_context()
-    if load_err or not canonical_text:
-        return _hold_load(load_err or "Unknown canonical error")
+async def mandatory_gateway(payload: GatewayPayload):
+    canonical_text, c_err = await canonical_loader()
+    if c_err or not canonical_text:
+        return _hold(reason=c_err or "canonical_error")
 
-    original_prompt = payload.prompt
+    inventory_text, i_err = await inventory_loader()
+    if i_err or not inventory_text:
+        return _hold(reason=i_err or "inventory_error")
+
+    audit_blob = canonical_text + "\n\n---\n\n" + inventory_text
+    if security_level_hold(audit_blob):
+        return _hold(reason="inventory_state_hold_or_invalid")
+
     enforced_prompt = (
         f"### SYSTEM_CANONICAL_LAW ###\n{canonical_text}\n\n"
-        f"### USER_REQUEST ###\n{original_prompt}"
+        f"### SYSTEM_INVENTORY ###\n{inventory_text}\n\n"
+        f"### USER_REQUEST ###\n{payload.prompt}"
     )
 
-    # Inventory audit (PASS required before forward)
-    if "STATE: HOLD" in canonical_text or "STATE: INVALID" in canonical_text:
-        return _hold_inventory()
-
-    # PASS -> upstream only
     return await forward_to_ai_router(enforced_prompt, payload)
 
 
 @app.get("/health")
 def health():
-    return {"ok": True, "service": "nextbase-api", "protocol": "NEXTBASE_API_GATEWAY_FIXED"}
+    return {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED"}
