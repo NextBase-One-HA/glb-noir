@@ -1,6 +1,9 @@
 """
 NextBase mandatory gateway: stateless canonical + inventory injection per request.
-Upstream: TRANSLATE_UPSTREAM_URL -> POST .../gateway only. No header-token gate; no proxy URL.
+Upstream: TRANSLATE_UPSTREAM_URL -> POST .../gateway only.
+
+Canonical: NEXTBASE_CANONICAL_URL (200 => use only URL body) else local NEXTBASE_SYSTEM_CANONICAL.md.
+Inventory: NEXTBASE_INVENTORY_URL (200 => use only URL body) else local SYSTEM_INVENTORY.md.
 
 Room/TTL: not handled here. No ai-router server-side state; forward is stateless HTTP only.
 """
@@ -38,34 +41,46 @@ def _path_inventory_local() -> Path:
 
 async def canonical_loader() -> tuple[str | None, str | None]:
     """
-    NEXTBASE_CANONICAL_URL (optional) then local NEXTBASE_SYSTEM_CANONICAL.md.
-    Returns (text, error). Error => gateway HOLD; never log body or secrets.
+    NEXTBASE_CANONICAL_URL: if set and GET returns 200, use body only (local not required).
+    Otherwise fall back to local docs/NEXTBASE_SYSTEM_CANONICAL.md.
+    If URL fails and local missing => HOLD. Never log body or secrets.
     """
-    parts: list[str] = []
     url = (os.getenv("NEXTBASE_CANONICAL_URL") or "").strip()
     if url:
         try:
             async with httpx.AsyncClient(timeout=CANONICAL_FETCH_TIMEOUT) as client:
                 r = await client.get(url)
-            if r.status_code != 200:
-                return None, "canonical_url_http_error"
-            parts.append(r.text)
+            if r.status_code == 200:
+                return r.text, None
         except Exception:
-            return None, "canonical_url_fetch_error"
+            pass
 
     local = _path_canonical_local()
-    if not local.is_file():
-        return None, "canonical_local_missing"
-    parts.append(local.read_text(encoding="utf-8"))
-    return "\n\n---\n\n".join(parts), None
+    if local.is_file():
+        return local.read_text(encoding="utf-8"), None
+    return None, "canonical_load_failed"
 
 
 async def inventory_loader() -> tuple[str | None, str | None]:
-    """Local SYSTEM_INVENTORY.md only."""
+    """
+    NEXTBASE_INVENTORY_URL: if set and GET returns 200, use body only (local not required).
+    Otherwise fall back to local SYSTEM_INVENTORY.md.
+    If URL fails and local missing => HOLD.
+    """
+    url = (os.getenv("NEXTBASE_INVENTORY_URL") or "").strip()
+    if url:
+        try:
+            async with httpx.AsyncClient(timeout=CANONICAL_FETCH_TIMEOUT) as client:
+                r = await client.get(url)
+            if r.status_code == 200:
+                return r.text, None
+        except Exception:
+            pass
+
     p = _path_inventory_local()
-    if not p.is_file():
-        return None, "inventory_local_missing"
-    return p.read_text(encoding="utf-8"), None
+    if p.is_file():
+        return p.read_text(encoding="utf-8"), None
+    return None, "inventory_load_failed"
 
 
 def security_level_hold(combined_audit_text: str) -> bool:
