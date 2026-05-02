@@ -1,6 +1,12 @@
 """
-NextBase mandatory canonical gateway: injects local CANONICAL into every AI-bound request.
-Upstream AI router base URL: TRANSLATE_UPSTREAM_URL (see Cloud Run env; never hardcode secrets).
+NextBase mandatory gateway (執行官プロトコル): every request re-attaches the latest CANONICAL
+to the prompt head. Upstream: TRANSLATE_UPSTREAM_URL only (no TRANSLATE_PROXY_URL).
+
+Load order:
+  1) NEXTBASE_CANONICAL_URL (optional external / dynamic GET)
+  2) Internal static: NEXTBASE_SYSTEM_CANONICAL.md + SYSTEM_INVENTORY.md
+
+Fail-safe: any load failure => securityLevel=1 and HOLD (process keeps running; no crash-loop).
 """
 from __future__ import annotations
 
@@ -15,6 +21,8 @@ from pydantic import BaseModel, ConfigDict
 # Optional gate headers — values only from environment (never committed).
 NB_GATE_HEADER_NAME = os.getenv("NB_GATE_HEADER_NAME", "X-NB-Gate-Token")
 NB_GATE_TOKEN = os.getenv("NB_GATE_TOKEN", "")
+
+CANONICAL_FETCH_TIMEOUT = float(os.getenv("NEXTBASE_CANONICAL_FETCH_TIMEOUT", "15"))
 
 
 def _canonical_docs_paths() -> tuple[Path, Path]:
@@ -34,15 +42,48 @@ def _canonical_docs_paths() -> tuple[Path, Path]:
     )
 
 
-def load_canonical_context() -> str:
-    """Load merged canonical text. Missing files => physical failure (caller must surface)."""
-    p1, p2 = _canonical_docs_paths()
+async def load_canonical_context() -> tuple[str | None, str | None]:
+    """
+    Merge canonical from URL (if set) then internal static files.
+    Returns (text, error). If error is set => gateway must HOLD (securityLevel=1); no exception.
+    """
     parts: list[str] = []
+    url = (os.getenv("NEXTBASE_CANONICAL_URL") or "").strip()
+    if url:
+        try:
+            async with httpx.AsyncClient(timeout=CANONICAL_FETCH_TIMEOUT) as client:
+                r = await client.get(url)
+            if r.status_code != 200:
+                return None, f"NEXTBASE_CANONICAL_URL HTTP {r.status_code}"
+            parts.append(r.text)
+        except Exception as e:
+            return None, f"NEXTBASE_CANONICAL_URL fetch failed: {e!s}"
+
+    p1, p2 = _canonical_docs_paths()
     for p in (p1, p2):
         if not p.is_file():
-            raise FileNotFoundError(f"CANONICAL MISSING (required): {p}")
+            return None, f"CANONICAL MISSING (required): {p}"
         parts.append(p.read_text(encoding="utf-8"))
-    return "\n\n---\n\n".join(parts)
+
+    return "\n\n---\n\n".join(parts), None
+
+
+def _hold_inventory() -> dict:
+    return {
+        "status": "HOLD",
+        "securityLevel": 1,
+        "message": "Physical inventory mismatch detected. Action required by NORI.",
+        "required_action": "Update environment variables or rotate keys.",
+    }
+
+
+def _hold_load(reason: str) -> dict:
+    return {
+        "status": "HOLD",
+        "securityLevel": 1,
+        "message": "Canonical load failure — execution halted.",
+        "required_action": reason,
+    }
 
 
 app = FastAPI(title="NextBase API — Mandatory Gateway", version="1.0.0")
@@ -55,17 +96,10 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-def _startup_verify_canonical() -> None:
-    """Stop process at boot if canonical files are absent."""
-    load_canonical_context()
-
-
 class GatewayPayload(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     prompt: str = ""
-    # Forward-through fields for ai-router /translate shape
     target: str = ""
     caller_id: str = "prod"
     model: str | None = None
@@ -104,27 +138,26 @@ def _check_gate(request: Request) -> None:
 
 @app.post("/gateway")
 async def mandatory_gateway(request: Request, payload: GatewayPayload):
-    # A. 正本の強制注入 (reload every request — no trust in remote history)
+    # Stateless: reload canonical every request (no trust in AI/history).
     _check_gate(request)
-    canonical_text = load_canonical_context()
+    canonical_text, load_err = await load_canonical_context()
+    if load_err or not canonical_text:
+        return _hold_load(load_err or "Unknown canonical error")
+
     original_prompt = payload.prompt
     enforced_prompt = (
         f"### SYSTEM_CANONICAL_LAW ###\n{canonical_text}\n\n"
         f"### USER_REQUEST ###\n{original_prompt}"
     )
 
-    # B. securityLevel 判定 (LEVEL 1 = 監査モード)
+    # Inventory audit (PASS required before forward)
     if "STATE: HOLD" in canonical_text or "STATE: INVALID" in canonical_text:
-        return {
-            "status": "HOLD",
-            "message": "Physical inventory mismatch detected. Action required by NORI.",
-            "required_action": "Update environment variables or rotate keys.",
-        }
+        return _hold_inventory()
 
-    # C. ai-router への物理転送
+    # PASS -> upstream only
     return await forward_to_ai_router(enforced_prompt, payload)
 
 
 @app.get("/health")
 def health():
-    return {"ok": True, "service": "nextbase-api"}
+    return {"ok": True, "service": "nextbase-api", "protocol": "NEXTBASE_API_GATEWAY_FIXED"}
