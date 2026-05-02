@@ -1,11 +1,10 @@
 """
-NextBase mandatory gateway: stateless canonical + inventory injection per request.
-Upstream: TRANSLATE_UPSTREAM_URL -> POST .../gateway only.
+NextBase API:
+- POST /gateway — canonical + inventory injection, then TRANSLATE_UPSTREAM_URL (ai-router carries no room/TTL state).
+- POST /rooms/* — Firestore is the source of truth for rooms, TTL, messages, audit_logs.
 
-Canonical: NEXTBASE_CANONICAL_URL (200 => use only URL body) else local NEXTBASE_SYSTEM_CANONICAL.md.
-Inventory: NEXTBASE_INVENTORY_URL (200 => use only URL body) else local SYSTEM_INVENTORY.md.
-
-Room/TTL: not handled here. No ai-router server-side state; forward is stateless HTTP only.
+Canonical: NEXTBASE_CANONICAL_URL or local NEXTBASE_SYSTEM_CANONICAL.md.
+Inventory: NEXTBASE_INVENTORY_URL or local SYSTEM_INVENTORY.md.
 """
 from __future__ import annotations
 
@@ -13,9 +12,11 @@ import os
 from pathlib import Path
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+import rooms_firestore
 
 CANONICAL_FETCH_TIMEOUT = float(os.getenv("NEXTBASE_CANONICAL_FETCH_TIMEOUT", "15"))
 
@@ -99,7 +100,7 @@ def _hold(*, reason: str) -> dict:
     return out
 
 
-app = FastAPI(title="NextBase API — Mandatory Gateway", version="1.0.0")
+app = FastAPI(title="NextBase API — Gateway + Rooms (Firestore)", version="1.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(",") if os.getenv("ALLOWED_ORIGINS") else ["*"],
@@ -167,3 +168,72 @@ async def mandatory_gateway(payload: GatewayPayload):
 @app.get("/health")
 def health():
     return {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED"}
+
+
+# --- Firestore: rooms / TTL / messages / audit (no Stripe / no billing lock) ---
+
+
+class RoomCreateBody(BaseModel):
+    ttl_days: int = Field(default=30, ge=1, le=365)
+
+
+class RoomJoinBody(BaseModel):
+    code: str
+
+
+class RoomMessageBody(BaseModel):
+    code: str
+    body: str
+    sender_id: str | None = None
+
+
+class RoomStatusBody(BaseModel):
+    code: str
+
+
+@app.post("/rooms/create")
+async def rooms_create(body: RoomCreateBody):
+    try:
+        return await rooms_firestore.room_create(ttl_days=body.ttl_days)
+    except RuntimeError:
+        raise HTTPException(status_code=503, detail="room_code_collision")
+
+
+@app.post("/rooms/join")
+async def rooms_join(body: RoomJoinBody):
+    out = await rooms_firestore.room_join(code=body.code)
+    if out.get("ok"):
+        return out
+    err = out.get("error", "unknown")
+    if err == "not_found":
+        raise HTTPException(status_code=404, detail=err)
+    if err == "expired":
+        raise HTTPException(status_code=410, detail=err)
+    raise HTTPException(status_code=400, detail=err)
+
+
+@app.post("/rooms/message")
+async def rooms_message(body: RoomMessageBody):
+    out = await rooms_firestore.room_message(
+        room_code=body.code,
+        body=body.body,
+        sender_id=body.sender_id,
+    )
+    if out.get("ok"):
+        return out
+    err = out.get("error", "unknown")
+    if err == "not_found":
+        raise HTTPException(status_code=404, detail=err)
+    if err == "expired":
+        raise HTTPException(status_code=410, detail=err)
+    raise HTTPException(status_code=400, detail=err)
+
+
+@app.post("/rooms/status")
+async def rooms_status_post(body: RoomStatusBody):
+    return await rooms_firestore.room_status(code=body.code)
+
+
+@app.get("/rooms/status")
+async def rooms_status_get(code: str = Query(..., min_length=1)):
+    return await rooms_firestore.room_status(code=code)

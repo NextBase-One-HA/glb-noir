@@ -5,6 +5,7 @@ WORKDIR /app
 COPY nextbase-api/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY nextbase-api/main.py .
+COPY nextbase-api/rooms_firestore.py .
 COPY docs/NEXTBASE_SYSTEM_CANONICAL.md docs/
 COPY docs/SYSTEM_INVENTORY.md docs/
 ENV PYTHONUNBUFFERED=1
