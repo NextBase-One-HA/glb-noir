@@ -1,4 +1,4 @@
-"""NextBase API gateway, rooms, sessions, and agent evidence ledger."""
+"""NextBase API gateway, rooms, sessions, agent evidence ledger, and billing entitlements."""
 from __future__ import annotations
 
 import json
@@ -7,8 +7,9 @@ from pathlib import Path
 
 import agent_tasks
 import agent_violations
+import entitlements
 import httpx
-from fastapi import Body, FastAPI, HTTPException, Query
+from fastapi import Body, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -84,7 +85,7 @@ def _hold(*, reason: str) -> dict:
     return out
 
 
-app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions + Agent Tasks", version="1.3.7")
+app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions + Billing", version="1.4.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(",") if os.getenv("ALLOWED_ORIGINS") else ["*"],
@@ -219,7 +220,7 @@ async def mandatory_gateway(payload: GatewayPayload):
 
 @app.get("/health")
 def health():
-    out = {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED", "api_version": "1.3.7"}
+    out = {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED", "api_version": "1.4.0"}
     rev = os.getenv("K_REVISION")
     if rev:
         out["revision"] = rev
@@ -264,18 +265,55 @@ async def agent_tasks_open():
     return await agent_tasks.open_tasks()
 
 
+# ===== Billing =====
+
+
+@app.post("/billing/core/checkout")
+async def billing_core_checkout():
+    out = entitlements.checkout_url(entitlements.CORE_PRODUCT)
+    if not out.get("ok"):
+        raise HTTPException(status_code=500, detail=out)
+    return out
+
+
+@app.post("/billing/travel/checkout")
+async def billing_travel_checkout():
+    out = entitlements.checkout_url(entitlements.TRAVEL_PRODUCT)
+    if not out.get("ok"):
+        raise HTTPException(status_code=500, detail=out)
+    return out
+
+
+@app.post("/billing/webhook")
+async def billing_webhook(request: Request):
+    raw = await request.body()
+    sig = request.headers.get("stripe-signature")
+    return await entitlements.process_stripe_webhook(raw_body=raw, signature=sig)
+
+
+@app.get("/entitlements")
+async def get_entitlements(customer_id: str | None = Query(default=None), session_id: str | None = Query(default=None)):
+    return await entitlements.entitlement_status(customer_id=customer_id, session_id=session_id)
+
+
 class RoomCreateBody(BaseModel):
     ttl_days: int = Field(default=30, ge=1, le=365)
+    customer_id: str | None = None
+    session_id: str | None = None
 
 
 class RoomJoinBody(BaseModel):
     code: str
+    customer_id: str | None = None
+    session_id: str | None = None
 
 
 class RoomMessageBody(BaseModel):
     code: str
     body: str
     sender_id: str | None = None
+    customer_id: str | None = None
+    session_id: str | None = None
 
 
 class RoomStatusBody(BaseModel):
@@ -284,6 +322,9 @@ class RoomStatusBody(BaseModel):
 
 @app.post("/rooms/create")
 async def rooms_create(body: RoomCreateBody):
+    gate = await entitlements.assert_room_create_allowed(customer_id=body.customer_id, session_id=body.session_id)
+    if not gate.get("ok"):
+        raise HTTPException(status_code=gate.get("status_code", 403), detail=gate.get("reason"))
     try:
         return await rooms_firestore.room_create(ttl_days=body.ttl_days)
     except RuntimeError:
@@ -292,6 +333,9 @@ async def rooms_create(body: RoomCreateBody):
 
 @app.post("/rooms/join")
 async def rooms_join(body: RoomJoinBody):
+    gate = await entitlements.assert_room_join_allowed(customer_id=body.customer_id, session_id=body.session_id)
+    if not gate.get("ok"):
+        raise HTTPException(status_code=gate.get("status_code", 403), detail=gate.get("reason"))
     out = await rooms_firestore.room_join(code=body.code)
     if out.get("ok"):
         return out
@@ -305,6 +349,9 @@ async def rooms_join(body: RoomJoinBody):
 
 @app.post("/rooms/message")
 async def rooms_message(body: RoomMessageBody):
+    gate = await entitlements.assert_room_join_allowed(customer_id=body.customer_id, session_id=body.session_id)
+    if not gate.get("ok"):
+        raise HTTPException(status_code=gate.get("status_code", 403), detail=gate.get("reason"))
     out = await rooms_firestore.room_message(room_code=body.code, body=body.body, sender_id=body.sender_id)
     if out.get("ok"):
         return out
