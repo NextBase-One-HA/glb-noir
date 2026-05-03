@@ -10,6 +10,7 @@ DONE is only allowed when physical evidence exists:
 
 Open-task listing is injected into POST /gateway under ### OPEN_AGENT_TASKS ###.
 DONE-rule violations are written to agent_violations.
+Verified DONE can reward a session reputation score.
 """
 from __future__ import annotations
 
@@ -28,6 +29,8 @@ COL_AGENT_VIOLATIONS = "agent_violations"
 COL_AGENT_REPUTATION = "agent_reputation"
 DEFAULT_TTL_HOURS = int(os.getenv("NEXTBASE_AGENT_TASK_TTL_HOURS", "12"))
 REQUIRED_EVIDENCE = ("git_commit", "deploy_revision", "test_command", "test_response")
+DONE_REWARD_POINTS = int(os.getenv("NEXTBASE_DONE_REWARD_POINTS", "10"))
+VIOLATION_PENALTY_POINTS = int(os.getenv("NEXTBASE_VIOLATION_PENALTY_POINTS", "20"))
 DONE_CLAIM_MARKERS = (
     '"status":"DONE"',
     '"status": "DONE"',
@@ -86,6 +89,18 @@ def _status_from_evidence(evidence: dict[str, Any]) -> tuple[str, list[str]]:
     return "DONE", []
 
 
+def _route_from_score(score: int) -> dict[str, Any]:
+    if score <= 0:
+        return {"route_class": "blocked", "securityLevel": 2}
+    if score < 50:
+        return {"route_class": "restricted", "securityLevel": 1}
+    return {"route_class": "normal", "securityLevel": 1}
+
+
+def _score_from_counts(violation_count: int, done_count: int = 0) -> int:
+    return max(0, min(100, 100 - (violation_count * VIOLATION_PENALTY_POINTS) + (done_count * DONE_REWARD_POINTS)))
+
+
 def _response_text(response: Any) -> str:
     if isinstance(response, dict):
         for key in ("translatedText", "text", "response", "message"):
@@ -128,18 +143,15 @@ def _blocking_tasks(open_tasks_payload: Any) -> list[dict[str, Any]]:
     return blocking
 
 
-def _reputation_from_count(count: int) -> dict[str, Any]:
-    score = max(0, 100 - (count * 20))
-    if count >= 5:
-        route_class = "blocked"
-        security_level = 2
-    elif count >= 3:
-        route_class = "restricted"
-        security_level = 1
-    else:
-        route_class = "normal"
-        security_level = 1
-    return {"score": score, "route_class": route_class, "securityLevel": security_level}
+def _reputation_payload(*, session_id: str | None, violation_count: int, done_count: int = 0) -> dict[str, Any]:
+    score = _score_from_counts(violation_count, done_count)
+    return {
+        "session_id": session_id,
+        "violation_count": violation_count,
+        "done_count": done_count,
+        "score": score,
+        **_route_from_score(score),
+    }
 
 
 async def task_start(*, title: str, detail: dict[str, Any] | None = None, ttl_hours: int | None = None) -> dict[str, Any]:
@@ -203,6 +215,17 @@ async def task_finish(*, task_id: str | None, evidence: dict[str, Any]) -> dict[
             payload["done_at"] = firestore.SERVER_TIMESTAMP
         ref.set(payload, merge=True)
         if status == "DONE":
+            session_id = existing.get("session_id") or merged.get("session_id")
+            if session_id:
+                rep_ref = fs.collection(COL_AGENT_REPUTATION).document(session_id)
+                rep_snap = rep_ref.get()
+                rep_data = rep_snap.to_dict() if rep_snap.exists else {}
+                violation_count = int((rep_data or {}).get("violation_count") or 0)
+                done_count = int((rep_data or {}).get("done_count") or 0) + 1
+                rep_ref.set(
+                    {**_reputation_payload(session_id=session_id, violation_count=violation_count, done_count=done_count), "updated_at": firestore.SERVER_TIMESTAMP},
+                    merge=True,
+                )
             return {
                 "status": "DONE",
                 "task_id": task_id,
@@ -247,11 +270,7 @@ async def open_tasks(limit: int = 10) -> dict[str, Any]:
     fs = _client()
 
     def read() -> list[dict[str, Any]]:
-        query = fs.collection(COL_AGENT_TASKS).where(
-            "status",
-            "in",
-            ["RUNNING", "HOLD"],
-        ).limit(limit)
+        query = fs.collection(COL_AGENT_TASKS).where("status", "in", ["RUNNING", "HOLD"]).limit(limit)
         out: list[dict[str, Any]] = []
         for snap in query.stream():
             data = snap.to_dict() or {}
@@ -283,9 +302,30 @@ async def session_violation_count(*, session_id: str | None, limit: int = 50) ->
 
 
 async def reputation_status(*, session_id: str | None) -> dict[str, Any]:
-    count = await session_violation_count(session_id=session_id)
-    rep = _reputation_from_count(count)
-    return {"session_id": session_id, "violation_count": count, **rep}
+    if not session_id:
+        return _reputation_payload(session_id=None, violation_count=0, done_count=0)
+    fs = _client()
+
+    def read() -> dict[str, Any]:
+        snap = fs.collection(COL_AGENT_REPUTATION).document(session_id).get()
+        if snap.exists:
+            data = snap.to_dict() or {}
+            violation_count = int(data.get("violation_count") or 0)
+            done_count = int(data.get("done_count") or 0)
+            return _reputation_payload(session_id=session_id, violation_count=violation_count, done_count=done_count)
+        return _reputation_payload(session_id=session_id, violation_count=0, done_count=0)
+
+    return await asyncio.to_thread(read)
+
+
+async def reputation_ranking(limit: int = 20) -> dict[str, Any]:
+    fs = _client()
+
+    def read() -> list[dict[str, Any]]:
+        query = fs.collection(COL_AGENT_REPUTATION).order_by("score", direction=firestore.Query.DESCENDING).limit(limit)
+        return [snap.to_dict() or {"session_id": snap.id} for snap in query.stream()]
+
+    return {"reputations": await asyncio.to_thread(read)}
 
 
 async def log_done_violation_if_needed(*, response: Any, open_tasks_payload: Any, session_id: str | None = None) -> dict[str, Any]:
@@ -298,9 +338,10 @@ async def log_done_violation_if_needed(*, response: Any, open_tasks_payload: Any
     if not blocking:
         return {"violation_logged": False, "reason": "no_open_blocking_tasks"}
 
-    prior_count = await session_violation_count(session_id=session_id)
-    violation_count = prior_count + 1
-    rep = _reputation_from_count(violation_count)
+    current = await reputation_status(session_id=session_id)
+    violation_count = int(current.get("violation_count") or 0) + 1
+    done_count = int(current.get("done_count") or 0)
+    rep = _reputation_payload(session_id=session_id, violation_count=violation_count, done_count=done_count)
     severity = "critical" if violation_count >= 3 else "high"
 
     fs = _client()
@@ -319,15 +360,7 @@ async def log_done_violation_if_needed(*, response: Any, open_tasks_payload: Any
         ref = fs.collection(COL_AGENT_VIOLATIONS).document()
         ref.set(violation)
         if session_id:
-            fs.collection(COL_AGENT_REPUTATION).document(session_id).set(
-                {
-                    "session_id": session_id,
-                    "violation_count": violation_count,
-                    **rep,
-                    "updated_at": firestore.SERVER_TIMESTAMP,
-                },
-                merge=True,
-            )
+            fs.collection(COL_AGENT_REPUTATION).document(session_id).set({**rep, "updated_at": firestore.SERVER_TIMESTAMP}, merge=True)
         return ref.id
 
     violation_id = await asyncio.to_thread(write)
