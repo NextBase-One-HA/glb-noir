@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 
 import agent_tasks
+import agent_violations
 import httpx
 from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -83,7 +84,7 @@ def _hold(*, reason: str) -> dict:
     return out
 
 
-app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions + Agent Tasks", version="1.3.3")
+app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions + Agent Tasks", version="1.3.4")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(",") if os.getenv("ALLOWED_ORIGINS") else ["*"],
@@ -147,6 +148,12 @@ async def mandatory_gateway(payload: GatewayPayload):
         open_tasks_payload = {"tasks": [], "error": "open_tasks_unavailable"}
         open_tasks_text = json.dumps(open_tasks_payload, ensure_ascii=False)
 
+    try:
+        recent_violations_payload = await agent_violations.recent_violations()
+        recent_violations_text = json.dumps(recent_violations_payload, ensure_ascii=False, indent=2)
+    except Exception:
+        recent_violations_text = json.dumps({"violations": []})
+
     blocks = [
         f"### SYSTEM_CANONICAL_LAW ###\n{canonical_text}\n\n",
         f"### SYSTEM_INVENTORY ###\n{inventory_text}\n\n",
@@ -155,6 +162,7 @@ async def mandatory_gateway(payload: GatewayPayload):
     if session_context:
         blocks.append(f"### SESSION_CONTEXT ###\n{session_context}\n\n")
     blocks.append(f"### OPEN_AGENT_TASKS ###\n{open_tasks_text}\n\n")
+    blocks.append(f"### RECENT_VIOLATIONS ###\n{recent_violations_text}\n\n")
     blocks.append(f"### USER_REQUEST ###\n{payload.prompt}")
     result = await forward_to_ai_router("".join(blocks), payload)
 
@@ -178,11 +186,16 @@ async def mandatory_gateway(payload: GatewayPayload):
 
 @app.get("/health")
 def health():
-    out = {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED", "api_version": "1.3.3"}
+    out = {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED", "api_version": "1.3.4"}
     rev = os.getenv("K_REVISION")
     if rev:
         out["revision"] = rev
     return out
+
+
+@app.get("/agent/violations")
+async def get_violations():
+    return await agent_violations.recent_violations()
 
 
 @app.post("/agent/task/start")
