@@ -7,6 +7,8 @@ DONE is only allowed when physical evidence exists:
 - deploy_revision
 - test_command
 - test_response
+
+Open-task listing is injected into POST /gateway under ### OPEN_AGENT_TASKS ###.
 """
 from __future__ import annotations
 
@@ -95,7 +97,9 @@ async def task_start(*, title: str, detail: dict[str, Any] | None = None, ttl_ho
     }
 
 
-async def task_finish(*, task_id: str, evidence: dict[str, Any]) -> dict[str, Any]:
+async def task_finish(*, task_id: str | None, evidence: dict[str, Any]) -> dict[str, Any]:
+    if not task_id:
+        return {"status": "HOLD", "reason": "missing_task_id", "task_id": ""}
     fs = _client()
     ref = fs.collection(COL_AGENT_TASKS).document(task_id)
 
@@ -145,7 +149,6 @@ async def task_get(*, task_id: str) -> dict[str, Any]:
         data = snap.to_dict() or {}
         evidence = data.get("evidence") or {}
         status, missing = _status_from_evidence(evidence)
-        # If task was still RUNNING but all evidence now exists, report DONE shape too.
         return {
             "exists": True,
             "task_id": task_id,
@@ -159,15 +162,15 @@ async def task_get(*, task_id: str) -> dict[str, Any]:
     return await asyncio.to_thread(read)
 
 
-async def open_tasks(limit: int = 10) -> list[dict[str, Any]]:
+async def open_tasks(limit: int = 10) -> dict[str, Any]:
     fs = _client()
 
     def read() -> list[dict[str, Any]]:
-        query = (
-            fs.collection(COL_AGENT_TASKS)
-            .where(filter=firestore.FieldFilter("status", "in", ["RUNNING", "HOLD"]))
-            .limit(limit)
-        )
+        query = fs.collection(COL_AGENT_TASKS).where(
+            "status",
+            "in",
+            ["RUNNING", "HOLD"],
+        ).limit(limit)
         out: list[dict[str, Any]] = []
         for snap in query.stream():
             data = snap.to_dict() or {}
@@ -182,4 +185,5 @@ async def open_tasks(limit: int = 10) -> list[dict[str, Any]]:
             )
         return out
 
-    return await asyncio.to_thread(read)
+    rows = await asyncio.to_thread(read)
+    return {"tasks": rows}

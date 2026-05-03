@@ -1,15 +1,21 @@
 """
 NextBase API:
-- POST /gateway — canonical + inventory + session injection, then TRANSLATE_UPSTREAM_URL.
-- POST /rooms/* — Firestore is the source of truth for rooms, TTL, messages, audit_logs.
+- POST /gateway — canonical + inventory + optional session + OPEN_AGENT_TASKS, then TRANSLATE_UPSTREAM_URL.
+- POST /agent/task/* — agent task ledger (Firestore agent_tasks).
+- POST /rooms/* — Firestore rooms / messages / audit_logs.
+
+Canonical: NEXTBASE_CANONICAL_URL or local NEXTBASE_SYSTEM_CANONICAL.md.
+Inventory: NEXTBASE_INVENTORY_URL or local SYSTEM_INVENTORY.md.
 """
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
+import agent_tasks
 import httpx
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -87,7 +93,10 @@ def _hold(*, reason: str) -> dict:
     return out
 
 
-app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions", version="1.2.0")
+app = FastAPI(
+    title="NextBase API — Gateway + Rooms + Sessions + Agent Tasks",
+    version="1.3.0",
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(",") if os.getenv("ALLOWED_ORIGINS") else ["*"],
@@ -149,12 +158,25 @@ async def mandatory_gateway(payload: GatewayPayload):
             inventory_snapshot=inventory_text,
         )
 
-    enforced_prompt = (
-        f"### SYSTEM_CANONICAL_LAW ###\n{canonical_text}\n\n"
-        f"### SYSTEM_INVENTORY ###\n{inventory_text}\n\n"
-        + (f"### SESSION_CONTEXT ###\n{session_context}\n\n" if session_context else "")
-        + f"### USER_REQUEST ###\n{payload.prompt}"
-    )
+    try:
+        open_tasks_payload = await agent_tasks.open_tasks()
+        if isinstance(open_tasks_payload, list):
+            open_tasks_payload = {"tasks": open_tasks_payload}
+        open_tasks_text = json.dumps(open_tasks_payload, ensure_ascii=False, indent=2)
+    except Exception:
+        open_tasks_text = json.dumps(
+            {"tasks": [], "error": "open_tasks_unavailable"}, ensure_ascii=False
+        )
+
+    blocks = [
+        f"### SYSTEM_CANONICAL_LAW ###\n{canonical_text}\n\n",
+        f"### SYSTEM_INVENTORY ###\n{inventory_text}\n\n",
+    ]
+    if session_context:
+        blocks.append(f"### SESSION_CONTEXT ###\n{session_context}\n\n")
+    blocks.append(f"### OPEN_AGENT_TASKS ###\n{open_tasks_text}\n\n")
+    blocks.append(f"### USER_REQUEST ###\n{payload.prompt}")
+    enforced_prompt = "".join(blocks)
 
     result = await forward_to_ai_router(enforced_prompt, payload)
 
@@ -173,7 +195,33 @@ def health():
     return {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED"}
 
 
-# --- Firestore Rooms ---
+@app.post("/agent/task/start")
+async def agent_task_start(body: dict = Body(...)):
+    return await agent_tasks.task_start(
+        title=body.get("title", "untitled"),
+        detail=body.get("detail", {}),
+    )
+
+
+@app.post("/agent/task/finish")
+async def agent_task_finish(body: dict = Body(...)):
+    return await agent_tasks.task_finish(
+        task_id=body.get("task_id"),
+        evidence=body.get("evidence", {}),
+    )
+
+
+@app.get("/agent/task/{task_id}")
+async def agent_task_get(task_id: str):
+    return await agent_tasks.task_get(task_id=task_id)
+
+
+@app.get("/agent/tasks/open")
+async def agent_tasks_open():
+    return await agent_tasks.open_tasks()
+
+
+# --- Firestore: rooms / TTL / messages / audit (no Stripe / no billing lock) ---
 
 
 class RoomCreateBody(BaseModel):
