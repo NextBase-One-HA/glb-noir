@@ -85,7 +85,7 @@ def _hold(*, reason: str) -> dict:
     return out
 
 
-app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions + Billing", version="1.4.0")
+app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions + Billing", version="1.4.1")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(",") if os.getenv("ALLOWED_ORIGINS") else ["*"],
@@ -136,12 +136,7 @@ async def mandatory_gateway(payload: GatewayPayload):
 
     reputation = await agent_tasks.reputation_status(session_id=payload.session_id)
     if reputation.get("route_class") == "blocked":
-        return {
-            "status": "HOLD",
-            "reason": "session_blocked",
-            "securityLevel": 2,
-            "reputation": reputation,
-        }
+        return {"status": "HOLD", "reason": "session_blocked", "securityLevel": 2, "reputation": reputation}
     if reputation.get("route_class") == "restricted" and not payload.model:
         payload.model = os.getenv("NEXTBASE_RESTRICTED_MODEL", "gemini-2.0-flash")
 
@@ -192,11 +187,7 @@ async def mandatory_gateway(payload: GatewayPayload):
     if violation_result.get("violation_logged"):
         severity = violation_result.get("severity", "high")
         count = violation_result.get("violation_count", 1)
-        message = (
-            "Repeated DONE claims without evidence detected."
-            if severity == "critical"
-            else "DONE claim without required evidence."
-        )
+        message = "Repeated DONE claims without evidence detected." if severity == "critical" else "DONE claim without required evidence."
         return {
             "status": "HOLD",
             "securityLevel": violation_result.get("securityLevel", 1),
@@ -220,7 +211,7 @@ async def mandatory_gateway(payload: GatewayPayload):
 
 @app.get("/health")
 def health():
-    out = {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED", "api_version": "1.4.0"}
+    out = {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED", "api_version": "1.4.1"}
     rev = os.getenv("K_REVISION")
     if rev:
         out["revision"] = rev
@@ -265,23 +256,14 @@ async def agent_tasks_open():
     return await agent_tasks.open_tasks()
 
 
-# ===== Billing =====
-
-
 @app.post("/billing/core/checkout")
 async def billing_core_checkout():
-    out = entitlements.checkout_url(entitlements.CORE_PRODUCT)
-    if not out.get("ok"):
-        raise HTTPException(status_code=500, detail=out)
-    return out
+    return entitlements.checkout_url(entitlements.CORE_PRODUCT)
 
 
 @app.post("/billing/travel/checkout")
 async def billing_travel_checkout():
-    out = entitlements.checkout_url(entitlements.TRAVEL_PRODUCT)
-    if not out.get("ok"):
-        raise HTTPException(status_code=500, detail=out)
-    return out
+    return entitlements.checkout_url(entitlements.TRAVEL_PRODUCT)
 
 
 @app.post("/billing/webhook")
@@ -324,43 +306,43 @@ class RoomStatusBody(BaseModel):
 async def rooms_create(body: RoomCreateBody):
     gate = await entitlements.assert_room_create_allowed(customer_id=body.customer_id, session_id=body.session_id)
     if not gate.get("ok"):
-        raise HTTPException(status_code=gate.get("status_code", 403), detail=gate.get("reason"))
+        return gate
     try:
         return await rooms_firestore.room_create(ttl_days=body.ttl_days)
     except RuntimeError:
-        raise HTTPException(status_code=503, detail="room_code_collision")
+        return {"ok": False, "status": "HOLD", "reason": "room_code_collision", "message": "Room creation is temporarily busy. Please try again."}
 
 
 @app.post("/rooms/join")
 async def rooms_join(body: RoomJoinBody):
     gate = await entitlements.assert_room_join_allowed(customer_id=body.customer_id, session_id=body.session_id)
     if not gate.get("ok"):
-        raise HTTPException(status_code=gate.get("status_code", 403), detail=gate.get("reason"))
+        return gate
     out = await rooms_firestore.room_join(code=body.code)
     if out.get("ok"):
         return out
     err = out.get("error", "unknown")
-    if err == "not_found":
-        raise HTTPException(status_code=404, detail=err)
-    if err == "expired":
-        raise HTTPException(status_code=410, detail=err)
-    raise HTTPException(status_code=400, detail=err)
+    messages = {
+        "not_found": "This room code was not found. Please check the code and try again.",
+        "expired": "This Travel Room has expired.",
+    }
+    return {"ok": False, "status": "DENY", "reason": err, "message": messages.get(err, "Unable to join this room. Please try again.")}
 
 
 @app.post("/rooms/message")
 async def rooms_message(body: RoomMessageBody):
     gate = await entitlements.assert_room_join_allowed(customer_id=body.customer_id, session_id=body.session_id)
     if not gate.get("ok"):
-        raise HTTPException(status_code=gate.get("status_code", 403), detail=gate.get("reason"))
+        return gate
     out = await rooms_firestore.room_message(room_code=body.code, body=body.body, sender_id=body.sender_id)
     if out.get("ok"):
         return out
     err = out.get("error", "unknown")
-    if err == "not_found":
-        raise HTTPException(status_code=404, detail=err)
-    if err == "expired":
-        raise HTTPException(status_code=410, detail=err)
-    raise HTTPException(status_code=400, detail=err)
+    messages = {
+        "not_found": "This room code was not found. Please check the code and try again.",
+        "expired": "This Travel Room has expired.",
+    }
+    return {"ok": False, "status": "DENY", "reason": err, "message": messages.get(err, "Unable to send this message. Please try again.")}
 
 
 @app.post("/rooms/status")
