@@ -84,7 +84,7 @@ def _hold(*, reason: str) -> dict:
     return out
 
 
-app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions + Agent Tasks", version="1.3.6")
+app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions + Agent Tasks", version="1.3.7")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(",") if os.getenv("ALLOWED_ORIGINS") else ["*"],
@@ -219,7 +219,7 @@ async def mandatory_gateway(payload: GatewayPayload):
 
 @app.get("/health")
 def health():
-    out = {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED", "api_version": "1.3.6"}
+    out = {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED", "api_version": "1.3.7"}
     rev = os.getenv("K_REVISION")
     if rev:
         out["revision"] = rev
@@ -234,6 +234,11 @@ async def get_violations():
 @app.get("/agent/reputation")
 async def get_reputation(session_id: str | None = Query(default=None)):
     return await agent_tasks.reputation_status(session_id=session_id)
+
+
+@app.get("/agent/reputation/ranking")
+async def get_reputation_ranking(limit: int = Query(default=20, ge=1, le=100)):
+    return await agent_tasks.reputation_ranking(limit=limit)
 
 
 @app.post("/agent/task/start")
