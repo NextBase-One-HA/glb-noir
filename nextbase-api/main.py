@@ -84,7 +84,7 @@ def _hold(*, reason: str) -> dict:
     return out
 
 
-app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions + Agent Tasks", version="1.3.4")
+app = FastAPI(title="NextBase API — Gateway + Rooms + Sessions + Agent Tasks", version="1.3.5")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(",") if os.getenv("ALLOWED_ORIGINS") else ["*"],
@@ -166,14 +166,33 @@ async def mandatory_gateway(payload: GatewayPayload):
     blocks.append(f"### USER_REQUEST ###\n{payload.prompt}")
     result = await forward_to_ai_router("".join(blocks), payload)
 
+    violation_result = {"violation_logged": False}
     try:
-        await agent_tasks.log_done_violation_if_needed(
+        violation_result = await agent_tasks.log_done_violation_if_needed(
             response=result,
             open_tasks_payload=open_tasks_payload,
             session_id=payload.session_id,
         )
     except Exception:
-        pass
+        violation_result = {"violation_logged": False, "reason": "violation_check_failed"}
+
+    if violation_result.get("violation_logged"):
+        severity = violation_result.get("severity", "high")
+        count = violation_result.get("violation_count", 1)
+        message = (
+            "Repeated DONE claims without evidence detected."
+            if severity == "critical"
+            else "DONE claim without required evidence."
+        )
+        return {
+            "status": "HOLD",
+            "securityLevel": 1,
+            "reason": "violation_detected",
+            "severity": severity,
+            "violation_count": count,
+            "violation_id": violation_result.get("violation_id"),
+            "message": message,
+        }
 
     if payload.session_id:
         await session_firestore.session_record_exchange(
@@ -186,7 +205,7 @@ async def mandatory_gateway(payload: GatewayPayload):
 
 @app.get("/health")
 def health():
-    out = {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED", "api_version": "1.3.4"}
+    out = {"status": "ok", "protocol": "NEXTBASE_API_GATEWAY_FIXED", "api_version": "1.3.5"}
     rev = os.getenv("K_REVISION")
     if rev:
         out["revision"] = rev
