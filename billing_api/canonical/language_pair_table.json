@@ -1,0 +1,12 @@
+{
+  "ja-en": "direct",
+  "en-ja": "direct",
+  "en-fa": "direct",
+  "fa-en": "direct",
+  "en-zh": "direct",
+  "zh-en": "direct",
+  "ja-fa": "pivot_en",
+  "fa-ja": "pivot_en",
+  "ja-zh": "pivot_en",
+  "zh-ja": "pivot_en"
+}

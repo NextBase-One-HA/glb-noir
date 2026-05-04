@@ -1,0 +1,53 @@
+{
+  "canonical_version": "1.0.0",
+  "canonical_hash": "b0e5c050932369a53d2e24797cf6f000420cfd0aac27bc1d233c8b5af474734d",
+  "passcode": "刻の共振、法の静寂。",
+  "external_enforcement": {
+    "source_of_truth": "external_canonical_only",
+    "internal_state_trust": false,
+    "preflight_reinject_required": true,
+    "canonical_hash_required": true,
+    "stale_state_forbidden": true,
+    "priority_order": [
+      "external_canonical",
+      "external_audit",
+      "ore_approval",
+      "internal_runtime_state"
+    ],
+    "violation_action": "INVALID"
+  },
+  "external_correction": {
+    "sync_gate": "STRICT",
+    "drift_prevention": "ROLLBACK_AND_SELF_FIX",
+    "canonical_hash_check": true,
+    "gate_a_required_flags": {
+      "human_final_authority": true,
+      "learning": false,
+      "evolution": false,
+      "mode": "NE_MODE"
+    },
+    "gateway_injection": {
+      "required": true,
+      "field": "__canonical",
+      "required_payload": {
+        "mode": "NE_MODE",
+        "human_final_authority": true,
+        "learning": false,
+        "evolution": false,
+        "rollback_on_drift": true,
+        "passcode": "刻の共振、法の静寂。"
+      }
+    },
+    "execution_routing": {
+      "fix_executor_map": {
+        "frontend": "BEE",
+        "backend": "BEE",
+        "logic": "KURO",
+        "validation": "NOIR",
+        "sync": "STELLA"
+      },
+      "auto_assign_owner": true,
+      "no_owner_allowed": false
+    }
+  }
+}

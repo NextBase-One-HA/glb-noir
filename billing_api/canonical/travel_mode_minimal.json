@@ -1,0 +1,222 @@
+{
+  "schema": "nextbase.travel_mode_minimal.v2",
+  "feature_flag": "NEXTBASE_TRAVEL_MODE_FULL",
+  "categories": [
+    {
+      "category": "Airport",
+      "icon": "airport",
+      "priority": 1,
+      "items": [
+        {
+          "intent_id": "airport_find_gate",
+          "user_intent_ja": "搭乗口へ行きたい",
+          "japanese_phrase": "搭乗口はどこですか？",
+          "translated_phrase": "Where is the boarding gate?",
+          "show_to_staff_text": "Could you show me where the boarding gate is?",
+          "voice_output_text": "Where is the boarding gate?",
+          "safe_polite_phrase": "Could you please help me?",
+          "emergency_short_phrase": "",
+          "next_actions": ["搭乗券を見せる", "端末番号を伝える", "出発時刻を確認する"]
+        }
+      ]
+    },
+    {
+      "category": "Immigration",
+      "icon": "passport",
+      "priority": 1,
+      "items": [
+        {
+          "intent_id": "immigration_tourism",
+          "user_intent_ja": "入国審査で目的を伝える",
+          "japanese_phrase": "観光で来ました。",
+          "translated_phrase": "I am here for tourism.",
+          "show_to_staff_text": "I am here for tourism. I can show my documents.",
+          "voice_output_text": "I am here for tourism.",
+          "safe_polite_phrase": "I will follow your instructions.",
+          "emergency_short_phrase": "",
+          "next_actions": ["パスポートを見せる", "滞在先を伝える", "滞在日数を伝える"]
+        }
+      ]
+    },
+    {
+      "category": "Taxi",
+      "icon": "taxi",
+      "priority": 3,
+      "items": [
+        {
+          "intent_id": "taxi_go_to_address",
+          "user_intent_ja": "この住所まで行きたい",
+          "japanese_phrase": "この住所までお願いします。",
+          "translated_phrase": "Please take me to this address.",
+          "show_to_staff_text": "Please take me to this address.",
+          "voice_output_text": "Please take me to this address.",
+          "safe_polite_phrase": "Could you please take me to this address?",
+          "emergency_short_phrase": "",
+          "next_actions": ["住所を見せる", "料金を確認する", "支払い方法を確認する"]
+        }
+      ]
+    },
+    {
+      "category": "Hotel",
+      "icon": "hotel",
+      "priority": 2,
+      "items": [
+        {
+          "intent_id": "hotel_checkin",
+          "user_intent_ja": "ホテルでチェックインしたい",
+          "japanese_phrase": "チェックインをお願いします。",
+          "translated_phrase": "I would like to check in.",
+          "show_to_staff_text": "I have a reservation and would like to check in.",
+          "voice_output_text": "I would like to check in.",
+          "safe_polite_phrase": "Could you help me please?",
+          "emergency_short_phrase": "",
+          "next_actions": ["予約名を見せる", "パスポートを出す", "朝食時間を確認する"]
+        }
+      ]
+    },
+    {
+      "category": "Restaurant",
+      "icon": "restaurant",
+      "priority": 3,
+      "items": [
+        {
+          "intent_id": "restaurant_recommend",
+          "user_intent_ja": "おすすめを聞きたい",
+          "japanese_phrase": "おすすめは何ですか？",
+          "translated_phrase": "What do you recommend?",
+          "show_to_staff_text": "Please tell me your recommendation.",
+          "voice_output_text": "What do you recommend?",
+          "safe_polite_phrase": "Thank you for checking.",
+          "emergency_short_phrase": "",
+          "next_actions": ["おすすめを確認する", "アレルギー有無を伝える", "支払い方法を確認する"]
+        }
+      ]
+    },
+    {
+      "category": "Payment",
+      "icon": "payment",
+      "priority": 2,
+      "items": [
+        {
+          "intent_id": "payment_card",
+          "user_intent_ja": "カード払いが可能か確認したい",
+          "japanese_phrase": "カードは使えますか？",
+          "translated_phrase": "Can I pay by card?",
+          "show_to_staff_text": "Can I pay by card or cash?",
+          "voice_output_text": "Can I pay by card?",
+          "safe_polite_phrase": "Please show me the total amount.",
+          "emergency_short_phrase": "",
+          "next_actions": ["合計金額を確認する", "レシートを受け取る", "支払い完了を確認する"]
+        }
+      ]
+    },
+    {
+      "category": "Shopping",
+      "icon": "shopping",
+      "priority": 4,
+      "items": [
+        {
+          "intent_id": "shopping_try_on",
+          "user_intent_ja": "試着したい",
+          "japanese_phrase": "試着できますか？",
+          "translated_phrase": "Can I try this on?",
+          "show_to_staff_text": "Can I try this item and check the size?",
+          "voice_output_text": "Can I try this on?",
+          "safe_polite_phrase": "Please let me confirm the price.",
+          "emergency_short_phrase": "",
+          "next_actions": ["サイズを伝える", "在庫を確認する", "返品可否を確認する"]
+        }
+      ]
+    },
+    {
+      "category": "Directions",
+      "icon": "directions",
+      "priority": 2,
+      "items": [
+        {
+          "intent_id": "directions_go_to_place",
+          "user_intent_ja": "目的地への行き方を知りたい",
+          "japanese_phrase": "この場所へ行きたいです。",
+          "translated_phrase": "I want to go to this place.",
+          "show_to_staff_text": "Please show me the way to this place.",
+          "voice_output_text": "I want to go to this place.",
+          "safe_polite_phrase": "Could you point me in the right direction?",
+          "emergency_short_phrase": "",
+          "next_actions": ["目的地名を見せる", "乗り場を確認する", "到着予定を確認する"]
+        }
+      ]
+    },
+    {
+      "category": "Emergency",
+      "icon": "emergency",
+      "priority": 1,
+      "items": [
+        {
+          "intent_id": "emergency_call_ambulance",
+          "user_intent_ja": "救急車を呼んでほしい",
+          "japanese_phrase": "救急車を呼んでください。",
+          "translated_phrase": "Please call an ambulance.",
+          "show_to_staff_text": "Please call an ambulance.",
+          "voice_output_text": "Please call an ambulance.",
+          "safe_polite_phrase": "Please help me calmly.",
+          "emergency_short_phrase": "Please call an ambulance.",
+          "next_actions": ["住所やホテル名を見せる", "近くの人に助けを求める", "落ち着いて待つ"]
+        }
+      ]
+    },
+    {
+      "category": "Hospital",
+      "icon": "hospital",
+      "priority": 1,
+      "items": [
+        {
+          "intent_id": "hospital_find_nearby",
+          "user_intent_ja": "近くの病院を知りたい",
+          "japanese_phrase": "近くの病院を教えてください。",
+          "translated_phrase": "Please tell me where the nearest hospital is.",
+          "show_to_staff_text": "Please tell me where the nearest hospital is.",
+          "voice_output_text": "Please tell me where the nearest hospital is.",
+          "safe_polite_phrase": "Please help me contact a doctor.",
+          "emergency_short_phrase": "Nearest hospital please.",
+          "next_actions": ["症状を伝える", "保険情報を出す", "アレルギーの有無を伝える"]
+        }
+      ]
+    },
+    {
+      "category": "Police",
+      "icon": "police",
+      "priority": 1,
+      "items": [
+        {
+          "intent_id": "police_report_robbery",
+          "user_intent_ja": "盗難被害を伝えたい",
+          "japanese_phrase": "盗難に遭いました。",
+          "translated_phrase": "I have been robbed.",
+          "show_to_staff_text": "I have been robbed.",
+          "voice_output_text": "I have been robbed.",
+          "safe_polite_phrase": "Please help me file a report.",
+          "emergency_short_phrase": "I have been robbed.",
+          "next_actions": ["被害内容を伝える", "パスポートの有無を確認する", "警察署へ行く"]
+        }
+      ]
+    },
+    {
+      "category": "Trouble",
+      "icon": "trouble",
+      "priority": 1,
+      "items": [
+        {
+          "intent_id": "trouble_contact_embassy",
+          "user_intent_ja": "日本大使館へ連絡したい",
+          "japanese_phrase": "日本大使館に連絡したいです。",
+          "translated_phrase": "I would like to contact the Japanese Embassy.",
+          "show_to_staff_text": "I would like to contact the Japanese Embassy.",
+          "voice_output_text": "I would like to contact the Japanese Embassy.",
+          "safe_polite_phrase": "Please help me contact the embassy.",
+          "emergency_short_phrase": "Contact Japanese Embassy.",
+          "next_actions": ["大使館情報を確認する", "電話を借りる", "ホテルスタッフに相談する"]
+        }
+      ]
+    }
+  ]
+}

@@ -211,8 +211,32 @@ def emit_bee_fix_for_hold(entry: dict[str, Any]) -> None:
     _save_dedup_index(index_obj)
 
 
+def _canonical_dir() -> Path:
+    """
+    Law files (ORE_LAYER_*.json) live here.
+    1) CANONICAL_PATH if set (directory, or a file under that tree)
+    2) <this file>/canonical (container: /app/canonical)
+    3) repo-root canonical for local monorepo dev: <this file>/../canonical
+    """
+    raw = (os.getenv("CANONICAL_PATH") or "").strip()
+    if raw:
+        p = Path(raw).expanduser()
+        if not p.is_absolute():
+            p = (Path.cwd() / p).resolve()
+        else:
+            p = p.resolve()
+        if p.is_file():
+            return p.parent
+        return p
+    here = Path(__file__).resolve().parent
+    sidecar = here / "canonical"
+    if sidecar.is_dir() and (sidecar / "ORE_LAYER_SYNC.json").exists():
+        return sidecar
+    return here.parent / "canonical"
+
+
 def load_external_lock() -> dict[str, Any]:
-    lock_path = Path(__file__).resolve().parent.parent / "canonical" / "ORE_LAYER_LOCK.json"
+    lock_path = _canonical_dir() / "ORE_LAYER_LOCK.json"
     with lock_path.open("r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -234,7 +258,7 @@ def drop_internal_state() -> dict[str, Any]:
 
 
 def load_external_canonical() -> dict[str, Any]:
-    canonical_path = Path(__file__).resolve().parent.parent / "canonical" / "ORE_LAYER_SYNC.json"
+    canonical_path = _canonical_dir() / "ORE_LAYER_SYNC.json"
     with canonical_path.open("r", encoding="utf-8") as f:
         return json.load(f)
 
