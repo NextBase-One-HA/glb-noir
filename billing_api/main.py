@@ -45,17 +45,56 @@ STRIPE_TRAVEL_PRICE_IDS = {
 stripe.api_key = STRIPE_SECRET_KEY
 
 
+def _stripe_mapping(obj: Any) -> dict[str, Any]:
+    """Best-effort: StripeObject / nested → plain dict (webhook-safe)."""
+    if obj is None:
+        return {}
+    if isinstance(obj, dict):
+        return obj
+    try:
+        if hasattr(obj, "to_dict_recursive"):
+            d = obj.to_dict_recursive()
+            if isinstance(d, dict):
+                return d
+    except Exception:
+        pass
+    try:
+        if hasattr(obj, "to_dict"):
+            d = obj.to_dict()
+            if isinstance(d, dict):
+                return d
+    except Exception:
+        pass
+    try:
+        tj = getattr(obj, "to_json", None)
+        if callable(tj):
+            return json.loads(tj())
+    except Exception:
+        pass
+    try:
+        return dict(obj)
+    except Exception:
+        pass
+    try:
+        keys = getattr(obj, "keys", None)
+        if callable(keys):
+            return {str(k): obj[k] for k in keys()}
+    except Exception:
+        pass
+    return {}
+
+
 def _event_payload(raw_body: bytes, signature: str | None) -> dict[str, Any]:
     """Normalize Stripe webhook body to a plain dict (Event vs StripeObject-safe)."""
     secret = STRIPE_WEBHOOK_SECRET or ""
     stripe.api_key = STRIPE_SECRET_KEY or ""
 
     if secret:
-        event = stripe.Webhook.construct_event(raw_body, signature or "", secret)
-        try:
-            return event.to_dict_recursive()
-        except Exception:
-            return dict(event)
+        event_obj = stripe.Webhook.construct_event(raw_body, signature or "", secret)
+        d = _stripe_mapping(event_obj)
+        if d:
+            return d
+        raise ValueError("could not convert verified Stripe event to dict")
 
     return json.loads(raw_body.decode("utf-8"))
 
@@ -688,44 +727,50 @@ async def billing_webhook(request: Request):
     except Exception as e:
         raise HTTPException(400, f"invalid signature: {e}") from e
 
-    et = event.get("type") if isinstance(event, dict) else getattr(event, "type", "")
-    data = event.get("data", {}) if isinstance(event, dict) else getattr(event, "data", {})
-    obj = data.get("object", {}) if isinstance(data, dict) else {}
+    et = str(event.get("type") or "")
+    data = _stripe_mapping(event.get("data"))
+    obj = _stripe_mapping(data.get("object"))
 
-    if et == "customer.subscription.updated":
-        cid = obj.get("customer") if isinstance(obj, dict) else getattr(obj, "customer", None)
-        if cid:
-            recompute_customer(str(cid))
-    elif et == "customer.subscription.deleted":
-        cid = obj.get("customer")
-        if cid:
-            recompute_customer(str(cid))
-    elif et == "invoice.payment_succeeded":
-        customer = obj.get("customer")
-        if customer:
-            sync_from_stripe_customer(str(customer))
-    elif et == "invoice.payment_failed":
-        customer = obj.get("customer")
-        if customer:
-            cid = str(customer)
-            r = _row(cid)
-            _upsert_row(
-                cid,
-                int(r["core_subscribed"]) if r else 1,
-                int(r["travel_active"]) if r else 0,
-                "past_due",
-                1,
-                time.time(),
-                time.time() + GRACE_SECONDS,
-            )
-            recompute_customer(cid)
-    elif et in ("checkout.session.completed", "checkout.session.async_payment_succeeded"):
-        session = obj
-        cid = session.get("customer") if isinstance(session, dict) else getattr(session, "customer", None)
-        if cid:
-            recompute_customer(str(cid))
+    handler_err: str | None = None
+    try:
+        if et == "customer.subscription.updated":
+            cid = obj.get("customer")
+            if cid:
+                recompute_customer(str(cid))
+        elif et == "customer.subscription.deleted":
+            cid = obj.get("customer")
+            if cid:
+                recompute_customer(str(cid))
+        elif et == "invoice.payment_succeeded":
+            customer = obj.get("customer")
+            if customer:
+                sync_from_stripe_customer(str(customer))
+        elif et == "invoice.payment_failed":
+            customer = obj.get("customer")
+            if customer:
+                cid = str(customer)
+                r = _row(cid)
+                _upsert_row(
+                    cid,
+                    int(r["core_subscribed"]) if r else 1,
+                    int(r["travel_active"]) if r else 0,
+                    "past_due",
+                    1,
+                    time.time(),
+                    time.time() + GRACE_SECONDS,
+                )
+                recompute_customer(cid)
+        elif et in ("checkout.session.completed", "checkout.session.async_payment_succeeded"):
+            cid = obj.get("customer")
+            if cid:
+                recompute_customer(str(cid))
+    except Exception as e:
+        handler_err = f"{type(e).__name__}: {e}"
 
-    return {"received": True, "type": et}
+    out: dict[str, Any] = {"received": True, "type": et}
+    if handler_err:
+        out["handler_error"] = handler_err[:800]
+    return out
 
 
 @app.post("/translate")
