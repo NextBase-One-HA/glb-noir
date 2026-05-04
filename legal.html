@@ -37,6 +37,8 @@
     .muted{color:var(--muted);font-size:12px;font-weight:300;}
     .nav{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13px;} /* ナビゲーションの隙間を広げ、少し大きく */
     footer{border-top:1px solid var(--line);margin-top:20px;padding-top:14px;color:var(--muted);font-size:12px;text-align:center;} /* フッターを中央寄せに */
+    .glb-lang-reset{font-size:11px;background:transparent;border:1px solid var(--line);color:var(--muted);padding:8px 16px;border-radius:999px;cursor:pointer;font-family:inherit;}
+    .glb-lang-reset:hover{color:var(--gold);border-color:rgba(255,215,0,0.45);}
   </style>
 </head>
 
@@ -46,7 +48,7 @@
       <div class="brand">NextBase One-HA</div>
       <div class="sub">Legal Notice / 特定商取引法に基づく表記 · GLOBAL LANGUAGE BREAKER (“GLB”) — Last updated: 2026-04-14.</div>
       <div class="nav">
-        <a href="index.next.html">← Back</a>
+        <a href="index.html">← Home</a>
         <a href="privacy.html">Privacy Policy</a>
         <a href="terms.html">Terms of Service</a>
         <a href="support.html">Support Center</a>
@@ -161,7 +163,13 @@
       <p>We commit to operate and control this technology responsibly for user safety and user trust, including clear cancellation paths and transparent service behavior.</p>
     </div>
 
+    <p style="text-align:center;margin:20px 0 8px;">
+      <button type="button" class="glb-lang-reset" id="glb-lang-reset" onclick="localStorage.removeItem('glb_ui_lang');location.href='index.html';">Language</button>
+    </p>
     <footer>© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending</footer>
   </div>
+  <script>
+(function(){var b=document.getElementById('glb-lang-reset');if(!b)return;var u='';try{u=localStorage.getItem('glb_ui_lang')||'';}catch(e){}b.textContent=(u==='ja')?'言語を変更':'Language';})();
+  </script>
 </body>
 </html>

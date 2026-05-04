@@ -22,12 +22,14 @@
     nav { margin-bottom:24px; font-size:13px; }
     nav a { margin-right:12px; }
     .note { font-size:13px; color:var(--muted); border-top:1px solid var(--line); padding-top:20px; margin-top:32px; }
+    .glb-lang-reset { font-size:11px; background:transparent; border:1px solid var(--line); color:var(--muted); padding:8px 16px; border-radius:999px; cursor:pointer; font-family:inherit; }
+    .glb-lang-reset:hover { color:var(--gold); border-color:rgba(255,229,102,0.45); }
   </style>
 </head>
 <body>
   <div class="wrap">
     <nav>
-      <a href="index.next.html">App</a>
+      <a href="index.html">Home</a>
       <a href="terms.html">Terms</a>
       <a href="legal.html">Legal</a>
       <a href="support.html">Support</a>
@@ -79,6 +81,12 @@
     <p>Privacy inquiries: see <a href="support.html">Support</a>. We do not publish individual legal names on these public pages.</p>
 
     <p class="note">© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending</p>
+    <p class="note" style="border-top:none; padding-top:12px; text-align:center; margin-top:8px;">
+      <button type="button" class="glb-lang-reset" id="glb-lang-reset" onclick="localStorage.removeItem('glb_ui_lang');location.href='index.html';">Language</button>
+    </p>
   </div>
+  <script>
+(function(){var b=document.getElementById('glb-lang-reset');if(!b)return;var u='';try{u=localStorage.getItem('glb_ui_lang')||'';}catch(e){}b.textContent=(u==='ja')?'言語を変更':'Language';})();
+  </script>
 </body>
 </html>
