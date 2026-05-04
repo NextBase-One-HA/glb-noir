@@ -581,6 +581,16 @@
         }
         .readalong-play:disabled { opacity: 0.35; cursor: not-allowed; }
     </style>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+body{font-family:'DM Sans',-apple-system,sans-serif!important}
+#glb-result-stage{position:relative!important;overflow:hidden!important}
+.glb-stage-hero-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(to bottom,rgba(5,5,10,.5) 0%,rgba(5,5,10,.72) 55%,rgba(10,10,10,1) 100%),url('hero_299.jpg') center 35%/cover no-repeat;filter:saturate(1.1) contrast(1.05)}
+.glb-result-inner{position:relative;z-index:1}
+.glb-stage-copy{position:absolute;top:12px;left:0;right:0;text-align:center;z-index:2;pointer-events:none}
+.glb-stage-copy-main{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(12px,3.2vw,17px);color:rgba(255,255,255,.48);letter-spacing:.02em}
+.glb-billboard-tools .glb-flip-btn{font-family:'DM Sans',sans-serif!important;font-size:13px!important;padding:11px 20px!important;border-radius:999px!important}
+</style>
 </head>
 <body>
     <div id="maintenance-overlay" class="maintenance-overlay" style="display:none;" aria-hidden="true" hidden aria-live="polite" aria-modal="true" role="dialog">
@@ -595,6 +605,8 @@
 
     <div class="glb-billboard" style="margin-top:0;">
         <div id="glb-result-stage" class="glb-result-stage" style="min-height:min(58dvh,480px);">
+            <div class="glb-stage-copy"><div class="glb-stage-copy-main" id="glb-stage-copy-main">Speak. They understand.</div></div>
+            <div class="glb-stage-hero-bg"></div>
             <div class="glb-result-inner">
                 <div id="glb-result-text" data-i18n-idle="idle" aria-live="polite">Idle</div>
                 <p id="glb-result-lang-caption" class="glb-result-lang-caption" aria-live="polite"></p>
@@ -2839,6 +2851,8 @@
                     });
             });
         })();
+
+(function(){try{var s=localStorage.getItem('glb_ui_lang');if(!s)return;var u=document.getElementById('ui-lang');if(u&&u.querySelector('option[value="'+s+'"]')){u.value=s;if(typeof applyUiLang==='function')setTimeout(applyUiLang,0);}var c={ja:'話すだけ。伝わる。',zh:'说话。他们听懂了。',ko:'말하세요. 통합니다.',es:'Habla. Te entienden.',fr:'Parlez. Ils comprennent.',de:'Sprechen. Sie verstehen.'};var el=document.getElementById('glb-stage-copy-main');if(el&&c[s])el.textContent=c[s];}catch(e){}})();
 
     </script>
 </body>
