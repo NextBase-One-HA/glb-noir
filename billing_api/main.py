@@ -14,7 +14,7 @@ from typing import Any, Optional
 
 import httpx
 import stripe
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
@@ -118,8 +118,15 @@ def hash_payload(body: bytes) -> str:
     return hashlib.sha256(body).hexdigest()
 
 
+def _app_log_dir() -> Path:
+    """Log under the app package (e.g. /app/logs) so Cloud Run can write; avoid parent/ repo-root /logs."""
+    d = Path(__file__).resolve().parent / "logs"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
 def append_audit_log(entry: dict[str, Any]) -> None:
-    log_path = Path(__file__).resolve().parent.parent / "logs" / "audit_history.jsonl"
+    log_path = _app_log_dir() / "audit_history.jsonl"
     log_path.parent.mkdir(parents=True, exist_ok=True)
     try:
         with log_path.open("a", encoding="utf-8") as f:
@@ -136,11 +143,11 @@ def hold_dedup_key(entry: dict[str, Any]) -> str:
 
 
 def _dedup_index_path() -> Path:
-    return Path(__file__).resolve().parent.parent / "logs" / "bee_dedup_index.json"
+    return _app_log_dir() / "bee_dedup_index.json"
 
 
 def _bee_log_path() -> Path:
-    return Path(__file__).resolve().parent.parent / "logs" / "bee_fix_suggestions.jsonl"
+    return _app_log_dir() / "bee_fix_suggestions.jsonl"
 
 
 def _load_dedup_index() -> dict[str, Any]:
@@ -482,6 +489,11 @@ def recompute_customer(customer_id: str) -> None:
     failed_at = row["payment_failed_at"] if row else None
     g_keep = grace_until if past_due_core else None
 
+    # One-time Travel Pass (payment mode) is stored in DB by apply_checkout_session_completed; subscriptions
+    # do not always represent it. Do not wipe that flag when recomputing from subs only.
+    if row is not None:
+        travel_any = max(travel_any, int(row["travel_active"] or 0))
+
     _upsert_row(
         customer_id,
         core_any,
@@ -588,6 +600,49 @@ def _checkout_line_items_include_travel_price(session_id: str) -> bool:
     return False
 
 
+def _payment_intent_line_items_include_travel_price(payment_intent_id: str) -> bool:
+    """True if Checkout Session line items or (fallback) Invoice lines reference a configured Travel price."""
+    if not STRIPE_TRAVEL_PRICE_IDS or not payment_intent_id.startswith("pi_"):
+        return False
+    try:
+        lst = stripe.checkout.Session.list(payment_intent=payment_intent_id, limit=20)
+        for sess in lst.data:
+            sid = getattr(sess, "id", "") or ""
+            if not sid.startswith("cs_"):
+                continue
+            if getattr(sess, "status", None) != "complete":
+                continue
+            if getattr(sess, "payment_status", None) != "paid":
+                continue
+            if _checkout_line_items_include_travel_price(sid):
+                return True
+    except Exception:
+        pass
+    try:
+        pi = stripe.PaymentIntent.retrieve(
+            payment_intent_id,
+            expand=["invoice.lines.data.price"],
+        )
+        inv = getattr(pi, "invoice", None)
+        if isinstance(inv, str):
+            inv = stripe.Invoice.retrieve(inv, expand=["lines.data.price"])
+        if inv is None:
+            return False
+        lines = getattr(inv, "lines", None)
+        if not lines:
+            return False
+        for li in lines.auto_paging_iter():
+            price = getattr(li, "price", None)
+            if price is None:
+                continue
+            pid = getattr(price, "id", None)
+            if pid and str(pid) in STRIPE_TRAVEL_PRICE_IDS:
+                return True
+    except Exception:
+        pass
+    return False
+
+
 def _stripe_checkout_session_payment_hold(session_id: str) -> Optional[str]:
     """Return hold reason while Checkout Session is not settled (open / unpaid)."""
     if not session_id.startswith("cs_") or not STRIPE_SECRET_KEY:
@@ -635,6 +690,63 @@ def sync_from_stripe_customer(customer_id: str) -> None:
     recompute_customer(customer_id)
 
 
+def _payment_intent_customer_id(pi: Any) -> Optional[str]:
+    c = getattr(pi, "customer", None)
+    if isinstance(c, str) and c.startswith("cus_"):
+        return c
+    if c is not None and not isinstance(c, str):
+        uid = getattr(c, "id", None) if not isinstance(c, dict) else c.get("id")
+        if uid and str(uid).startswith("cus_"):
+            return str(uid)
+    return None
+
+
+def apply_payment_intent_to_customer(payment_intent_id: str, customer_id: str) -> bool:
+    """Grant Travel from a succeeded PI's Checkout Session line items to an explicit Customer (guest / manual link)."""
+    if not STRIPE_SECRET_KEY or not payment_intent_id.startswith("pi_") or not customer_id.startswith("cus_"):
+        return False
+    if not STRIPE_TRAVEL_PRICE_IDS:
+        return False
+    if not _payment_intent_line_items_include_travel_price(payment_intent_id):
+        return False
+    recompute_customer(customer_id)
+    r = _row(customer_id)
+    core = int(r["core_subscribed"]) if r else 0
+    travel = max(int(r["travel_active"]) if r else 0, 1)
+    row_st = (r["subscription_status"] or "") if r else ""
+    pf = int(r["payment_failed"]) if r else 0
+    fa = float(r["payment_failed_at"]) if r and r["payment_failed_at"] is not None else None
+    gu = float(r["grace_until"]) if r and r["grace_until"] is not None else None
+    _upsert_row(customer_id, core, travel, row_st, pf, fa, gu)
+    return True
+
+
+def resolve_customer_from_payment_intent(payment_intent_id: str) -> Optional[str]:
+    """Run checkout completion for sessions tied to this PI and return a resolved cus_ id if any."""
+    if not STRIPE_SECRET_KEY or not payment_intent_id.startswith("pi_"):
+        return None
+    try:
+        lst = stripe.checkout.Session.list(payment_intent=payment_intent_id, limit=10)
+    except Exception:
+        return None
+    for sess in lst.data:
+        sid = getattr(sess, "id", "") or ""
+        if not sid.startswith("cs_"):
+            continue
+        try:
+            full = stripe.checkout.Session.retrieve(
+                sid, expand=["customer", "payment_intent", "subscription"]
+            )
+            session_obj = _session_as_dict(full)
+            apply_checkout_session_completed(session_obj)
+            rcid = _resolve_customer_id_from_checkout(session_obj)
+            if rcid:
+                return rcid
+        except Exception:
+            continue
+    return None
+
+
 def compute_entitlement_response(customer_id: str) -> dict[str, Any]:
     row = _row(customer_id)
     if not row:
@@ -651,7 +763,8 @@ def compute_entitlement_response(customer_id: str) -> dict[str, Any]:
         core = True
     if st in ("canceled", "unpaid", "incomplete_expired"):
         core = False
-        travel = False
+        # Do not clear travel_active here: one-time Travel Pass is not tied to subscription_status.
+        # Subscription-derived travel is adjusted in recompute_customer from Stripe subs.
 
     return {
         "ok": True,
@@ -800,6 +913,7 @@ async def ops_release(request: Request, body: OpsActionBody):
 async def get_entitlements(
     customer_id: Optional[str] = None,
     session_id: Optional[str] = None,
+    payment_intent_id: Optional[str] = None,
 ) -> dict[str, Any]:
     """Resolve Stripe entitlements and a gate ``status``: PASS | HOLD | INVALID."""
     if not STRIPE_SECRET_KEY:
@@ -813,6 +927,7 @@ async def get_entitlements(
 
     cid = (customer_id or "").strip()
     sid = (session_id or "").strip()
+    pid = (payment_intent_id or "").strip()
 
     ph = _stripe_checkout_session_payment_hold(sid) if sid.startswith("cs_") else None
     if ph:
@@ -837,6 +952,46 @@ async def get_entitlements(
                     cid = rcid
         except Exception:
             pass
+
+    if pid.startswith("pi_"):
+        try:
+            pi = stripe.PaymentIntent.retrieve(pid, expand=["customer"])
+        except Exception:
+            return {
+                "status": "HOLD",
+                "reason": "invalid_payment_intent",
+                "ok": False,
+                "core_subscribed": False,
+                "travel_active": False,
+            }
+        if getattr(pi, "status", None) != "succeeded":
+            return {
+                "status": "HOLD",
+                "reason": "payment_not_succeeded",
+                "ok": False,
+                "core_subscribed": False,
+                "travel_active": False,
+            }
+        pi_cus = _payment_intent_customer_id(pi)
+        if cid.startswith("cus_"):
+            if pi_cus and pi_cus != cid:
+                return {
+                    "status": "HOLD",
+                    "reason": "payment_intent_customer_mismatch",
+                    "ok": False,
+                    "core_subscribed": False,
+                    "travel_active": False,
+                    "customer_id": cid,
+                    "payment_intent_customer": pi_cus,
+                }
+            apply_payment_intent_to_customer(pid, cid)
+        else:
+            rcid = resolve_customer_from_payment_intent(pid)
+            if rcid:
+                cid = rcid
+            elif pi_cus:
+                cid = pi_cus
+                apply_payment_intent_to_customer(pid, cid)
 
     if not cid or not cid.startswith("cus_"):
         return {
@@ -867,8 +1022,17 @@ async def get_entitlements(
 
 
 @app.get("/entitlements")
-async def entitlements(customer_id: Optional[str] = None, session_id: Optional[str] = None):
-    return await get_entitlements(customer_id=customer_id, session_id=session_id)
+async def entitlements(
+    customer_id: Optional[str] = None,
+    session_id: Optional[str] = None,
+    payment_intent_id: Optional[str] = None,
+    force_sync: bool = Query(False),
+):
+    return await get_entitlements(
+        customer_id=customer_id,
+        session_id=session_id,
+        payment_intent_id=payment_intent_id,
+    )
 
 
 @app.post("/billing/webhook")
