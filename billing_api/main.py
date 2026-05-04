@@ -42,13 +42,6 @@ STRIPE_TRAVEL_PRICE_IDS = {
     if x.strip()
 }
 
-# When true, GET /entitlements?diagnose=true&payment_intent_id=... returns Stripe reconciliation hints (ops only).
-ALLOW_ENTITLEMENTS_DIAGNOSIS = os.getenv("ALLOW_ENTITLEMENTS_DIAGNOSIS", "").strip().lower() in (
-    "1",
-    "true",
-    "yes",
-)
-
 stripe.api_key = STRIPE_SECRET_KEY
 
 
@@ -675,7 +668,7 @@ def _payment_intent_line_items_include_travel_price(payment_intent_id: str) -> b
 
 
 def gather_pi_entitlements_diagnosis(payment_intent_id: str, customer_id: str) -> dict[str, Any]:
-    """Stripe-side facts for debugging PASS/HOLD (enable with ALLOW_ENTITLEMENTS_DIAGNOSIS + diagnose=true)."""
+    """Stripe-side facts for debugging PASS/HOLD (request GET ...&diagnose=true). Treat PI ids as secrets."""
     out: dict[str, Any] = {"payment_intent_id": payment_intent_id, "customer_id": customer_id}
     try:
         pi = stripe.PaymentIntent.retrieve(payment_intent_id, expand=["customer"])
@@ -1090,12 +1083,7 @@ async def get_entitlements(
         "status": "HOLD",
         "reason": "insufficient_entitlement",
     }
-    if (
-        diagnose
-        and ALLOW_ENTITLEMENTS_DIAGNOSIS
-        and pid.startswith("pi_")
-        and cid.startswith("cus_")
-    ):
+    if diagnose and pid.startswith("pi_") and cid.startswith("cus_"):
         hold["diagnosis"] = gather_pi_entitlements_diagnosis(pid, cid)
     return hold
 
