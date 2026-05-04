@@ -556,6 +556,23 @@ def _checkout_line_items_include_travel_price(session_id: str) -> bool:
     return False
 
 
+def _stripe_checkout_session_payment_hold(session_id: str) -> Optional[str]:
+    """Return hold reason while Checkout Session is not settled (open / unpaid)."""
+    if not session_id.startswith("cs_") or not STRIPE_SECRET_KEY:
+        return None
+    try:
+        sess = stripe.checkout.Session.retrieve(session_id)
+        st = getattr(sess, "status", None)
+        ps = getattr(sess, "payment_status", None)
+        if st == "open":
+            return "payment_processing"
+        if st == "complete" and ps == "unpaid":
+            return "payment_processing"
+    except Exception:
+        pass
+    return None
+
+
 def apply_checkout_session_completed(obj: dict[str, Any]) -> None:
     """payment-mode Payment Link: customer may be null in webhook; travel is not on subscriptions."""
     ps = (obj.get("payment_status") or "").strip()
@@ -748,19 +765,32 @@ async def ops_release(request: Request, body: OpsActionBody):
     return await guarded_ops_action(request, "release_action", "/ops/release", target)
 
 
-@app.get("/entitlements")
-async def entitlements(customer_id: Optional[str] = None, session_id: Optional[str] = None):
+async def get_entitlements(
+    customer_id: Optional[str] = None,
+    session_id: Optional[str] = None,
+) -> dict[str, Any]:
+    """Resolve Stripe entitlements and a gate ``status``: PASS | HOLD | INVALID."""
     if not STRIPE_SECRET_KEY:
-        return JSONResponse(
-            {
-                "ok": False,
-                "reason": "stripe_not_configured",
-                "core_subscribed": False,
-                "travel_active": False,
-            }
-        )
+        return {
+            "status": "INVALID",
+            "reason": "stripe_not_configured",
+            "ok": False,
+            "core_subscribed": False,
+            "travel_active": False,
+        }
+
     cid = (customer_id or "").strip()
     sid = (session_id or "").strip()
+
+    ph = _stripe_checkout_session_payment_hold(sid) if sid.startswith("cs_") else None
+    if ph:
+        return {
+            "status": "HOLD",
+            "reason": ph,
+            "ok": False,
+            "core_subscribed": False,
+            "travel_active": False,
+        }
 
     if sid.startswith("cs_"):
         try:
@@ -777,7 +807,13 @@ async def entitlements(customer_id: Optional[str] = None, session_id: Optional[s
             pass
 
     if not cid or not cid.startswith("cus_"):
-        return {"ok": False, "reason": "missing_customer", "core_subscribed": False, "travel_active": False}
+        return {
+            "status": "HOLD",
+            "reason": "missing_customer",
+            "ok": False,
+            "core_subscribed": False,
+            "travel_active": False,
+        }
 
     try:
         sync_from_stripe_customer(cid)
@@ -785,7 +821,22 @@ async def entitlements(customer_id: Optional[str] = None, session_id: Optional[s
         pass
 
     data = compute_entitlement_response(cid)
-    return data
+    allowed = bool(
+        data.get("ok")
+        and (data.get("core_subscribed") or data.get("travel_active"))
+    )
+    if allowed:
+        return {**data, "status": "PASS"}
+    return {
+        **data,
+        "status": "HOLD",
+        "reason": "insufficient_entitlement",
+    }
+
+
+@app.get("/entitlements")
+async def entitlements(customer_id: Optional[str] = None, session_id: Optional[str] = None):
+    return await get_entitlements(customer_id=customer_id, session_id=session_id)
 
 
 @app.post("/billing/webhook")
@@ -850,6 +901,41 @@ async def billing_webhook(request: Request):
     return out
 
 
+async def mandatory_translate_gateway(
+    prompt: str,
+    session_id: Optional[str],
+    forward_fields: dict[str, Any],
+) -> Response:
+    """Upstream translate with context-aware prompt (billing-side gateway)."""
+    if not TRANSLATE_PROXY_URL:
+        raise HTTPException(
+            501,
+            "TRANSLATE_PROXY_URL not set; configure upstream or deploy merged translate",
+        )
+    payload = dict(forward_fields)
+    payload["text"] = prompt
+    if session_id:
+        payload["session_id"] = session_id
+    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    body, audit_meta = preflight_reinject_loop(
+        body,
+        route="/translate",
+        upstream_target=f"{TRANSLATE_PROXY_URL}/translate",
+    )
+    append_audit_log(audit_meta)
+    async with httpx.AsyncClient(timeout=120.0) as client:
+        r = await client.post(
+            f"{TRANSLATE_PROXY_URL}/translate",
+            content=body,
+            headers={"Content-Type": "application/json"},
+        )
+    return Response(
+        content=r.content,
+        status_code=r.status_code,
+        media_type=r.headers.get("content-type", "application/json"),
+    )
+
+
 @app.post("/translate")
 async def translate_proxy(request: Request):
     if not TRANSLATE_PROXY_URL:
@@ -857,14 +943,41 @@ async def translate_proxy(request: Request):
             501,
             "TRANSLATE_PROXY_URL not set; configure upstream or deploy merged translate",
         )
-    body = await request.body()
+
+    raw = await request.body()
+    body_json: dict[str, Any] = {}
     try:
-        body, audit_meta = preflight_reinject_loop(
-            body,
-            route="/translate",
-            upstream_target=f"{TRANSLATE_PROXY_URL}/translate",
+        ct = (request.headers.get("content-type") or "").lower()
+        if raw and ("json" in ct or raw[:1] in (b"{", b"[")):
+            body_json = json.loads(raw.decode("utf-8"))
+    except Exception:
+        body_json = {}
+
+    cid_in = (
+        body_json.get("customer_id")
+        or body_json.get("client_id")
+        or body_json.get("stripe_customer_id")
+    )
+    sid_in = body_json.get("session_id")
+    entitlement = await get_entitlements(customer_id=cid_in, session_id=sid_in)
+    if entitlement.get("status") != "PASS":
+        return JSONResponse(status_code=200, content=entitlement)
+
+    lang = body_json.get("lang") or "日本語"
+    text = body_json.get("text") or ""
+    prompt = (
+        "### 空気読みロジック(Context-Aware) ###\n"
+        f"以下のテキストを{lang}に翻訳せよ。\n"
+        f"テキスト: {text}"
+    )
+    try:
+        return await mandatory_translate_gateway(
+            prompt=prompt,
+            session_id=sid_in if isinstance(sid_in, str) else None,
+            forward_fields=body_json,
         )
-        append_audit_log(audit_meta)
+    except HTTPException:
+        raise
     except Exception as e:
         return JSONResponse(
             status_code=400,
@@ -874,22 +987,6 @@ async def translate_proxy(request: Request):
                 "NEXT_ACTION": "SELF_FIX_NOW",
             },
         )
-    ct = request.headers.get("content-type", "application/json")
-    log = {
-        "canonical_loaded": True,
-        "timestamp": int(time.time() * 1000),
-    }
-    try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            r = await client.post(
-                f"{TRANSLATE_PROXY_URL}/translate",
-                content=body,
-                headers={"Content-Type": ct},
-            )
-        _ = log
-        return Response(content=r.content, status_code=r.status_code, media_type=r.headers.get("content-type", "application/json"))
-    except Exception as e:
-        raise HTTPException(502, str(e)) from e
 
 
 @app.get("/health")
