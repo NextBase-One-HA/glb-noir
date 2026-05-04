@@ -1,0 +1,9 @@
+# When this file exists, gcloud uses ONLY these patterns (not repo-root .gitignore).
+# Do NOT add patterns that exclude canonical/ — Cloud Build needs it for COPY.
+__pycache__/
+*.py[cod]
+.DS_Store
+*.db
+.venv/
+venv/
+.git/

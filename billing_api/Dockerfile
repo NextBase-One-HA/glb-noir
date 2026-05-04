@@ -1,16 +1,27 @@
-# Build with context = this directory (billing_api), e.g.
-#   cd billing_api && gcloud run deploy SERVICE --source . --region asia-northeast1
-FROM python:3.12-slim
+# Deploy from THIS directory (billing_api) — uploads only files here.
+#   gcloud run deploy nextbase-billing --source . --region asia-northeast1
+# (Use a dedicated service name; do not reuse nextbase-api unless you intend to replace that image.)
+#
+# Build context must include ./canonical (sync: cp -r ../canonical ./canonical).
+FROM python:3.11-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-COPY requirements-billing.txt .
+# Single copy: whole module tree; .dockerignore strips only local junk (not canonical/).
+COPY . .
+
 RUN pip install --no-cache-dir -r requirements-billing.txt
 
-COPY main.py .
-COPY canonical ./canonical
-
-# Fail the image build if the law files are not in the context
-RUN test -f canonical/ORE_LAYER_SYNC.json && test -f canonical/ORE_LAYER_LOCK.json
+RUN set -eux; \
+  ls -la; \
+  ls -la canonical/; \
+  test -f canonical/ORE_LAYER_SYNC.json; \
+  test -f canonical/ORE_LAYER_LOCK.json
 
 ENV CANONICAL_PATH=/app/canonical
 ENV PYTHONPATH=/app
