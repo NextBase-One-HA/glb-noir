@@ -44,6 +44,22 @@ STRIPE_TRAVEL_PRICE_IDS = {
 
 stripe.api_key = STRIPE_SECRET_KEY
 
+
+def _event_payload(raw_body: bytes, signature: str | None) -> dict[str, Any]:
+    """Normalize Stripe webhook body to a plain dict (Event vs StripeObject-safe)."""
+    secret = STRIPE_WEBHOOK_SECRET or ""
+    stripe.api_key = STRIPE_SECRET_KEY or ""
+
+    if secret:
+        event = stripe.Webhook.construct_event(raw_body, signature or "", secret)
+        try:
+            return event.to_dict_recursive()
+        except Exception:
+            return dict(event)
+
+    return json.loads(raw_body.decode("utf-8"))
+
+
 ALLOWED_ORIGINS = [
     "https://nextbase-one-ha.github.io",
     "http://localhost:5173",
@@ -663,18 +679,14 @@ async def billing_webhook(request: Request):
     payload = await request.body()
     sig = request.headers.get("stripe-signature") or ""
 
-    if STRIPE_WEBHOOK_SECRET:
-        try:
-            event = stripe.Webhook.construct_event(payload, sig, STRIPE_WEBHOOK_SECRET)
-        except ValueError as e:
-            raise HTTPException(400, f"invalid payload: {e}") from e
-        except Exception as e:
-            raise HTTPException(400, f"invalid signature: {e}") from e
-    else:
-        try:
-            event = json.loads(payload.decode("utf-8"))
-        except json.JSONDecodeError as e:
-            raise HTTPException(400, str(e)) from e
+    try:
+        event = _event_payload(payload, sig)
+    except ValueError as e:
+        raise HTTPException(400, f"invalid payload: {e}") from e
+    except json.JSONDecodeError as e:
+        raise HTTPException(400, str(e)) from e
+    except Exception as e:
+        raise HTTPException(400, f"invalid signature: {e}") from e
 
     et = event.get("type") if isinstance(event, dict) else getattr(event, "type", "")
     data = event.get("data", {}) if isinstance(event, dict) else getattr(event, "data", {})
