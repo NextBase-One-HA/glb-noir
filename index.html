@@ -8,513 +8,334 @@
 <link rel="apple-touch-icon" href="icon.png">
 <title>GLB — Global Language Breaker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#04040a;
-  --bg2:#08080f;
-  --panel:#0d0d18;
-  --gold:#f0c93a;
-  --gold2:#c9960a;
-  --gold-dim:rgba(240,201,58,.07);
-  --gold-ring:rgba(240,201,58,.22);
-  --white:#f0ede8;
-  --muted:#4a4864;
-  --muted2:#28263a;
+  --bg:#04040a;--bg2:#08080f;--panel:#0d0d18;--panel2:#121224;
+  --gold:#f0c93a;--gold2:#c9960a;
+  --gold-dim:rgba(240,201,58,.07);--gold-ring:rgba(240,201,58,.22);--gold-glow:rgba(240,201,58,.18);
+  --white:#f0ede8;--muted:#5a5870;--muted2:#28263a;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);
+  --f-serif:'DM Serif Display',Georgia,serif;
+  --f-sans:'DM Sans',sans-serif;
+  --f-mono:'DM Mono',monospace;
+  --ease:cubic-bezier(0.16,1,0.3,1);
   --safe:env(safe-area-inset-bottom,0px);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{
-  background:var(--bg);
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wLEQX3UQPN8je5_IeWTwKD4YZNr4DSviGiLlcm5P8Clkt1adABN5qWKWX2av3Z_1WHeKT8V_BLNn3mMCxVLtdLFkJbc-fVp4JG-F_ENUQrzyy9ZrxkEB4wZfS-GPZIg9h0x93Z3fsNWNeJBdlOk4_NEULzZqxxfB613ttFVMiPtuZg0TdGBCvzaapwvcXBZgLNZ2LzjIap3KOL54VG79ugXRYTlj4KJ-iZKG3v1jJjnCDmKzuGOTXZCwivMq4rEk1rDe5PUILpHE_G-q-1RJiHbv0diOB2UcK0');
-  background-size:cover;
-  background-position:center 30%;
-  background-attachment:fixed;
-  color:var(--white);
-  font-family:'DM Sans',sans-serif;
-  font-weight:300;
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-  min-height:100svh;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.78) 0%,rgba(0,0,0,.93) 100%);
-  pointer-events:none;
-  z-index:0;
-}
+body{background:var(--bg);color:var(--white);font-family:var(--f-sans);font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100svh;}
 
 /* grain */
-body::before{
-content:'';position:fixed;inset:0;
-background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-pointer-events:none;z-index:1;opacity:.35;
-}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5;}
 
-/* ── GATE ── */
+/* ════ GATE ════ */
 #lang-gate{
 position:fixed;inset:0;z-index:9999;
-background:var(--bg);
-display:flex;flex-direction:column;align-items:center;justify-content:center;
-padding:48px 24px calc(48px + var(--safe));
+display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+padding:0 0 calc(52px + var(--safe));
 transition:opacity .5s ease,transform .5s ease;
+overflow:hidden;
+}
+#lang-gate .gate-photo{
+position:absolute;inset:0;
+background-image:url('https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=1200&q=85&auto=format&fit=crop');
+background-size:cover;background-position:center 30%;
+z-index:0;
+}
+#lang-gate .gate-photo::after{
+content:'';position:absolute;inset:0;
+background:
+linear-gradient(180deg,
+rgba(4,4,10,0.45) 0%,
+rgba(4,4,10,0.1)  25%,
+rgba(4,4,10,0.4)  55%,
+rgba(4,4,10,0.92) 80%,
+rgba(4,4,10,1)    100%
+),
+radial-gradient(ellipse 60% 40% at 50% 30%,rgba(240,180,40,0.12) 0%,transparent 55%);
 }
 #lang-gate.exit{opacity:0;transform:translateY(-24px);pointer-events:none;}
+#lang-gate > *:not(.gate-photo){position:relative;z-index:1;}
 
+.gate-top{
+flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+padding:0 24px 24px;text-align:center;
+}
 .gate-logo{
-font-family:'DM Serif Display',serif;
-font-style:italic;
-font-size:clamp(52px,14vw,80px);
-line-height:1;
-letter-spacing:-0.02em;
-background:linear-gradient(135deg,var(--white) 0%,var(--gold) 60%);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-background-clip:text;
-margin-bottom:6px;
-text-align:center;
+font-family:var(--f-serif);font-style:italic;
+font-size:clamp(72px,18vw,100px);line-height:1;letter-spacing:-0.02em;
+background:linear-gradient(135deg,var(--white) 0%,var(--gold) 55%);
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+margin-bottom:8px;
+text-shadow:none;
+filter:drop-shadow(0 0 40px rgba(240,201,58,0.3));
 }
-.gate-sub{
-font-size:10px;letter-spacing:.26em;text-transform:uppercase;
-color:var(--muted);margin-bottom:44px;
+.gate-tagline{
+font-family:var(--f-serif);font-size:clamp(18px,4.5vw,24px);font-weight:400;
+color:var(--white);line-height:1.3;margin-bottom:6px;
 }
-.gate-q{
-font-size:clamp(16px,4vw,20px);font-weight:500;
-color:var(--white);margin-bottom:28px;text-align:center;
-}
-.lang-grid{
-display:grid;grid-template-columns:1fr 1fr 1fr;
-gap:8px;width:100%;max-width:400px;
-}
-.lang-opt{
-background:var(--panel);
-border:1px solid rgba(255,255,255,.06);
-border-radius:12px;
-padding:13px 6px;
-font-family:'DM Sans',sans-serif;
-font-size:12px;font-weight:500;
-color:var(--white);
-cursor:pointer;text-align:center;
-transition:all .18s ease;
--webkit-tap-highlight-color:transparent;
-line-height:1.35;
-}
-.lang-opt:hover,.lang-opt.selected{
-border-color:var(--gold-ring);
-background:var(--gold-dim);
-color:var(--gold);
-}
-.gate-more{
-margin-top:14px;font-size:11px;color:var(--muted);
-cursor:pointer;letter-spacing:.04em;border:none;background:none;
-text-decoration:underline;text-underline-offset:3px;
+.gate-tagline em{font-style:italic;color:var(--gold);}
+.gate-badge{
+font-family:var(--f-mono);font-size:9px;letter-spacing:.22em;
+text-transform:uppercase;color:rgba(240,201,58,.5);margin-bottom:0;
 }
 
-/* ── INTRO PANEL ── */
+.gate-bottom{
+width:100%;padding:0 20px;display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.gate-q{font-size:13px;font-weight:500;color:var(--white);letter-spacing:.02em;}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;width:100%;max-width:380px;}
+.lang-opt{
+background:rgba(13,13,24,0.82);border:1px solid rgba(255,255,255,.09);
+border-radius:12px;padding:11px 4px;
+font-family:var(--f-sans);font-size:11px;font-weight:500;color:var(--white);
+cursor:pointer;text-align:center;transition:all .18s;
+-webkit-tap-highlight-color:transparent;line-height:1.35;
+backdrop-filter:blur(10px);
+}
+.lang-opt:hover,.lang-opt.selected{border-color:var(--gold-ring);background:rgba(240,201,58,.1);color:var(--gold);}
+.gate-more{font-family:var(--f-mono);font-size:10px;color:var(--muted);cursor:pointer;letter-spacing:.06em;border:none;background:none;text-decoration:underline;text-underline-offset:3px;}
+
+/* ════ INTRO PANEL ════ */
 #intro-panel{
 position:fixed;inset:0;z-index:9998;
 background:var(--bg);
-display:none;
-flex-direction:column;
-align-items:center;
-justify-content:flex-start;
+display:none;flex-direction:column;align-items:center;
+min-height:0;
+height:100svh;
+max-height:100dvh;
 overflow-y:auto;
+overflow-x:hidden;
 -webkit-overflow-scrolling:touch;
 overscroll-behavior:contain;
-height:100svh;
-padding:0 0 calc(32px + var(--safe));
+touch-action:pan-y;
+padding-bottom:calc(32px + var(--safe));
 }
 #intro-panel.show{display:flex;}
 #intro-panel.exit{opacity:0;transform:translateY(-16px);pointer-events:none;transition:opacity .4s,transform .4s;}
 
-/* hero strip */
 .ip-hero{
-width:100%;
-min-height:38svh;
-position:relative;
-overflow:hidden;
-background:linear-gradient(180deg,#0a0a18 0%,var(--bg) 100%);
-display:flex;flex-direction:column;
-align-items:center;justify-content:flex-end;
-padding:0 24px 28px;
-flex-shrink:0;
+width:100%;min-height:50svh;position:relative;overflow:hidden;
+display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+padding:0 22px 32px;flex-shrink:0;
 }
-.ip-hero-glow{
-position:absolute;
-width:320px;height:320px;
-border-radius:50%;
-background:radial-gradient(circle,rgba(240,201,58,.12) 0%,transparent 65%);
-top:20%;left:50%;transform:translateX(-50%);
-pointer-events:none;
+.ip-hero-photo{
+position:absolute;inset:0;
+background-image:url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1200&q=85&auto=format&fit=crop');
+background-size:cover;background-position:center 35%;
 }
-.ip-logo{
-font-family:'DM Serif Display',serif;
-font-style:italic;
-font-size:clamp(48px,13vw,72px);
-color:var(--gold);
-line-height:1;
-letter-spacing:-0.02em;
-margin-bottom:10px;
-text-align:center;
-text-shadow:0 0 40px rgba(240,201,58,.3);
-position:relative;z-index:1;
+.ip-hero-photo::after{
+content:'';position:absolute;inset:0;
+background:
+linear-gradient(180deg,
+rgba(4,4,10,0.4)  0%,
+rgba(4,4,10,0.1)  30%,
+rgba(4,4,10,0.55) 60%,
+rgba(4,4,10,0.98) 100%
+),
+radial-gradient(ellipse 65% 45% at 50% 20%,rgba(240,180,40,0.14) 0%,transparent 55%);
 }
-.ip-tagline{
-font-size:clamp(15px,3.5vw,18px);
-font-weight:300;
-color:var(--white);
-text-align:center;
-line-height:1.5;
-max-width:300px;
-position:relative;z-index:1;
-}
-.ip-tagline em{
-font-style:italic;
-color:var(--gold);
-font-family:'DM Serif Display',serif;
-}
+.ip-glow{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(240,201,58,.12) 0%,transparent 65%);top:10%;left:50%;transform:translateX(-50%);pointer-events:none;z-index:1;}
+.ip-logo{font-family:var(--f-serif);font-style:italic;font-size:clamp(56px,14vw,80px);color:var(--gold);line-height:1;letter-spacing:-0.02em;margin-bottom:10px;text-align:center;filter:drop-shadow(0 0 32px rgba(240,201,58,.35));position:relative;z-index:2;}
+.ip-tagline{font-size:clamp(16px,3.8vw,20px);font-weight:300;color:var(--white);text-align:center;line-height:1.5;max-width:280px;position:relative;z-index:2;}
+.ip-tagline em{font-style:italic;color:var(--gold);font-family:var(--f-serif);}
 
-/* body */
-.ip-body{
-width:100%;max-width:440px;
-padding:28px 22px 24px;
-display:flex;flex-direction:column;
-gap:0;
-background-image:linear-gradient(180deg,rgba(0,0,0,.35) 0%,rgba(0,0,0,.8) 45%,rgba(0,0,0,.95) 100%),url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc');
-background-size:cover;
-background-position:80% center;
-border-radius:16px;
-}
+.ip-body{width:100%;max-width:440px;padding:32px 22px 0;display:flex;flex-direction:column;gap:0;flex-shrink:0;}
 
-/* 3-line value */
-.ip-values{
-display:flex;flex-direction:column;
-gap:1px;
-margin-bottom:24px;
-}
-.ip-val{
-display:flex;align-items:flex-start;
-gap:14px;
-padding:16px 0;
-border-bottom:1px solid rgba(255,255,255,.04);
-}
+.sec-tag{font-family:var(--f-mono);font-size:.58rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem;display:flex;align-items:center;gap:.55rem;}
+.sec-tag::before{content:'';width:16px;height:1px;background:var(--gold);opacity:.5;}
+
+.ip-values{display:flex;flex-direction:column;margin-bottom:28px;}
+.ip-val{display:flex;align-items:flex-start;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.05);}
 .ip-val:last-child{border-bottom:none;}
-.ip-val-icon{
-font-size:18px;
-flex-shrink:0;
-margin-top:1px;
-line-height:1;
-}
-.ip-val-text{}
-.ip-val-title{
-font-size:13px;font-weight:600;
-color:var(--white);
-margin-bottom:3px;
-line-height:1.3;
-}
-.ip-val-desc{
-font-size:12px;font-weight:300;
-color:var(--muted);
-line-height:1.65;
-}
+.ip-val-title{font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px;line-height:1.3;}
+.ip-val-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.7;}
 
-/* room card */
-.ip-room{
+.ip-room-card{
 background:linear-gradient(135deg,rgba(240,201,58,.06) 0%,rgba(240,201,58,.02) 100%);
-border:1px solid var(--gold-ring);
-border-radius:16px;
-padding:18px 18px 16px;
-margin-bottom:24px;
-position:relative;
-overflow:hidden;
+border:1px solid var(--gold-ring);border-radius:16px;
+padding:20px;margin-bottom:24px;position:relative;overflow:hidden;
 }
-.ip-room::before{
-content:'';
-position:absolute;
-top:-40px;right:-40px;
-width:120px;height:120px;
-border-radius:50%;
-background:radial-gradient(circle,rgba(240,201,58,.08) 0%,transparent 65%);
-pointer-events:none;
+.ip-room-card::before{content:'';position:absolute;top:-40px;right:-40px;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(240,201,58,.1) 0%,transparent 65%);pointer-events:none;}
+.ip-room-card::after{
+content:'';position:absolute;inset:0;border-radius:16px;
+background-image:url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&q=50&auto=format&fit=crop');
+background-size:cover;background-position:center;opacity:0.06;
 }
-.ip-room-tag{
-font-size:9px;letter-spacing:.2em;text-transform:uppercase;
-color:var(--gold);font-weight:600;
-margin-bottom:8px;
-display:flex;align-items:center;gap:6px;
-}
-.ip-room-tag::before{
-content:'';width:16px;height:1px;
-background:var(--gold);opacity:.5;
-}
-.ip-room-title{
-font-family:'DM Serif Display',serif;
-font-style:italic;
-font-size:clamp(20px,5vw,26px);
-color:var(--white);
-line-height:1.2;
-margin-bottom:8px;
-}
+.ip-room-tag{font-family:var(--f-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px;position:relative;z-index:1;}
+.ip-room-tag::before{content:'';width:14px;height:1px;background:var(--gold);opacity:.5;}
+.ip-room-title{font-family:var(--f-serif);font-style:italic;font-size:clamp(20px,5vw,26px);color:var(--white);line-height:1.2;margin-bottom:6px;position:relative;z-index:1;}
 .ip-room-title em{color:var(--gold);}
-.ip-room-desc{
-font-size:12px;font-weight:300;
-color:var(--muted);
-line-height:1.7;
-}
-.ip-room-pills{
-display:flex;gap:6px;flex-wrap:wrap;
-margin-top:12px;
-}
-.ip-pill{
-font-size:10px;font-weight:500;
-padding:4px 10px;
-border-radius:999px;
-border:1px solid rgba(255,255,255,.08);
-color:var(--muted);
-background:rgba(255,255,255,.02);
-}
+.ip-room-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.7;position:relative;z-index:1;}
+.ip-room-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;position:relative;z-index:1;}
+.ip-pill{font-size:10px;font-weight:500;padding:4px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.08);color:var(--muted);background:rgba(255,255,255,.02);}
 .ip-pill.gold{border-color:var(--gold-ring);color:var(--gold);}
 
-/* CTAs */
-.ip-ctas{
-display:flex;flex-direction:column;gap:10px;
-margin-bottom:24px;
-}
+.ip-steps{display:flex;flex-direction:column;gap:0;margin-bottom:28px;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.ip-step{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;}
+.ip-step:last-child{border-bottom:none;}
+.ip-step-num{font-family:var(--f-mono);font-size:9px;letter-spacing:.16em;color:var(--gold);opacity:.6;margin-top:2px;flex-shrink:0;width:18px;}
+.ip-step-tt{font-size:13px;font-weight:600;color:var(--white);margin-bottom:3px;}
+.ip-step-dd{font-size:11px;font-weight:300;color:var(--muted);line-height:1.6;}
+
+.ip-plan-wrap{margin-bottom:20px;}
+.ip-plan{background:var(--panel);border:1px solid var(--gold-ring);border-radius:16px;padding:18px;position:relative;overflow:hidden;}
+.ip-plan::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(240,201,58,.07) 0%,transparent 60%);pointer-events:none;}
+.ip-plan-price{font-family:var(--f-serif);font-size:2.6rem;color:var(--gold);line-height:1;margin-bottom:3px;}
+.ip-plan-name{font-size:12px;font-weight:700;color:var(--white);margin-bottom:5px;letter-spacing:.04em;}
+.ip-plan-desc{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:0;}
+
+.ip-ctas{display:flex;flex-direction:column;gap:9px;margin-bottom:20px;}
 .cta-primary{
 width:100%;padding:17px;
 background:linear-gradient(160deg,#ffe87a 0%,var(--gold) 45%,var(--gold2) 100%);
-color:#07060a;
-font-family:'DM Sans',sans-serif;
-font-size:15px;font-weight:700;
-letter-spacing:.03em;
+color:#07060a;font-family:var(--f-sans);font-size:15px;font-weight:700;letter-spacing:.03em;
 border-radius:999px;border:none;cursor:pointer;
-box-shadow:0 0 32px rgba(240,201,58,.22),0 0 64px rgba(240,201,58,.08);
+box-shadow:0 0 32px var(--gold-glow),0 0 64px rgba(240,201,58,.07);
 text-decoration:none;display:block;text-align:center;
 transition:filter .15s,transform .1s;
 }
 .cta-primary:active{filter:brightness(1.06);transform:scale(.98);}
 .cta-ghost{
-width:100%;padding:14px;
-background:transparent;
-color:var(--muted);
-font-size:13px;font-weight:500;
-letter-spacing:.03em;
-border:1px solid rgba(255,255,255,.07);
-border-radius:999px;cursor:pointer;
+width:100%;padding:14px;background:transparent;color:var(--muted);
+font-size:13px;font-weight:500;letter-spacing:.03em;
+border:1px solid var(--border2);border-radius:999px;cursor:pointer;
 text-decoration:none;display:block;text-align:center;
 transition:border-color .2s,color .2s;
 }
 .cta-ghost:hover{border-color:var(--gold-ring);color:var(--gold);}
+.ip-hint{font-size:10px;color:var(--muted2);text-align:center;letter-spacing:.04em;margin-top:-2px;line-height:1.6;}
 
-.ip-hint{
-font-size:10px;color:var(--muted2);
-text-align:center;letter-spacing:.04em;
-margin-top:-4px;
-line-height:1.6;
-}
-
-/* pricing quick */
-.ip-plans{
-display:grid;grid-template-columns:1fr;
-gap:10px;
-margin:0 auto 8px;
-max-width:360px;
-}
-.ip-plan{
-background:var(--panel);
-border:1px solid rgba(255,255,255,.06);
-border-radius:14px;
-padding:16px 14px;
-}
-.ip-plan.featured{
-border-color:var(--gold-ring);
-background:rgba(240,201,58,.04);
-}
-.ip-plan-price{
-font-family:'DM Serif Display',serif;
-font-size:24px;color:var(--gold);
-line-height:1;margin-bottom:4px;
-}
-.ip-plan-name{
-font-size:11px;font-weight:700;
-color:var(--white);
-margin-bottom:6px;letter-spacing:.04em;
-}
-.ip-plan-desc{
-font-size:11px;color:var(--muted);line-height:1.6;
-}
-
-/* footer mini */
-.ip-footer{
-padding:20px 22px 0;
-width:100%;max-width:440px;
-text-align:center;
-}
-.ip-footer a{
-font-size:10px;color:#333;text-decoration:none;margin:0 8px;letter-spacing:.04em;
-}
+.ip-footer{padding:24px 22px 0;width:100%;max-width:440px;text-align:center;flex-shrink:0;}
+.ip-footer a{font-family:var(--f-mono);font-size:9px;color:var(--muted2);text-decoration:none;margin:0 8px;letter-spacing:.06em;text-transform:uppercase;}
 .ip-footer a:hover{color:var(--gold);}
 .ip-footer p{font-size:9px;color:var(--muted2);margin-top:10px;letter-spacing:.04em;}
 
-/* ── STRIPE MODAL ── */
-.stripe-modal-bg{
-position:fixed;inset:0;z-index:10000;
-background:rgba(4,4,10,.92);
-backdrop-filter:blur(16px);
-display:flex;align-items:center;justify-content:center;
-padding:24px;
-opacity:0;pointer-events:none;
-transition:opacity .25s ease;
-}
+.stripe-modal-bg{position:fixed;inset:0;z-index:10000;background:rgba(4,4,10,.92);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s ease;}
 .stripe-modal-bg.open{opacity:1;pointer-events:all;}
-.stripe-modal{
-background:#0d0d18;
-border:1px solid var(--gold-ring);
-border-radius:20px;
-padding:28px 22px;
-width:100%;max-width:340px;
-text-align:center;
-}
-.sml{font-family:'DM Serif Display',serif;font-style:italic;font-size:26px;color:var(--gold);margin-bottom:4px;}
-.sm-title{font-size:14px;font-weight:600;color:var(--white);margin-bottom:10px;}
-.sm-price{font-family:'DM Serif Display',serif;font-size:42px;color:var(--gold);line-height:1;}
-.sm-period{font-size:11px;color:var(--muted);letter-spacing:.05em;margin-bottom:16px;}
-.sm-note{font-size:11px;color:var(--muted);line-height:1.65;margin-bottom:18px;}
-.sm-go{
-display:block;padding:14px;
-background:linear-gradient(160deg,#ffe87a 0%,var(--gold) 45%,var(--gold2) 100%);
-color:#07060a;font-size:14px;font-weight:700;
-border-radius:999px;border:none;cursor:pointer;
-text-decoration:none;margin-bottom:8px;
-}
-.sm-cancel{
-padding:10px;background:none;
-border:1px solid rgba(255,255,255,.07);border-radius:999px;
-color:var(--muted);font-size:12px;cursor:pointer;width:100%;
-transition:border-color .18s,color .18s;
-}
+.stripe-modal{background:#0d0d18;border:1px solid var(--gold-ring);border-radius:20px;padding:28px 22px;width:100%;max-width:340px;text-align:center;animation:smUp .3s var(--ease) forwards;}
+@keyframes smUp{from{transform:translateY(20px);opacity:0;}to{transform:none;opacity:1;}}
+.sm-logo{font-family:var(--f-serif);font-style:italic;font-size:1.8rem;color:var(--gold);margin-bottom:4px;letter-spacing:-.02em;}
+.sm-title{font-size:.85rem;font-weight:600;color:var(--white);margin-bottom:10px;}
+.sm-price{font-family:var(--f-serif);font-size:2.8rem;color:var(--gold);line-height:1;letter-spacing:-.02em;}
+.sm-period{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.1em;color:var(--muted);margin-bottom:14px;}
+.sm-note{font-size:.78rem;font-weight:300;color:var(--muted);line-height:1.65;margin-bottom:18px;}
+.sm-note .sm-tax{color:var(--gold);font-size:.72rem;display:block;margin-top:4px;}
+.sm-go{display:block;padding:14px;background:linear-gradient(160deg,#ffe87a 0%,var(--gold) 45%,var(--gold2) 100%);color:#07060a;font-family:var(--f-sans);font-size:.88rem;font-weight:700;border-radius:999px;border:none;cursor:pointer;text-decoration:none;margin-bottom:8px;box-shadow:0 0 24px var(--gold-glow);transition:filter .15s;}
+.sm-go:hover{filter:brightness(1.08);}
+.sm-cancel{display:block;width:100%;padding:12px;background:none;border:1px solid rgba(255,255,255,.07);border-radius:999px;color:var(--muted);font-family:var(--f-sans);font-size:.82rem;cursor:pointer;transition:border-color .18s,color .18s;}
 .sm-cancel:hover{border-color:var(--gold-ring);color:var(--white);}
 
-/* ── LANG MODAL ── */
-.lang-modal-bg{
-position:fixed;inset:0;z-index:999;
-background:rgba(4,4,10,.9);backdrop-filter:blur(10px);
-display:flex;align-items:center;justify-content:center;
-padding:24px;
-opacity:0;pointer-events:none;transition:opacity .3s;
-}
+.lang-modal-bg{position:fixed;inset:0;z-index:10001;background:rgba(4,4,10,.9);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s;}
 .lang-modal-bg.open{opacity:1;pointer-events:all;}
-.lang-modal{
-background:var(--bg2);border:1px solid rgba(255,255,255,.07);
-border-radius:16px;padding:28px 20px;
-width:100%;max-width:400px;
-}
-.lang-modal-title{font-size:15px;font-weight:600;margin-bottom:18px;color:var(--white);}
-
-/* GLB_GLOBAL_BG_OVERRIDE */
-body{
-  background-color:#000 !important;
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wLEQX3UQPN8je5_IeWTwKD4YZNr4DSviGiLlcm5P8Clkt1adABN5qWKWX2av3Z_1WHeKT8V_BLNn3mMCxVLtdLFkJbc-fVp4JG-F_ENUQrzyy9ZrxkEB4wZfS-GPZIg9h0x93Z3fsNWNeJBdlOk4_NEULzZqxxfB613ttFVMiPtuZg0TdGBCvzaapwvcXBZgLNZ2LzjIap3KOL54VG79ugXRYTlj4KJ-iZKG3v1jJjnCDmKzuGOTXZCwivMq4rEk1rDe5PUILpHE_G-q-1RJiHbv0diOB2UcK0') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.78) 0%,rgba(0,0,0,.93) 100%);
-  pointer-events:none;
-  z-index:0;
-}
-#lang-gate .gate-photo{ background-image:url('https://lh3.googleusercontent.com/gg/AEir0wLEQX3UQPN8je5_IeWTwKD4YZNr4DSviGiLlcm5P8Clkt1adABN5qWKWX2av3Z_1WHeKT8V_BLNn3mMCxVLtdLFkJbc-fVp4JG-F_ENUQrzyy9ZrxkEB4wZfS-GPZIg9h0x93Z3fsNWNeJBdlOk4_NEULzZqxxfB613ttFVMiPtuZg0TdGBCvzaapwvcXBZgLNZ2LzjIap3KOL54VG79ugXRYTlj4KJ-iZKG3v1jJjnCDmKzuGOTXZCwivMq4rEk1rDe5PUILpHE_G-q-1RJiHbv0diOB2UcK0') !important; }
-.ip-hero-photo{ background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important; }
-
-
-/* GLB_GLOBAL_BG_ALL_PAGES */
-body{
-  background-color:#000 !important;
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wLEQX3UQPN8je5_IeWTwKD4YZNr4DSviGiLlcm5P8Clkt1adABN5qWKWX2av3Z_1WHeKT8V_BLNn3mMCxVLtdLFkJbc-fVp4JG-F_ENUQrzyy9ZrxkEB4wZfS-GPZIg9h0x93Z3fsNWNeJBdlOk4_NEULzZqxxfB613ttFVMiPtuZg0TdGBCvzaapwvcXBZgLNZ2LzjIap3KOL54VG79ugXRYTlj4KJ-iZKG3v1jJjnCDmKzuGOTXZCwivMq4rEk1rDe5PUILpHE_G-q-1RJiHbv0diOB2UcK0') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
-  pointer-events:none;
-  z-index:0;
-}
-
+.lang-modal{background:var(--bg2);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:26px 18px;width:100%;max-width:400px;}
+.lang-modal-title{font-size:14px;font-weight:600;margin-bottom:16px;color:var(--white);}
 </style>
 
 </head>
 <body>
 
-<!-- LANGUAGE GATE -->
-
 <div id="lang-gate">
-  <div class="gate-logo">GLB</div>
-  <p class="gate-sub">Global Language Breaker</p>
-  <p class="gate-q" id="gate-q">Choose your language</p>
-  <div class="lang-grid" id="lang-grid"></div>
-  <button class="gate-more" id="gate-more" style="display:none;" onclick="showMoreLangs()">More languages</button>
-</div>
+  <div class="gate-photo"></div>
 
-<!-- INTRO PANEL -->
+  <div class="gate-top">
+    <div class="gate-logo">GLB</div>
+    <div class="gate-tagline" id="gate-tagline">Be understood.<br><em>Anywhere.</em></div>
+    <div class="gate-badge">Global Language Breaker</div>
+  </div>
+
+  <div class="gate-bottom">
+    <p class="gate-q" id="gate-q">Choose your language</p>
+    <div class="lang-grid" id="lang-grid"></div>
+    <button class="gate-more" id="gate-more" style="display:none;" onclick="showMoreLangs()">More languages</button>
+  </div>
+</div>
 
 <div id="intro-panel">
   <div class="ip-hero">
-    <div class="ip-hero-glow"></div>
+    <div class="ip-hero-photo"></div>
+    <div class="ip-glow"></div>
     <div class="ip-logo">GLB</div>
     <p class="ip-tagline" id="ip-tagline">Be understood.<br><em>Anywhere.</em></p>
   </div>
 
   <div class="ip-body">
 
-<!-- 3 value lines -->
 <div class="ip-values">
   <div class="ip-val">
-    <span class="ip-val-icon">🌐</span>
-    <div class="ip-val-text">
+    <div>
       <div class="ip-val-title" id="val1-t">13 languages. One screen.</div>
-      <div class="ip-val-desc" id="val1-d">Speak or type — your translation appears instantly. Hand the screen to anyone.</div>
+      <div class="ip-val-desc" id="val1-d">Speak or type — translation appears instantly. Hand the screen to anyone, anywhere.</div>
     </div>
   </div>
   <div class="ip-val">
-    <span class="ip-val-icon">⚡</span>
-    <div class="ip-val-text">
-      <div class="ip-val-title" id="val2-t">Gets faster, the more you use it.</div>
-      <div class="ip-val-desc" id="val2-d">GLB remembers your language pair on this device. Phrases you use often come back instantly.</div>
+    <div>
+      <div class="ip-val-title" id="val2-t">Gets faster the more you use it.</div>
+      <div class="ip-val-desc" id="val2-d">GLB remembers your phrases on this device. The same translation is never fetched twice — it just appears.</div>
     </div>
   </div>
   <div class="ip-val">
-    <span class="ip-val-icon">🔒</span>
-    <div class="ip-val-text">
-      <div class="ip-val-title" id="val3-t">No forgotten charges.</div>
-      <div class="ip-val-desc" id="val3-d">Cancel before your next billing date. No surprise charges on Core — you control renewal in Stripe.</div>
+    <div>
+      <div class="ip-val-title" id="val3-t">Create a 30-day translation room.</div>
+      <div class="ip-val-desc" id="val3-d">Travel Pass holders can invite companions into a private room — guide, host, friend — and translate together for 30 days.</div>
+    </div>
+  </div>
+  <div class="ip-val">
+    <div>
+      <div class="ip-val-title" id="val4-t">No forgotten charges.</div>
+      <div class="ip-val-desc" id="val4-d">Cancel before your next billing date. GLB renews monthly only if you keep it — manage anytime in Stripe.</div>
     </div>
   </div>
 </div>
 
-<!-- Plans: Core only on onboarding (Travel via index.premium from Core app) -->
-<div class="ip-plans">
+<div class="ip-room-card">
+  <div class="ip-room-tag">30-Day Translation Room</div>
+  <div class="ip-room-title" id="room-title">Your trip,<br><em>one room.</em></div>
+  <div class="ip-room-desc" id="room-desc">Create a private 6-digit room. Share the code with your companion. The room disappears after 30 days.</div>
+  <div class="ip-room-pills">
+    <span class="ip-pill gold" id="pill-1">Travel Pass · $14.99</span>
+    <span class="ip-pill" id="pill-2">GLB members join free</span>
+    <span class="ip-pill" id="pill-3">30 days</span>
+  </div>
+</div>
+
+<div class="sec-tag" id="how-tag">How it works</div>
+<div class="ip-steps">
+  <div class="ip-step">
+    <div class="ip-step-num">01</div>
+    <div class="ip-step-text">
+      <div class="ip-step-tt" id="step1-t">Choose your plan</div>
+      <div class="ip-step-dd" id="step1-d">Try free (5 translations/day) or go unlimited with GLB $2.99/mo. Add Travel Pass for the 30-day room.</div>
+    </div>
+  </div>
+  <div class="ip-step">
+    <div class="ip-step-num">02</div>
+    <div class="ip-step-text">
+      <div class="ip-step-tt" id="step2-t">Speak or type</div>
+      <div class="ip-step-dd" id="step2-d">GLB detects your scene — airport, taxi, hotel, restaurant — and surfaces the right translation instantly.</div>
+    </div>
+  </div>
+  <div class="ip-step">
+    <div class="ip-step-num">03</div>
+    <div class="ip-step-text">
+      <div class="ip-step-tt" id="step3-t">Show the screen</div>
+      <div class="ip-step-dd" id="step3-d">Translation appears on screen. Turn it toward the other person. Zero delay. Zero confusion.</div>
+    </div>
+  </div>
+</div>
+
+<div class="ip-plan-wrap">
   <div class="ip-plan">
     <div class="ip-plan-price">$2.99</div>
-    <div class="ip-plan-name" id="plan1-name">GLB Core</div>
-    <div class="ip-plan-desc" id="plan1-desc">Unlimited translation · 13 languages · Cancel anytime</div>
+    <div class="ip-plan-name" id="plan-name">GLB</div>
+    <div class="ip-plan-desc" id="plan-desc">Unlimited translation · 13 languages · Cancel anytime · Join 30-day rooms</div>
   </div>
 </div>
 
-<!-- CTAs -->
-<div class="ip-ctas" style="margin-top:20px;">
+<div class="ip-ctas">
   <a href="index.next.html" class="cta-primary" id="ip-cta1">Try free</a>
-  <a href="javascript:void(0)" onclick="openStripeConfirm(event)" class="cta-ghost" id="ip-cta2">GLB Core $2.99</a>
+  <a href="javascript:void(0)" onclick="openStripeModal(event)" class="cta-ghost" id="ip-cta2">GLB $2.99</a>
 </div>
 <p class="ip-hint" id="ip-hint">No credit card · Works instantly · Cancel anytime</p>
 
@@ -526,12 +347,11 @@ body::after{
       <a href="privacy.html">Privacy</a>
       <a href="legal.html">Legal</a>
       <a href="support.html">Support</a>
+      <a href="index.premium.html">Travel Pass</a>
     </p>
     <p>© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending</p>
   </div>
 </div>
-
-<!-- LANG MODAL -->
 
 <div class="lang-modal-bg" id="lang-modal-bg" onclick="closeLangModal(event)">
   <div class="lang-modal">
@@ -540,301 +360,315 @@ body::after{
   </div>
 </div>
 
-<!-- STRIPE MODAL -->
-
-<div class="stripe-modal-bg" id="stripe-modal-bg" onclick="closeStripeConfirm(event)">
+<div class="stripe-modal-bg" id="stripe-modal-bg" onclick="closeStripeModal(event)">
   <div class="stripe-modal">
-    <div class="sml">GLB</div>
+    <div class="sm-logo">GLB</div>
     <div class="sm-title" id="sm-title">Secure checkout</div>
     <div class="sm-price">$2.99</div>
     <div class="sm-period" id="sm-period">/ month · cancel anytime</div>
-    <div class="sm-note" id="sm-note">You will be redirected to Stripe secure payment.<br>Tax may be added at checkout.</div>
-    <a href="https://buy.stripe.com/bJedRbefH5yogzZfuDasg09" class="sm-go" id="sm-confirm">Go to Stripe →</a>
-    <button class="sm-cancel" id="sm-cancel" onclick="closeStripeConfirm()">Cancel</button>
+    <div class="sm-note" id="sm-note">
+      You will be redirected to Stripe secure payment.
+      <span class="sm-tax" id="sm-tax">* Tax may be added at checkout depending on your country.</span>
+    </div>
+    <a href="https://buy.stripe.com/bJedRbefH5yogzZfuDasg09" class="sm-go" id="sm-go">Go to Stripe →</a>
+    <button class="sm-cancel" id="sm-cancel" onclick="closeStripeModal()">Cancel</button>
   </div>
 </div>
 
 <script>
-const LS_LANG = 'glb_ui_lang';
-const LS_BASE = 'glb_user_base_lang';
-const STRIPE_URL = 'https://buy.stripe.com/bJedRbefH5yogzZfuDasg09';
-/** Billing API (entitlements); GitHub Pages origin is allowed in billing_api CORS. */
-const GLB_BILLING_API_BASE = 'https://nextbase-billing-125142687526.asia-northeast1.run.app';
+const LS_LANG='glb_ui_lang';
+const LS_BASE='glb_user_base_lang';
+const STRIPE_CORE='https://buy.stripe.com/bJedRbefH5yogzZfuDasg09';
+const GLB_BILLING_API_BASE='https://nextbase-billing-125142687526.asia-northeast1.run.app';
 
-function getCheckoutSessionIdFromUrl() {
-  try {
-    const id = new URLSearchParams(window.location.search).get('session_id');
-    return id && String(id).trim();
-  } catch (e) {
-    return '';
-  }
+function getCheckoutSessionIdFromUrl(){
+  try{
+    const id=new URLSearchParams(window.location.search).get('session_id');
+    return id&&String(id).trim();
+  }catch(e){return '';}
 }
 
-async function resolveBillingDestination(sessionId) {
-  const sid = String(sessionId || '').trim();
-  if (!sid || !/^cs_(live|test)_/.test(sid)) return '';
-  const url = GLB_BILLING_API_BASE + '/entitlements?session_id=' + encodeURIComponent(sid);
-  try {
-    const r = await fetch(url, { method: 'GET', credentials: 'omit' });
-    const data = await r.json();
-    if (data && data.status === 'PASS' && data.travel_active) {
-      return 'index.14.99.html?session_id=' + encodeURIComponent(sid);
+async function resolveBillingDestination(sessionId){
+  const sid=String(sessionId||'').trim();
+  if(!sid||!/^cs_(live|test)_/.test(sid))return '';
+  const url=GLB_BILLING_API_BASE+'/entitlements?session_id='+encodeURIComponent(sid);
+  try{
+    const r=await fetch(url,{method:'GET',credentials:'omit'});
+    const data=await r.json();
+    if(data&&data.status==='PASS'&&data.travel_active){
+      return 'index.14.99.html?session_id='+encodeURIComponent(sid);
     }
-    if (data && data.status === 'PASS' && data.core_subscribed) {
+    if(data&&data.status==='PASS'&&data.core_subscribed){
       return 'index.2.99.html';
     }
-    // HOLD / insufficient / missing_customer — travel surface + purchase path (no infinite gate loop)
     return 'index.14.99.html';
-  } catch (e) {
+  }catch(e){
     return 'index.premium.html';
   }
 }
 
-const LANGS = [
-  {c:'en',l:'English',flag:'🇬🇧',short:'EN'},
-  {c:'ja',l:'日本語',flag:'🇯🇵',short:'日本語'},
-  {c:'zh',l:'中文',flag:'🇨🇳',short:'中文'},
-  {c:'ko',l:'한국어',flag:'🇰🇷',short:'한국어'},
-  {c:'es',l:'Español',flag:'🇪🇸',short:'ES'},
-  {c:'fr',l:'Français',flag:'🇫🇷',short:'FR'},
-  {c:'de',l:'Deutsch',flag:'🇩🇪',short:'DE'},
-  {c:'it',l:'Italiano',flag:'🇮🇹',short:'IT'},
-  {c:'ru',l:'Русский',flag:'🇷🇺',short:'RU'},
-  {c:'th',l:'ไทย',flag:'🇹🇭',short:'TH'},
-  {c:'vi',l:'Tiếng Việt',flag:'🇻🇳',short:'VN'},
-  {c:'hi',l:'हिन्दी',flag:'🇮🇳',short:'HI'},
-  {c:'pt',l:'Português',flag:'🇧🇷',short:'PT'},
+const LANGS=[
+  {c:'en',l:'English',    f:'🇬🇧'},
+  {c:'ja',l:'日本語',      f:'🇯🇵'},
+  {c:'zh',l:'中文',        f:'🇨🇳'},
+  {c:'ko',l:'한국어',      f:'🇰🇷'},
+  {c:'es',l:'Español',    f:'🇪🇸'},
+  {c:'fr',l:'Français',   f:'🇫🇷'},
+  {c:'de',l:'Deutsch',    f:'🇩🇪'},
+  {c:'it',l:'Italiano',   f:'🇮🇹'},
+  {c:'ru',l:'Русский',    f:'🇷🇺'},
+  {c:'th',l:'ไทย',         f:'🇹🇭'},
+  {c:'vi',l:'Tiếng Việt', f:'🇻🇳'},
+  {c:'hi',l:'हिन्दी',       f:'🇮🇳'},
+  {c:'pt',l:'Português',  f:'🇧🇷'},
 ];
 
-const I18N = {
+const I18N={
   en:{
-    gateQ:'Choose your language',
-    gateMore:'More languages',
+    gateTagline:'Be understood.<br><em>Anywhere.</em>',
+    gateQ:'Choose your language',gateMore:'More languages',
     tagline:'Be understood.<br><em>Anywhere.</em>',
-    val1t:'13 languages. One screen.',
-    val1d:'Speak or type — translation appears instantly. Hand the screen to anyone.',
-    val2t:'Gets faster, the more you use it.',
-    val2d:'GLB remembers your language pair on this device. Phrases you use often come back instantly.',
-    val3t:'No forgotten charges.',
-    val3d:'Cancel before your next billing date. Core renews monthly only if you keep it — manage anytime in Stripe.',
-    plan1n:'GLB Core',plan1d:'Unlimited translation · 13 languages · Cancel anytime',
-    cta1:'Try free',
-    cta2:'GLB Core $2.99',
-    hint:'No credit card · Works instantly · Cancel anytime',
+    val1t:'13 languages. One screen.',val1d:'Speak or type — translation appears instantly. Hand the screen to anyone.',
+    val2t:'Gets faster the more you use it.',val2d:'GLB remembers your phrases on this device. Same translation is never fetched twice.',
+    val3t:'Create a 30-day translation room.',val3d:'Travel Pass holders can invite companions into a private room and translate together for 30 days.',
+    val4t:'No forgotten charges.',val4d:'Cancel before your next billing date. GLB renews monthly only if you keep it — manage anytime in Stripe.',
+    roomTitle:'Your trip,<br><em>one room.</em>',
+    roomDesc:'Create a private 6-digit room. Share the code with your companion. The room disappears after 30 days.',
+    pill1:'Travel Pass · $14.99',pill2:'GLB members join free',pill3:'30 days',
+    howTag:'How it works',
+    step1t:'Choose your plan',step1d:'Try free (5/day) or go unlimited with GLB $2.99/mo. Add Travel Pass for the 30-day room.',
+    step2t:'Speak or type',step2d:'GLB detects your scene — airport, taxi, hotel, restaurant — and surfaces the right translation instantly.',
+    step3t:'Show the screen',step3d:'Translation appears on screen. Turn it toward the other person. Zero delay. Zero confusion.',
+    planName:'GLB',planDesc:'Unlimited translation · 13 languages · Cancel anytime · Join 30-day rooms',
+    cta1:'Try free',cta2:'GLB $2.99',hint:'No credit card · Works instantly · Cancel anytime',
     modalTitle:'Change language',
     smTitle:'Secure checkout',smPeriod:'/ month · cancel anytime',
-    smNote:'You will be redirected to Stripe secure payment.<br>Tax may be added at checkout.',
-    smGo:'Go to Stripe →',smCancel:'Cancel'
+    smNote:'You will be redirected to Stripe secure payment.',smTax:'* Tax may be added at checkout depending on your country.',
+    smGo:'Go to Stripe →',smCancel:'Cancel',
   },
   ja:{
-    gateQ:'言語を選んでください',
-    gateMore:'その他の言語',
+    gateTagline:'どこでも、<br><em>伝わる。</em>',
+    gateQ:'言語を選んでください',gateMore:'その他の言語',
     tagline:'どこでも、<br><em>伝わる。</em>',
-    val1t:'13言語。1つの画面。',
-    val1d:'話すか入力するだけ。翻訳が即座に表示される。画面をそのまま相手に向けて。',
-    val2t:'使うほど、速くなる。',
-    val2d:'GLBはこの端末にあなたの言語ペアを記憶します。よく使うフレーズは瞬時に出てくる。',
-    val3t:'課金し忘れ、ゼロ。',
-    val3d:'次の請求日前に解約すれば追加料金なし。Coreは継続する場合のみ課金 — Stripeでいつでも管理できます。',
-    plan1n:'GLB Core',plan1d:'翻訳無制限 · 13言語 · いつでも解約可',
-    cta1:'無料で試す',
-    cta2:'GLB Core $2.99',
-    hint:'クレジットカード不要 · すぐ使える · いつでも解約',
+    val1t:'13言語。1つの画面。',val1d:'話すか入力するだけ。翻訳が即座に表示される。画面をそのまま相手に向けて。',
+    val2t:'使うほど、速くなる。',val2d:'GLBはこの端末にあなたのフレーズを記憶します。同じ翻訳は2度APIを叩かない。',
+    val3t:'30日間翻訳ルームを作れる。',val3d:'Travel Passを持っていれば、同行者をプライベートルームに招待して30日間一緒に翻訳できます。',
+    val4t:'課金し忘れ、ゼロ。',val4d:'次の請求日前に解約すれば追加料金なし。GLBは継続する場合のみ課金。Stripeでいつでも管理できます。',
+    roomTitle:'この旅、<br><em>ひとつのルームで。</em>',
+    roomDesc:'6桁のプライベートコードを生成。シェアするだけ。ルームは30日後に消えます。',
+    pill1:'Travel Pass · $14.99',pill2:'GLBユーザーは無料参加',pill3:'30日間',
+    howTag:'使い方',
+    step1t:'プランを選ぶ',step1d:'無料（1日5回翻訳）から始めるか、GLB $2.99/月で無制限に。30日ルームにはTravel Passが必要。',
+    step2t:'話すか入力する',step2d:'GLBが現在のシーン（空港・タクシー・ホテル・レストラン）を検出し、最適な翻訳を即座に表示します。',
+    step3t:'画面を向ける',step3d:'翻訳が画面に表示されたら、相手に向けるだけ。遅延ゼロ。混乱ゼロ。',
+    planName:'GLB',planDesc:'翻訳無制限 · 13言語 · いつでも解約可 · 30日ルームに参加可',
+    cta1:'無料で試す',cta2:'GLB $2.99',hint:'クレジットカード不要 · すぐ使える · いつでも解約',
     modalTitle:'言語を変更',
     smTitle:'Stripeで決済',smPeriod:'/ 月 · いつでも解約可能',
-    smNote:'Stripeのセキュアな決済ページに移動します。<br><span style="color:var(--gold);font-size:10px;">※ お住まいの国によって税金が加算される場合があります。</span>',
-    smGo:'Stripeへ進む →',smCancel:'キャンセル'
+    smNote:'Stripeのセキュアな決済ページに移動します。',smTax:'※ お住まいの国によって、税金が加算される場合があります。',
+    smGo:'Stripeへ進む →',smCancel:'キャンセル',
   },
   zh:{
+    gateTagline:'随处<br><em>沟通无障碍。</em>',
     gateQ:'选择您的语言',gateMore:'更多语言',
     tagline:'随处<br><em>沟通无障碍。</em>',
     val1t:'13种语言，一个屏幕。',val1d:'说话或输入——翻译立即显示。把屏幕递给对方即可。',
-    val2t:'越用越快。',val2d:'GLB在此设备上记住您的语言对。常用短语瞬间出现。',
-    val3t:'不担心忘记取消。',val3d:'在下次账单日前取消即可。Core按月续订，仅在您保留时收费。',
-    plan1n:'GLB Core',plan1d:'无限翻译 · 13种语言 · 随时取消',
-    cta1:'免费试用',cta2:'GLB Core $2.99',
-    hint:'无需信用卡 · 立即使用 · 随时取消',
-    modalTitle:'更改语言',smTitle:'安全结账',smPeriod:'/ 月 · 随时取消',
-    smNote:'您将被重定向到Stripe安全支付页面。',smGo:'前往Stripe →',smCancel:'取消'
+    val2t:'越用越快。',val2d:'GLB在此设备上记住您的短语。相同的翻译不会重复调用API。',
+    val3t:'创建30天翻译室。',val3d:'Travel Pass持有者可邀请同伴进入私人房间，共同翻译30天。',
+    val4t:'不担心忘记取消。',val4d:'在下次账单日前取消即可。GLB按月续订，仅在您保留时收费。',
+    roomTitle:'这趟旅程，<br><em>一个房间。</em>',
+    roomDesc:'生成6位私人代码。分享后同伴即可加入。房间30天后消失。',
+    pill1:'Travel Pass · $14.99',pill2:'GLB用户免费加入',pill3:'30天',
+    howTag:'使用方法',
+    step1t:'选择方案',step1d:'免费试用（每天5次）或GLB $2.99/月无限次。30天房间需要Travel Pass。',
+    step2t:'说话或输入',step2d:'GLB检测您的场景——机场、出租车、酒店、餐厅——并立即提供翻译。',
+    step3t:'展示屏幕',step3d:'翻译显示在屏幕上。转向对方。零延迟。零混淆。',
+    planName:'GLB',planDesc:'无限翻译 · 13种语言 · 随时取消 · 可加入30天房间',
+    cta1:'免费试用',cta2:'GLB $2.99',hint:'无需信用卡 · 立即使用 · 随时取消',
+    modalTitle:'更改语言',
+    smTitle:'安全结账',smPeriod:'/ 月 · 随时取消',
+    smNote:'您将被重定向到Stripe安全支付页面。',smTax:'※ 结账时可能会根据您所在国家加收税款。',
+    smGo:'前往Stripe →',smCancel:'取消',
   },
   ko:{
+    gateTagline:'어디서든<br><em>통하는 말.</em>',
     gateQ:'언어를 선택하세요',gateMore:'더 많은 언어',
     tagline:'어디서든<br><em>통하는 말.</em>',
-    val1t:'13개 언어, 화면 하나.',val1d:'말하거나 입력하면 번역이 즉시 표시됩니다.',
-    val2t:'쓸수록 빨라집니다.',val2d:'GLB가 이 기기에서 언어 쌍을 기억합니다.',
-    val3t:'결제 걱정 없음.',val3d:'다음 청구일 전에 취소하면 추가 요금 없음. Core는 유지할 때만 월간 결제됩니다.',
-    plan1n:'GLB Core',plan1d:'무제한 번역 · 13개 언어 · 언제든 취소',
-    cta1:'무료 체험',cta2:'GLB Core $2.99',
-    hint:'신용카드 불필요 · 즉시 사용 · 언제든 취소',
-    modalTitle:'언어 변경',smTitle:'안전한 결제',smPeriod:'/ 월 · 언제든 취소',
-    smNote:'Stripe 보안 결제 페이지로 이동합니다.',smGo:'Stripe로 이동 →',smCancel:'취소'
+    val1t:'13개 언어, 화면 하나.',val1d:'말하거나 입력하면 번역이 즉시 표시됩니다. 화면을 그대로 상대방에게 보여주세요.',
+    val2t:'쓸수록 빨라집니다.',val2d:'GLB가 이 기기에서 문구를 기억합니다. 같은 번역은 두 번 API를 사용하지 않습니다.',
+    val3t:'30일 번역 룸을 만들 수 있어요.',val3d:'Travel Pass 소지자는 동반자를 비공개 룸에 초대해 30일간 함께 번역할 수 있습니다.',
+    val4t:'결제 걱정 없음.',val4d:'다음 청구일 전에 취소하면 추가 요금 없음. GLB는 유지할 때만 월간 결제됩니다.',
+    roomTitle:'이번 여행,<br><em>하나의 룸.</em>',
+    roomDesc:'6자리 비공개 코드를 생성하세요. 공유하면 동반자가 참여합니다. 룸은 30일 후 사라집니다.',
+    pill1:'Travel Pass · $14.99',pill2:'GLB 멤버 무료 참여',pill3:'30일',
+    howTag:'이용 방법',
+    step1t:'플랜 선택',step1d:'무료(1일 5회) 또는 GLB $2.99/월 무제한. 30일 룸은 Travel Pass 필요.',
+    step2t:'말하거나 입력',step2d:'GLB가 공항, 택시, 호텔, 레스토랑 등 상황을 감지해 즉시 번역을 제공합니다.',
+    step3t:'화면 보여주기',step3d:'번역이 화면에 표시되면 상대방에게 돌려주세요. 지연 없음. 혼란 없음.',
+    planName:'GLB',planDesc:'무제한 번역 · 13개 언어 · 언제든 취소 · 30일 룸 참여 가능',
+    cta1:'무료 체험',cta2:'GLB $2.99',hint:'신용카드 불필요 · 즉시 사용 · 언제든 취소',
+    modalTitle:'언어 변경',
+    smTitle:'안전한 결제',smPeriod:'/ 월 · 언제든 취소',
+    smNote:'Stripe 보안 결제 페이지로 이동합니다.',smTax:'※ 국가에 따라 세금이 추가될 수 있습니다.',
+    smGo:'Stripe로 이동 →',smCancel:'취소',
   },
   es:{
+    gateTagline:'Hazte entender.<br><em>En cualquier lugar.</em>',
     gateQ:'Elige tu idioma',gateMore:'Más idiomas',
     tagline:'Hazte entender.<br><em>En cualquier lugar.</em>',
-    val1t:'13 idiomas. Una pantalla.',val1d:'Habla o escribe — la traducción aparece al instante.',
-    val2t:'Mejora con el uso.',val2d:'GLB recuerda tu par de idiomas en este dispositivo.',
-    val3t:'Sin cargos olvidados.',val3d:'Cancela antes de tu próxima fecha de facturación. Core solo renueva si lo mantienes.',
-    plan1n:'GLB Core',plan1d:'Traducción ilimitada · 13 idiomas · Cancela cuando quieras',
-    cta1:'Probar gratis',cta2:'GLB Core $2.99',
-    hint:'Sin tarjeta · Funciona al instante · Cancela cuando quieras',
-    modalTitle:'Cambiar idioma',smTitle:'Pago seguro',smPeriod:'/ mes · cancela cuando quieras',
-    smNote:'Serás redirigido a la página de pago seguro de Stripe.',smGo:'Ir a Stripe →',smCancel:'Cancelar'
-  }
+    val1t:'13 idiomas. Una pantalla.',val1d:'Habla o escribe — la traducción aparece al instante. Muestra la pantalla a cualquiera.',
+    val2t:'Mejora con el uso.',val2d:'GLB recuerda tus frases en este dispositivo. La misma traducción no se vuelve a pedir.',
+    val3t:'Crea una sala de traducción de 30 días.',val3d:'Con Travel Pass invita a compañeros a una sala privada y traduce juntos durante 30 días.',
+    val4t:'Sin cargos olvidados.',val4d:'Cancela antes de la próxima facturación. GLB solo renueva si lo mantienes — gestiona en Stripe.',
+    roomTitle:'Tu viaje,<br><em>una sala.</em>',
+    roomDesc:'Crea una sala privada de 6 dígitos. Comparte el código. La sala desaparece a los 30 días.',
+    pill1:'Travel Pass · $14.99',pill2:'Miembros GLB gratis',pill3:'30 días',
+    howTag:'Cómo funciona',
+    step1t:'Elige tu plan',step1d:'Prueba gratis (5/día) o ilimitado con GLB $2.99/mes. Travel Pass para la sala de 30 días.',
+    step2t:'Habla o escribe',step2d:'GLB detecta el contexto — aeropuerto, taxi, hotel, restaurante — y muestra la traducción al instante.',
+    step3t:'Muestra la pantalla',step3d:'La traducción aparece en pantalla. Gírala hacia la otra persona. Sin demora. Sin confusión.',
+    planName:'GLB',planDesc:'Traducción ilimitada · 13 idiomas · Cancela cuando quieras · Únete a salas de 30 días',
+    cta1:'Probar gratis',cta2:'GLB $2.99',hint:'Sin tarjeta · Listo al instante · Cancela cuando quieras',
+    modalTitle:'Cambiar idioma',
+    smTitle:'Pago seguro',smPeriod:'/ mes · cancela cuando quieras',
+    smNote:'Serás redirigido al pago seguro de Stripe.',smTax:'* Pueden aplicarse impuestos según tu país.',
+    smGo:'Ir a Stripe →',smCancel:'Cancelar',
+  },
 };
 
-// fallback to en
-function t(lang, key) {
-  const d = I18N[lang] || I18N.en;
-  return d[key] !== undefined ? d[key] : (I18N.en[key] || '');
-}
+function t(l,k){const d=I18N[l]||I18N.en;return d[k]!==undefined?d[k]:(I18N.en[k]||'');}
 
-let showingMore = false;
-let selectedLang = null;
-let currentLang = 'en';
+let showingMore=false,selectedLang=null,currentLang='en';
 
-function buildLangGrid(containerId, clickFn) {
-  const c = document.getElementById(containerId);
-  if (!c) return;
-  c.innerHTML = '';
-  const show = showingMore ? LANGS : LANGS.slice(0, 9);
-  show.forEach(lang => {
-    const btn = document.createElement('button');
-    btn.className = 'lang-opt' + (selectedLang === lang.c ? ' selected' : '');
-    btn.innerHTML = lang.flag + '<br>' + lang.l;
-    btn.onclick = () => clickFn(lang.c, btn, containerId);
-    c.appendChild(btn);
+function buildGrid(id,fn){
+  const c=document.getElementById(id);if(!c)return;c.innerHTML='';
+  const show=showingMore?LANGS:LANGS.slice(0,9);
+  show.forEach(l=>{
+    const b=document.createElement('button');
+    b.className='lang-opt'+(selectedLang===l.c?' selected':'');
+    b.innerHTML=l.f+'<br>'+l.l;
+    b.onclick=()=>fn(l.c,b,id);
+    c.appendChild(b);
   });
 }
 
-function selectGateLang(code, btn, containerId) {
-  selectedLang = code;
-  document.querySelectorAll('#' + containerId + ' .lang-opt').forEach(b => b.classList.remove('selected'));
+function selectGate(code,btn,cid){
+  selectedLang=code;
+  document.querySelectorAll('#'+cid+' .lang-opt').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
-  // auto-proceed after short delay for snappiness
-  setTimeout(() => enterApp(), 320);
+  setTimeout(()=>enterApp(),320);
 }
 
-function showMoreLangs() {
-  showingMore = true;
-  buildLangGrid('lang-grid', selectGateLang);
-  document.getElementById('gate-more').style.display = 'none';
+function showMoreLangs(){
+  showingMore=true;
+  buildGrid('lang-grid',selectGate);
+  const gm=document.getElementById('gate-more');
+  if(gm)gm.textContent=t(currentLang,'gateMore');
+  document.getElementById('gate-more').style.display='none';
 }
 
-async function enterApp() {
-  if (!selectedLang) return;
-  currentLang = selectedLang;
-  try {
-    localStorage.setItem(LS_LANG, currentLang);
-    localStorage.setItem(LS_BASE, currentLang);
-    localStorage.setItem('glb_ui_lang_v2', currentLang);
-    // set default target lang
-    const defaultTarget = currentLang === 'en' ? 'ja' : 'en';
-    localStorage.setItem('glb_user_target_lang', defaultTarget);
-  } catch(e) {}
+async function enterApp(){
+  if(!selectedLang)return;
+  currentLang=selectedLang;
+  try{
+    localStorage.setItem(LS_LANG,currentLang);
+    localStorage.setItem(LS_BASE,currentLang);
+    localStorage.setItem('glb_ui_lang_v2',currentLang);
+    localStorage.setItem('glb_base_lang',currentLang);
+    const def=currentLang==='en'?'ja':'en';
+    localStorage.setItem('glb_user_target_lang',def);
+  }catch{}
 
-  const checkoutSid = getCheckoutSessionIdFromUrl();
-  if (checkoutSid) {
-    const dest = await resolveBillingDestination(checkoutSid);
-    if (dest) {
-      window.location.replace(dest);
-      return;
-    }
+  const checkoutSid=getCheckoutSessionIdFromUrl();
+  if(checkoutSid){
+    const dest=await resolveBillingDestination(checkoutSid);
+    if(dest){window.location.replace(dest);return;}
   }
 
-  const gate = document.getElementById('lang-gate');
-  const panel = document.getElementById('intro-panel');
-  if (!gate || !panel) return;
-
-  // Intro must stack above the gate while it fades (#intro-panel was 9998 < #lang-gate 9999 → black screen).
   applyIntroLang(currentLang);
-  panel.style.zIndex = '10000';
+  const panel=document.getElementById('intro-panel');
+  panel.style.zIndex='10000';
   panel.classList.add('show');
-
+  const gate=document.getElementById('lang-gate');
   gate.classList.add('exit');
-  setTimeout(() => {
-    gate.style.display = 'none';
-    gate.style.zIndex = '';
-  }, 500);
+  setTimeout(()=>{gate.style.display='none';gate.style.zIndex='';},500);
 }
 
-function applyIntroLang(lang) {
-  const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-  set('ip-tagline', t(lang, 'tagline'));
-  set('val1-t', t(lang, 'val1t')); set('val1-d', t(lang, 'val1d'));
-  set('val2-t', t(lang, 'val2t')); set('val2-d', t(lang, 'val2d'));
-  set('val3-t', t(lang, 'val3t')); set('val3-d', t(lang, 'val3d'));
-  set('plan1-name', t(lang, 'plan1n')); set('plan1-desc', t(lang, 'plan1d'));
-  const c1 = document.getElementById('ip-cta1'); if (c1) c1.textContent = t(lang, 'cta1');
-  const c2 = document.getElementById('ip-cta2'); if (c2) c2.textContent = t(lang, 'cta2');
-  set('ip-hint', t(lang, 'hint'));
+function applyIntroLang(lang){
+  const set=(id,html)=>{const el=document.getElementById(id);if(el)el.innerHTML=html;};
+  set('gate-tagline',t(lang,'gateTagline'));
+  document.getElementById('gate-q').textContent=t(lang,'gateQ');
+  const gm=document.getElementById('gate-more');
+  if(gm&&gm.style.display!=='none')gm.textContent=t(lang,'gateMore');
+  set('ip-tagline',t(lang,'tagline'));
+  set('val1-t',t(lang,'val1t'));set('val1-d',t(lang,'val1d'));
+  set('val2-t',t(lang,'val2t'));set('val2-d',t(lang,'val2d'));
+  set('val3-t',t(lang,'val3t'));set('val3-d',t(lang,'val3d'));
+  set('val4-t',t(lang,'val4t'));set('val4-d',t(lang,'val4d'));
+  set('room-title',t(lang,'roomTitle'));set('room-desc',t(lang,'roomDesc'));
+  document.getElementById('pill-1').textContent=t(lang,'pill1');
+  document.getElementById('pill-2').textContent=t(lang,'pill2');
+  document.getElementById('pill-3').textContent=t(lang,'pill3');
+  document.getElementById('how-tag').textContent=t(lang,'howTag');
+  set('step1-t',t(lang,'step1t'));set('step1-d',t(lang,'step1d'));
+  set('step2-t',t(lang,'step2t'));set('step2-d',t(lang,'step2d'));
+  set('step3-t',t(lang,'step3t'));set('step3-d',t(lang,'step3d'));
+  document.getElementById('plan-name').textContent=t(lang,'planName');
+  document.getElementById('plan-desc').textContent=t(lang,'planDesc');
+  document.getElementById('ip-cta1').textContent=t(lang,'cta1');
+  document.getElementById('ip-cta2').textContent=t(lang,'cta2');
+  set('ip-hint',t(lang,'hint'));
 }
 
-// lang modal
-function openLangModal() {
-  const m = document.getElementById('lang-modal-bg'); m.classList.add('open');
-  document.getElementById('modal-title').textContent = t(currentLang, 'modalTitle');
-  buildLangGrid('modal-grid', (code) => {
-    currentLang = code;
-    try { localStorage.setItem(LS_LANG, code); localStorage.setItem(LS_BASE, code); localStorage.setItem('glb_ui_lang_v2', code); } catch(e) {}
-    applyIntroLang(currentLang);
-    closeLangModal();
+function openLangModal(){
+  document.getElementById('lang-modal-bg').classList.add('open');
+  document.getElementById('modal-title').textContent=t(currentLang,'modalTitle');
+  buildGrid('modal-grid',(code)=>{
+    currentLang=code;
+    try{localStorage.setItem(LS_LANG,code);localStorage.setItem(LS_BASE,code);localStorage.setItem('glb_base_lang',code);}catch{}
+    applyIntroLang(currentLang);closeLangModal();
   });
 }
-function closeLangModal(e) {
-  if (!e || e.target === document.getElementById('lang-modal-bg'))
-    document.getElementById('lang-modal-bg').classList.remove('open');
-}
+function closeLangModal(e){if(!e||e.target===document.getElementById('lang-modal-bg'))document.getElementById('lang-modal-bg').classList.remove('open');}
 
-// stripe modal
-function openStripeConfirm(e) {
-  if (e) e.preventDefault();
-  const d = I18N[currentLang] || I18N.en;
-  const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-  set('sm-title', d.smTitle); set('sm-period', d.smPeriod); set('sm-note', d.smNote);
-  const btn = document.getElementById('sm-confirm');
-  if (btn) { btn.textContent = d.smGo; btn.setAttribute('href', STRIPE_URL); }
-  const cancel = document.getElementById('sm-cancel'); if (cancel) cancel.textContent = d.smCancel;
+function openStripeModal(e){
+  if(e)e.preventDefault();
+  const lang=currentLang;
+  document.getElementById('sm-title').textContent=t(lang,'smTitle');
+  document.getElementById('sm-period').textContent=t(lang,'smPeriod');
+  document.getElementById('sm-note').innerHTML=t(lang,'smNote')+'<span class="sm-tax" id="sm-tax">'+t(lang,'smTax')+'</span>';
+  const go=document.getElementById('sm-go');
+  go.textContent=t(lang,'smGo');
+  go.href=STRIPE_CORE;
+  document.getElementById('sm-cancel').textContent=t(lang,'smCancel');
   document.getElementById('stripe-modal-bg').classList.add('open');
 }
-function closeStripeConfirm(e) {
-  if (e && e.target !== document.getElementById('stripe-modal-bg')) return;
-  document.getElementById('stripe-modal-bg').classList.remove('open');
+function closeStripeModal(e){
+  if(!e||e.target===document.getElementById('stripe-modal-bg'))
+    document.getElementById('stripe-modal-bg').classList.remove('open');
 }
 
-// INIT
-async function init() {
-  const checkoutSid = getCheckoutSessionIdFromUrl();
-  if (checkoutSid) {
-    const dest = await resolveBillingDestination(checkoutSid);
-    if (dest) {
-      window.location.replace(dest);
-      return;
-    }
+(async function init(){
+  const checkoutSid=getCheckoutSessionIdFromUrl();
+  if(checkoutSid){
+    const dest=await resolveBillingDestination(checkoutSid);
+    if(dest){window.location.replace(dest);return;}
   }
-
-  let stored = null;
-  try { stored = localStorage.getItem(LS_LANG); } catch(e) {}
-  if (stored && LANGS.find(l => l.c === stored)) {
-    // returning user: skip gate, show intro directly
-    currentLang = stored;
-    selectedLang = stored;
-    document.getElementById('lang-gate').style.display = 'none';
+  let stored=null;try{stored=localStorage.getItem(LS_LANG);}catch{}
+  if(stored&&LANGS.find(l=>l.c===stored)){
+    currentLang=stored;selectedLang=stored;
     applyIntroLang(currentLang);
+    document.getElementById('lang-gate').style.display='none';
+    document.getElementById('intro-panel').style.zIndex='10000';
     document.getElementById('intro-panel').classList.add('show');
-  } else {
-    // new user: show gate
-    buildLangGrid('lang-grid', selectGateLang);
-    const more = document.getElementById('gate-more');
-    if (more) {
-      more.textContent = 'More languages';
-      more.style.display = '';
-    }
+  }else{
+    buildGrid('lang-grid',selectGate);
+    const m=document.getElementById('gate-more');
+    if(m){m.textContent=t('en','gateMore');m.style.display='';}
+    document.getElementById('gate-tagline').innerHTML=t('en','gateTagline');
+    document.getElementById('gate-q').textContent=t('en','gateQ');
   }
-}
-init().catch(function () {
-  buildLangGrid('lang-grid', selectGateLang);
-});
+})().catch(()=>buildGrid('lang-grid',selectGate));
 </script>
 
 </body>
