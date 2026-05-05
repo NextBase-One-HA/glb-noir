@@ -26,9 +26,9 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: var(--bg);
-      background-image: url('hero_299.jpg');
+      background-image: url('image_2.png');
       background-size: cover;
-      background-position: center 30%;
+      background-position: center;
       background-attachment: fixed;
       color: var(--text);
       font-family: var(--f-mono);
@@ -170,7 +170,7 @@
           </div>
         </div>
 
-        <button class="btn" id="bt" style="margin-top:auto" onclick="tr()">TRANSLATE_EXECUTE</button>
+        <button class="btn" id="bt" style="margin-top:auto" onclick="tr()">GLB</button>
       </div>
 
       <div class="room-footer">
@@ -209,7 +209,7 @@
       if(!text) return;
 
       const b = document.getElementById('bt');
-      b.textContent = 'PROCESSING...';
+      b.textContent = 'GLB...';
       b.disabled = true;
 
       // DEMO DELAY
@@ -218,7 +218,7 @@
       document.getElementById('rt').textContent = `>> ${text.toUpperCase()}`;
       document.getElementById('res').classList.add('show');
 
-      b.textContent = 'TRANSLATE_EXECUTE';
+      b.textContent = 'GLB';
       b.disabled = false;
     }
 
