@@ -54,7 +54,7 @@
             --white: #ffffff;
         }
         body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 0; padding-bottom: env(safe-area-inset-bottom, 0); text-align: center; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: rgba(255, 230, 100, 0.15); }
-        .cockpit { padding: 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(600px, 100%); margin: 0 auto; box-sizing: border-box; }
+        .cockpit { position: relative; z-index: 1; padding: 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(600px, 100%); margin: 0 auto; box-sizing: border-box; }
         .header { margin-bottom: 22px; padding: 0 6px; }
         .gold-text { color: var(--gold); letter-spacing: 4px; font-weight: bold; }
         @keyframes glb-neon-title {
@@ -478,7 +478,7 @@
             text-shadow: 0 0 10px var(--gold-glow-mid);
         }
         @media (max-width: 480px) {
-            .cockpit { padding: 16px 14px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+            .cockpit { position: relative; z-index: 1; padding: 16px 14px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
             .glb-billboard { margin-top: 8px; }
             h1.gold-text.app-brand-title {
                 font-size: clamp(1.05rem, 5.8vw, 1.55rem);
@@ -667,62 +667,21 @@
             font-style: italic;
             color: #fff8e8;
         }
-    
-/* Global noir scenic background override */
-body{
-  background-color:#000 !important;
-  background-image:url('hero_299.jpg') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-  position:relative;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
-  pointer-events:none;
-  z-index:0;
-}
 
-
-/* GLB_GLOBAL_BG_OVERRIDE */
-body{
-  background-color:#000 !important;
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
-  pointer-events:none;
-  z-index:0;
-}
-
-
-/* GLB_GLOBAL_BG_ALL_PAGES */
-body{
-  background-color:#000 !important;
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
-  pointer-events:none;
-  z-index:0;
-}
-
-</style>
+        /* Full-page scenic background: layered gradients + repo asset + HTTPS fallback (no ::after veil). */
+        body {
+            min-height: 100svh;
+            background-color: #04040a;
+            background-image:
+                radial-gradient(circle at 50% 28%, rgba(0, 0, 0, 0.2) 0%, rgba(4, 4, 10, 0.88) 62%, rgba(4, 4, 10, 1) 100%),
+                linear-gradient(180deg, rgba(4, 4, 10, 0.45) 0%, rgba(4, 4, 10, 0.75) 100%),
+                url('hero_299.jpg'),
+                url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80');
+            background-size: cover, cover, cover, cover;
+            background-position: center 30%;
+            background-attachment: fixed;
+        }
+    </style>
 </head>
 <body>
     <div id="maintenance-overlay" class="maintenance-overlay" style="display:none;" aria-hidden="true" hidden aria-live="polite" aria-modal="true" role="dialog">
@@ -796,7 +755,7 @@ body::after{
         </div>
         <input type="text" id="tr-text" placeholder="Text to translate (e.g. hello)" autocomplete="off">
         <input type="hidden" id="tr-src" value="en">
-        <input type="hidden" id="tr-tgt" value="en">
+        <input type="hidden" id="tr-tgt" value="ja">
         <div style="display:none;" aria-hidden="true">
             <label for="region-preset" id="label-region">Region</label>
             <select id="region-preset" class="lang-select" aria-hidden="true">
@@ -902,6 +861,8 @@ body::after{
         var GLB_PROJECT_PUBLIC_ROOT = './';
         /** Translate /health: smile-friend-engine (us-central1) */
         const NEXTBASE_APP_ORIGIN = 'https://smile-friend-engine-125142687526.us-central1.run.app';
+        /** Stripe entitlements (SQLite + PASS/HOLD); not served by smile-friend-engine. */
+        const GLB_BILLING_API_BASE = 'https://nextbase-billing-125142687526.asia-northeast1.run.app';
         var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
         var GLB_STRIPE_CORE_URL = 'https://buy.stripe.com/bJedRbefH5yogzZfuDasg09';
         const APP_VERSION = '2026.04.24.core.funnel.1';
@@ -1739,9 +1700,9 @@ body::after{
             var customerId = (localStorage.getItem(LS_CUSTOMER_ID) || '').trim();
             var apiUrl = '';
             if (customerId) {
-                apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?customer_id=' + encodeURIComponent(customerId);
+                apiUrl = GLB_BILLING_API_BASE + '/entitlements?customer_id=' + encodeURIComponent(customerId);
             } else if (sessionId) {
-                apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?session_id=' + encodeURIComponent(sessionId);
+                apiUrl = GLB_BILLING_API_BASE + '/entitlements?session_id=' + encodeURIComponent(sessionId);
             } else {
                 return null;
             }
@@ -2817,6 +2778,7 @@ body::after{
             function fetchTranslate(text, source, target) {
                 return fetch(NEXTBASE_APP_ORIGIN + '/translate', {
                     method: 'POST',
+                    mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(glbTranslatePayload(text, source, target, 'prod')),
                     cache: 'no-store'
