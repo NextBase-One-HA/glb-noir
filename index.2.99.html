@@ -20,13 +20,34 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background: var(--bg);
+            background-image: url('hero_299.jpg');
+            background-size: cover;
+            background-position: center 30%;
+            background-attachment: fixed;
             color: #fff;
-            font-family: var(--f-mono);
+            font-family: -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            text-align: center;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: rgba(255, 230, 100, 0.15);
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.95) 100%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         /* --- STAGE: 背景風景と漆黒の融合 --- */
         #glb-result-stage {
+            position: relative;
+            z-index: 1;
             position: relative;
             min-height: 55dvh;
             display: flex;
