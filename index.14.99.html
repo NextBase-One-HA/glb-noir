@@ -26,15 +26,28 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: var(--bg);
+      background-image: url('image_2.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
       color: var(--text);
       font-family: var(--f-mono);
       font-size: 14px;
       line-height: 1.6;
       overflow-x: hidden;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.95) 100%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     /* --- LAYOUT --- */
-    #app { position: relative; min-height: 100vh; display: flex; flex-direction: column; }
+    #app { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
     .screen { display: none; flex-direction: column; flex: 1; }
     .screen.active { display: flex; }
 
@@ -62,14 +75,14 @@
     .btn:disabled { border-color: var(--text3); color: var(--text3); cursor: not-allowed; }
 
     /* --- MAIN APP --- */
-    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border); }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.72); backdrop-filter: blur(10px); }
     .brand { font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; color: var(--teal); }
     .lang-pair { display: flex; gap: 0.8rem; align-items: center; cursor: pointer; background: var(--surface); padding: 0.4rem 0.8rem; border: 1px solid var(--border); }
     .lang-code { font-weight: 700; font-size: 0.9rem; }
 
-    .timer-bar { background: var(--surface); padding: 0.3rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.65rem; color: var(--amber); }
+    .timer-bar { background: rgba(10,10,10,0.72); backdrop-filter: blur(10px); padding: 0.3rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.65rem; color: var(--amber); }
 
-    .scene-strip { display: flex; overflow-x: auto; gap: 0.5rem; padding: 0.8rem 1rem; }
+    .scene-strip { display: flex; overflow-x: auto; gap: 0.5rem; padding: 0.8rem 1rem; background: rgba(10,10,10,0.58); backdrop-filter: blur(8px); }
     .scene-pill {
       white-space: nowrap; font-size: 0.7rem; color: var(--text2);
       padding: 0.3rem 0.6rem; cursor: pointer; border: 1px solid transparent;
@@ -94,7 +107,7 @@
     .action-link { font-size: 0.7rem; color: var(--text2); text-decoration: none; cursor: pointer; border-bottom: 1px solid transparent; }
     .action-link:hover { color: var(--teal); border-bottom-color: var(--teal); }
 
-    .room-footer { padding: 1rem; border-top: 1px solid var(--border); font-size: 0.7rem; display: flex; justify-content: space-between; align-items: center; color: var(--text3); }
+    .room-footer { padding: 1rem; border-top: 1px solid var(--border); font-size: 0.7rem; display: flex; justify-content: space-between; align-items: center; color: var(--text3); background: rgba(10,10,10,0.7); backdrop-filter: blur(10px); }
 
     /* Utility */
     .hide { display: none; }
