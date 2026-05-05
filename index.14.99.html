@@ -1,1266 +1,246 @@
 <!DOCTYPE html>
-<!--
-  PROJECT_PUBLIC_ROOT: https://nextbase-one-ha.github.io/nextbase-world/
-  【ページ正本・CANONICAL_TRAVEL_1499】
-  Travel モード本体は本ファイル。index.premium.html は説明LP。課金後は本ページへ着地。
-  30-Day Room 作成: glb-room.html?mode=create（本ページヘッダー直下の Create Room と同一導線）。
--->
-
-<html lang="en" class="notranslate" translate="no">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<link rel="icon" type="image/png" href="icon.png">
-<link rel="apple-touch-icon" href="icon.png">
-<title>GLOBAL LANGUAGE BREAKER</title>
-    <link rel="canonical" href="https://nextbase-one-ha.github.io/nextbase-world/index.14.99.html">
-    <meta property="og:url" content="https://nextbase-one-ha.github.io/nextbase-world/index.14.99.html">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>GLB Travel — Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
 
-:root {
-  --black:#050508; --panel:#11111a; --accent:#f3c623;
-  --accent-soft:rgba(243,198,35,.15); --white:#fff;
-  --text-dim:#9494b8; --border-glass:rgba(255,255,255,.08);
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  background:var(--black); color:var(--white);
-  font-family:'DM Sans',sans-serif; margin:0;
-  display:flex; flex-direction:column; min-height:100vh;
-  overflow-x:hidden; overflow-y:auto; -webkit-font-smoothing:antialiased;
-}
-.glb-header{padding:20px;display:flex;flex-direction:column;gap:15px;background:linear-gradient(to bottom,rgba(18,18,34,1),rgba(10,10,16,0));z-index:10}
-.brand-row{display:flex;justify-content:space-between;align-items:center}
-.glb-logo{font-family:'Syne',sans-serif;font-size:14px;letter-spacing:.1em;color:var(--accent);font-weight:800}
-.lang-selector-group{display:flex;align-items:center;background:var(--panel);border:1px solid var(--border-glass);border-radius:999px;padding:4px 12px}
-.lang-sel{background:transparent;border:0;color:var(--white);font-size:14px;font-weight:500;padding:8px 4px;outline:none;max-width:120px}
-.lang-swap-icon{color:var(--accent);padding:0 10px;font-size:18px;cursor:pointer}
-.glb-stage{flex:1;margin:0 20px;background:var(--panel);border:1px solid var(--border-glass);border-radius:32px;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px 24px;box-shadow:0 20px 40px rgba(0,0,0,.5)}
-.stage-label{position:absolute;top:24px;font-size:11px;text-transform:uppercase;letter-spacing:.2em;color:var(--text-dim)}
-.glb-result{font-family:'Syne',sans-serif;font-size:clamp(32px,8vw,48px);font-weight:800;text-align:center;line-height:1.1;width:100%;word-break:break-word}
-.glb-result.idle{font-family:'DM Sans',sans-serif;font-size:18px;color:var(--text-dim);opacity:.7}
-.glb-result.flipped{transform:rotate(180deg)}
-.flip-action{position:absolute;bottom:24px;background:var(--accent-soft);color:var(--accent);border:0;padding:8px 16px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer}
-.control-hub{padding:24px 20px calc(24px + env(safe-area-inset-bottom));background:var(--black)}
-.mode-switcher{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
-.mode-btn{background:var(--panel);border:1px solid var(--border-glass);border-radius:20px;padding:16px 8px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-dim);cursor:pointer}
-.mode-btn.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-.mode-icon{font-size:22px}.mode-label{font-size:11px;font-weight:700}
-.input-panel{display:none;animation:slideUp .3s ease-out}.input-panel.visible{display:block}
-@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.primary-action-btn{width:100%;padding:20px;border-radius:24px;border:0;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
-.mic-trigger{background:var(--white);color:var(--black)}.mic-trigger.recording{background:#ff3b30;color:#fff;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(.98)}}
-.text-input-group{display:flex;flex-direction:column;gap:12px}
-.modern-input{background:var(--panel);border:1px solid var(--border-glass);border-radius:16px;padding:18px;color:white;font-size:16px;outline:none}
-.translate-trigger{background:var(--accent);color:var(--black)}
-.quota-banner{text-align:center;padding:15px;font-size:12px;color:var(--text-dim)}
-.upgrade-link{color:var(--accent);text-decoration:underline;font-weight:700;margin-left:5px;cursor:pointer}
-.glb-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-height:30vh;overflow-y:auto}
-.glb-card{background:var(--panel);border:1px solid var(--border-glass);padding:15px;border-radius:16px;cursor:pointer}
-.glb-card-en{font-size:11px;color:var(--text-dim);margin-bottom:4px}
-.glb-card-translated{font-size:15px;font-weight:700}
-.maintenance-overlay{position:fixed;inset:0;z-index:99999;background:rgba(8,8,8,.96);display:none;align-items:center;justify-content:center;padding:24px}
-.maintenance-overlay.show{display:flex}
-.maintenance-card{width:min(520px,100%);border:1px solid #2a2a2a;border-radius:14px;background:#121212;padding:18px 16px}
-.maintenance-reload{margin-top:12px;border:1px solid #ffe566;color:#fff8c8;background:#1a1a1a;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:700}
+  <style>
+    :root {
+      --bg:        #000000;
+      --surface:   #0a0a0a;
+      --surface2:  #111111;
+      --border:    rgba(255,255,255,0.06);
+      --border2:   rgba(255,255,255,0.12);
+      --teal:      #00ffd9; /* 唯一のアクセント：サイバーシアン */
+      --amber:     #f59e0b;
+      --text:      #ffffff;
+      --text2:     #888888;
+      --text3:     #444444;
+      --f-mono:    'JetBrains Mono', monospace;
+    }
 
-/* Room CTA — aligned with index.premium.html .glb-travel-lp-secondary (tokens: --accent) */
-.glb-room-create-wrap{padding:4px 16px 14px;text-align:center;max-width:min(420px,100%);margin:0 auto}
-.glb-room-pass-hint{margin:0 0 12px;font-size:12px;color:var(--text-dim);line-height:1.6;text-align:center}
-.glb-room-pass-hint strong{color:var(--accent);font-weight:700}
-a.glb-travel-lp-secondary{
-  display:block;width:100%;max-width:340px;margin:0 auto;
-  padding:14px 20px;border-radius:999px;font-size:14px;font-weight:700;letter-spacing:.04em;
-  text-align:center;text-decoration:none;color:var(--accent);background:transparent;
-  border:1px solid rgba(243,198,35,.45);box-shadow:none;
-  transition:border-color .2s,background .2s;
-}
-a.glb-travel-lp-secondary:hover{border-color:rgba(243,198,35,.75);background:rgba(243,198,35,.08)}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--f-mono);
+      font-size: 14px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-</style>
+    /* --- LAYOUT --- */
+    #app { position: relative; min-height: 100vh; display: flex; flex-direction: column; }
+    .screen { display: none; flex-direction: column; flex: 1; }
+    .screen.active { display: flex; }
+
+    /* --- GUARD --- */
+    #screen-guard { align-items: center; justify-content: center; padding: 2rem; }
+    .spinner { width: 20px; height: 20px; border: 1px solid var(--border); border-top-color: var(--teal); animation: spin 1s linear infinite; margin-bottom: 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* --- ONBOARDING --- */
+    #screen-onboard { padding: 2rem; align-items: center; justify-content: center; }
+    .ob-wrap { width: 100%; max-width: 400px; }
+    .headline { font-size: 1.2rem; font-weight: 700; margin-bottom: 2rem; letter-spacing: -0.02em; }
+    .headline span { color: var(--teal); }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 2rem; }
+    .chip {
+      padding: 0.8rem 0.2rem; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text2); font-size: 0.7rem; text-align: center; cursor: pointer; transition: 0.2s;
+    }
+    .chip:hover, .chip.selected { border-color: var(--teal); color: var(--teal); background: transparent; }
+    .btn {
+      width: 100%; padding: 1rem; background: transparent; color: var(--teal); border: 1px solid var(--teal);
+      font-family: var(--f-mono); font-weight: 700; cursor: pointer; transition: 0.2s;
+    }
+    .btn:hover:not(:disabled) { background: var(--teal); color: #000; }
+    .btn:disabled { border-color: var(--text3); color: var(--text3); cursor: not-allowed; }
+
+    /* --- MAIN APP --- */
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border); }
+    .brand { font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; color: var(--teal); }
+    .lang-pair { display: flex; gap: 0.8rem; align-items: center; cursor: pointer; background: var(--surface); padding: 0.4rem 0.8rem; border: 1px solid var(--border); }
+    .lang-code { font-weight: 700; font-size: 0.9rem; }
+
+    .timer-bar { background: var(--surface); padding: 0.3rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.65rem; color: var(--amber); }
+
+    .scene-strip { display: flex; overflow-x: auto; gap: 0.5rem; padding: 0.8rem 1rem; }
+    .scene-pill {
+      white-space: nowrap; font-size: 0.7rem; color: var(--text2);
+      padding: 0.3rem 0.6rem; cursor: pointer; border: 1px solid transparent;
+    }
+    .scene-pill.active { color: var(--teal); border: 1px solid var(--teal); }
+    .scene-pill::before { content: '[ '; }
+    .scene-pill::after { content: ' ]'; }
+
+    .input-area { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+    textarea {
+      flex: 1; background: transparent; border: none; color: var(--text);
+      font-family: var(--f-mono); font-size: 1.1rem; resize: none; outline: none; min-height: 100px;
+    }
+    .result-box {
+      margin-top: 1rem; padding: 1.5rem; background: var(--surface2); border-left: 2px solid var(--teal);
+      display: none; flex-direction: column; gap: 1rem;
+    }
+    .result-box.show { display: flex; }
+    .result-text { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+
+    .actions { display: flex; gap: 1rem; margin-top: 1rem; }
+    .action-link { font-size: 0.7rem; color: var(--text2); text-decoration: none; cursor: pointer; border-bottom: 1px solid transparent; }
+    .action-link:hover { color: var(--teal); border-bottom-color: var(--teal); }
+
+    .room-footer { padding: 1rem; border-top: 1px solid var(--border); font-size: 0.7rem; display: flex; justify-content: space-between; align-items: center; color: var(--text3); }
+
+    /* Utility */
+    .hide { display: none; }
+    @media (min-width: 480px) { #app { max-width: 480px; margin: 0 auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); } }
+  </style>
 </head>
 
 <body>
-<div id="maintenance-overlay" class="maintenance-overlay" style="display:none;" aria-hidden="true" hidden aria-live="polite" aria-modal="true" role="dialog">
-  <div class="maintenance-card">
-    <h2>Maintenance</h2>
-    <p id="maintenance-message">We are currently enhancing the system for a better experience. Please check back shortly.</p>
-    <button type="button" id="maintenance-reload" class="maintenance-reload" style="display:none;">Reload</button>
-  </div>
-</div>
+  <div id="app">
+    <div id="screen-guard" class="screen active">
+      <div class="spinner"></div>
+      <div style="font-size:0.7rem; letter-spacing:0.1em; color:var(--text2)">INITIALIZING...</div>
+    </div>
 
-<p id="travel-status" style="display:none;font-size:11px;text-align:center;color:#f3c623;margin:8px 0 0;padding:0 16px;"></p>
-<p id="travel-remaining-line" style="display:none;font-size:11px;text-align:center;color:#a89860;margin:4px 0;padding:0 16px;" role="status" aria-live="polite"></p>
-<p id="travel-expiry-display" style="display:none;font-size:11px;text-align:center;color:#a89860;margin:0 0 8px;padding:0 16px;" role="status" aria-live="polite"></p>
+    <div id="screen-onboard" class="screen">
+      <div class="ob-wrap">
+        <div class="headline">/ SELECT_<br><span>LANGUAGE</span></div>
+        <div class="grid" id="lang-grid">
+          <div class="chip" data-code="en" onclick="sel(this)">ENGLISH</div>
+          <div class="chip" data-code="ja" onclick="sel(this)">JAPANESE</div>
+          <div class="chip" data-code="zh" onclick="sel(this)">CHINESE</div>
+          <div class="chip" data-code="ko" onclick="sel(this)">KOREAN</div>
+          <div class="chip" data-code="es" onclick="sel(this)">SPANISH</div>
+          <div class="chip" data-code="fr" onclick="sel(this)">FRENCH</div>
+        </div>
+        <button class="btn" id="btn-start" disabled onclick="finishOnboarding()">START_CONNECTION</button>
+      </div>
+    </div>
 
-<div class="glb-header">
-  <div class="brand-row">
-    <span class="glb-logo">GLB TRAVEL</span>
-    <span style="font-size:10px;color:var(--accent);letter-spacing:.08em;">30 DAY PASS</span>
-  </div>
-  <div class="lang-selector-group">
-    <select id="t-from" class="lang-sel"></select>
-    <span class="lang-swap-icon" id="t-swap">⇄</span>
-    <select id="t-to" class="lang-sel"></select>
-  </div>
-</div>
+    <div id="screen-app" class="screen">
+      <div class="topbar">
+        <div class="brand">GLB//TRVL</div>
+        <div class="lang-pair" onclick="swap()">
+          <span class="lang-code" id="l-from">EN</span>
+          <span style="color:var(--text3)">::</span>
+          <span class="lang-code" id="l-to">JA</span>
+        </div>
+        <div class="action-link">SETTINGS</div>
+      </div>
 
-<div class="glb-room-create-wrap" aria-label="30-day room">
-  <p class="glb-room-pass-hint"><strong>30-day translation room</strong> — included with this pass. Generate a 6-digit code; <strong>GLB Core ($2.99/mo) users can join</strong> your room. Access matches your Travel window.</p>
-  <a class="glb-travel-lp-secondary" href="glb-room.html?mode=create">Create Room</a>
-</div>
+      <div class="timer-bar">PASS_STATUS: ACTIVE // <span id="days">30</span>_DAYS_REMAINING</div>
 
-<div class="glb-stage" id="stage-area">
-  <span class="stage-label">When words fail</span>
-  <div class="glb-result idle" id="glb-result">Be understood. Anywhere.</div>
-  <div class="subline">AI detects your travel scene.<br>Airport · Taxi · Hotel · Restaurant · Emergency</div>
-  <button class="flip-action" id="flip-btn">🔄 Flip for them</button>
-</div>
+      <div class="scene-strip">
+        <div class="scene-pill active" onclick="setSc(this)">AUTO</div>
+        <div class="scene-pill" onclick="setSc(this)">AIRPORT</div>
+        <div class="scene-pill" onclick="setSc(this)">HOTEL</div>
+        <div class="scene-pill" onclick="setSc(this)">RESTAURANT</div>
+        <div class="scene-pill" onclick="setSc(this)">EMERGENCY</div>
+      </div>
 
-<div class="control-hub">
-  <div class="mode-switcher">
-    <button class="mode-btn active" id="btn-speak"><span class="mode-icon">🎙️</span><span class="mode-label">VOICE</span></button>
-    <button class="mode-btn" id="btn-show"><span class="mode-icon">⌨️</span><span class="mode-label">TYPE</span></button>
-    <button class="mode-btn" id="btn-essentials"><span class="mode-icon">💡</span><span class="mode-label">PHRASES</span></button>
-  </div>
+      <div class="input-area">
+        <textarea id="ti" placeholder="TYPE_MESSAGE_HERE..." oninput="checkIn()"></textarea>
 
-  <div class="input-panel visible" id="panel-speak">
-    <button class="primary-action-btn mic-trigger" id="mic-btn">🎤 Speak now</button>
-  </div>
+        <div id="res" class="result-box">
+          <div style="font-size:0.6rem; color:var(--text3); letter-spacing:0.2em">TRANSLATED_OUTPUT</div>
+          <div class="result-text" id="rt"></div>
+          <div class="actions">
+            <span class="action-link" onclick="speak()">[ SPEAK ]</span>
+            <span class="action-link" onclick="copy()">[ COPY ]</span>
+          </div>
+        </div>
 
-  <div class="input-panel" id="panel-show">
-    <div class="text-input-group">
-      <input type="text" id="show-input" class="modern-input" placeholder="Enter message..." autocomplete="off">
-      <button class="primary-action-btn translate-trigger" id="t-btn">GLB</button>
+        <button class="btn" id="bt" style="margin-top:auto" onclick="tr()">TRANSLATE_EXECUTE</button>
+      </div>
+
+      <div class="room-footer">
+        <span>MODE: PREMIUM_NOIR</span>
+        <span class="action-link">+ CREATE_ROOM</span>
+      </div>
     </div>
   </div>
 
-  <div class="input-panel" id="panel-essentials">
-    <div class="glb-cards" id="glb-cards"></div>
-  </div>
-
-  
-<div class="quota-banner" id="glb-quota-container">
-    <span id="glb-quota"></span>
-    <span id="upgrade-prompt" class="upgrade-link" style="display:none;" onclick="location.href='index.premium.html'">Travel Pass details</span>
-  </div>
-</div>
-
-<footer style="text-align:center;padding:12px 16px calc(20px + env(safe-area-inset-bottom));font-size:11px;color:#666;flex-shrink:0;">
-  <a href="index.html" style="color:var(--accent);text-decoration:none;margin:0 8px;">Home</a>
-  <a href="glb-room.html?mode=create" style="color:#9494b8;text-decoration:none;margin:0 8px;">Room</a>
-  <a href="terms.html" style="color:#9494b8;text-decoration:none;margin:0 8px;">Terms</a>
-  <a href="privacy.html" style="color:#9494b8;text-decoration:none;margin:0 8px;">Privacy</a>
-  <a href="support.html" style="color:#9494b8;text-decoration:none;margin:0 8px;">Support</a>
-</footer>
-
-<script>
-window.__GLB_PAGE_LAYER = 'travel';
-var GLB_PROJECT_PUBLIC_ROOT = 'https://nextbase-one-ha.github.io/nextbase-world/';
-function glbResolveApiOrigin() {
-    try {
-        if (window.__GLB_RUNTIME_CONFIG__ && window.__GLB_RUNTIME_CONFIG__.apiOrigin) {
-            return String(window.__GLB_RUNTIME_CONFIG__.apiOrigin).replace(/\/+$/, '');
-        }
-    } catch (e) { /* ignore */ }
-    return ('https://' + ['smile', 'friend', 'engine-125142687526'].join('-') + '.us-central1.run.app').replace(/\/+$/, '');
-}
-const NEXTBASE_APP_ORIGIN = glbResolveApiOrigin();
-const NEXTBASE_APP = NEXTBASE_APP_ORIGIN;
-var GLB_STRIPE_PORTAL_LOGIN_FALLBACK = 'https://billing.stripe.com/p/login/fZuaEZ0oRgd25Vl96fasg00';
-const APP_VERSION = '2026.04.26.travel.ui.9';
-const MAINTENANCE_DEFAULT = 'We are currently enhancing the system for a better experience. Please check back shortly.';
-const LS_CUSTOMER_ID = 'GLB_CUSTOMER_ID';
-const LS_GLB_CLIENT_ID = 'glb_client_id_v1';
-function glbEnsureClientId() {
-    try {
-        var k = LS_GLB_CLIENT_ID;
-        var v = localStorage.getItem(k);
-        if (v && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v).trim())) {
-            return String(v).trim();
-        }
-        if (window.crypto && window.crypto.randomUUID) {
-            v = window.crypto.randomUUID();
-        } else {
-            v = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r = Math.random() * 16 | 0;
-                var v2 = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v2.toString(16);
-            });
-        }
-        localStorage.setItem(k, v);
-        return v;
-    } catch (e) {
-        return '00000000-0000-4000-8000-000000000001';
-    }
-}
-function glbTranslatePayloadTravel(text, from, to, callerId) {
-    var o = {
-        text: text,
-        source: from,
-        target: to,
-        caller_id: callerId || 'travel',
-        client_id: glbEnsureClientId()
+  <script>
+    const state = {
+      from: 'en', to: 'ja',
+      onboarded: localStorage.getItem('on')
     };
-    try {
-        var cid = (localStorage.getItem(LS_CUSTOMER_ID) || '').trim();
-        if (cid) o.customer_id = cid;
-    } catch (e1) { /* ignore */ }
-    return o;
-}
-const LS_TRAVEL_PENDING = 'glb_travel_pending';
-const LS_PENDING_SESSION_ID = 'GLB_PENDING_SESSION_ID';
-const LS_BILLING_STATE = 'glb_billing_state_v1';
-const PLAN_CORE_299 = 'core_2_99';
-const PLAN_TRAVEL_1499_30D = 'travel_14_99_30d';
-const MS_30D = 30 * 24 * 60 * 60 * 1000;
-var GLB_CORE_SUBSCRIBED = false;
-var GLB_TRAVEL_ACTIVE = false;
-var GLB_TRAVEL_EXPIRES_AT = null;
-var GLB_SYSTEM_STATUS_CACHE = null;
-var GLB_SYSTEM_STATUS_AT = 0;
-var GLB_SYSTEM_STATUS_TTL = 30000;
-var GLB_MAINTENANCE_ON = false;
-var CURRENT_LANG = 'en';
 
-function T(k) {
-    var d = {
-        travelDaysLeft: 'Remaining {{n}} days (through {{date}})',
-        travelExpiresOn: 'Valid until {{date}}.'
+    function sel(el) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      state.from = el.dataset.code;
+      document.getElementById('btn-start').disabled = false;
+    }
+
+    function finishOnboarding() {
+      localStorage.setItem('on', '1');
+      show('screen-app');
+    }
+
+    function checkIn() {
+      if(!document.getElementById('ti').value.trim()) {
+        document.getElementById('res').classList.remove('show');
+      }
+    }
+
+    async function tr() {
+      const text = document.getElementById('ti').value.trim();
+      if(!text) return;
+
+      const b = document.getElementById('bt');
+      b.textContent = 'PROCESSING...';
+      b.disabled = true;
+
+      // DEMO DELAY
+      await new Promise(r => setTimeout(r, 600));
+
+      document.getElementById('rt').textContent = `>> ${text.toUpperCase()}`;
+      document.getElementById('res').classList.add('show');
+
+      b.textContent = 'TRANSLATE_EXECUTE';
+      b.disabled = false;
+    }
+
+    function swap() {
+      [state.from, state.to] = [state.to, state.from];
+      document.getElementById('l-from').textContent = state.from.toUpperCase();
+      document.getElementById('l-to').textContent = state.to.toUpperCase();
+    }
+
+    function setSc(el) {
+      document.querySelectorAll('.scene-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function show(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function speak() {
+      const u = new SpeechSynthesisUtterance(document.getElementById('rt').textContent);
+      u.lang = state.to;
+      speechSynthesis.speak(u);
+    }
+
+    function copy() {
+      navigator.clipboard.writeText(document.getElementById('rt').textContent);
+    }
+
+    window.onload = () => {
+      setTimeout(() => {
+        if(!state.onboarded) show('screen-onboard');
+        else show('screen-app');
+      }, 800);
     };
-    return d[k] || k;
-}
-
-function parseBillingState() {
-    try {
-        var raw = localStorage.getItem(LS_BILLING_STATE);
-        if (!raw) return null;
-        var o = JSON.parse(raw);
-        if (!o || typeof o !== 'object') return null;
-        return o;
-    } catch (e) { return null; }
-}
-
-function persistBillingState(patch) {
-    try {
-        var cur = parseBillingState() || {};
-        var next = {};
-        var k;
-        for (k in cur) { if (Object.prototype.hasOwnProperty.call(cur, k)) next[k] = cur[k]; }
-        for (k in patch) { if (Object.prototype.hasOwnProperty.call(patch, k)) next[k] = patch[k]; }
-        next.updatedAt = Date.now();
-        if (next.active === false) next.plan = null;
-        localStorage.setItem(LS_BILLING_STATE, JSON.stringify(next));
-        try { localStorage.removeItem('glb_subscribed'); localStorage.removeItem('glb_paid_lock_v1'); } catch (eRm) { /* ignore */ }
-    } catch (e) { /* ignore */ }
-}
-
-(function migrateLegacyBillingToState() {
-    try {
-        var cur = parseBillingState();
-        var hasState = !!(cur && typeof cur.active === 'boolean');
-        var legV = '';
-        var legLock = false;
-        try {
-            legV = localStorage.getItem('glb_subscribed') || '';
-            legLock = localStorage.getItem('glb_paid_lock_v1') === '1';
-        } catch (e0) { /* ignore */ }
-        var legacyPaid = legV === '1' || legV === 'true' || legLock;
-        if (!hasState && legacyPaid) {
-            persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'migration_legacy', updatedAt: Date.now() });
-        }
-        if (parseBillingState()) {
-            localStorage.removeItem('glb_subscribed');
-            localStorage.removeItem('glb_paid_lock_v1');
-        }
-    } catch (e) { /* ignore */ }
-})();
-
-function glbCorePaidActive() {
-    var s = parseBillingState();
-    if (!s || s.active !== true) return false;
-    return s.plan === PLAN_CORE_299 || s.plan === PLAN_TRAVEL_1499_30D;
-}
-
-function getTravelPassState() {
-    var s = parseBillingState();
-    return (s && s.travelPass && typeof s.travelPass === 'object') ? s.travelPass : null;
-}
-
-function isTravelPassActive(nowMs) {
-    nowMs = nowMs || Date.now();
-    var s = parseBillingState();
-    if (!s || s.active !== true || s.plan !== PLAN_TRAVEL_1499_30D) return false;
-    var tp = getTravelPassState();
-    if (!tp || tp.enabled !== true) return false;
-    if (tp.expired === true) return false;
-    var exp = Number(tp.expiresAt || 0);
-    if (!exp || !isFinite(exp)) return false;
-    return nowMs < exp;
-}
-
-function glbIsAdminMode() {
-    try {
-        var u = new URL(window.location.href);
-        return (u.searchParams.get('nori') || '') === 'admin';
-    } catch (e) {
-        return false;
-    }
-}
-
-function isTravelUiUnlimited() {
-    return glbIsAdminMode() || isTravelPassActive() || !!GLB_TRAVEL_ACTIVE;
-}
-
-function expireTravelPassIfNeeded() {
-    try {
-        var now = Date.now();
-        var s = parseBillingState();
-        if (!s || s.active !== true) return false;
-        if (s.plan !== PLAN_TRAVEL_1499_30D) return false;
-        var tp = getTravelPassState();
-        var exp = tp ? Number(tp.expiresAt || 0) : 0;
-        if (!exp || !isFinite(exp)) return false;
-        if (now < exp) return false;
-        persistBillingState({
-            plan: PLAN_CORE_299,
-            active: true,
-            source: 'travel_expired',
-            travelPass: {
-                enabled: false,
-                startedAt: tp ? tp.startedAt : null,
-                expiresAt: exp,
-                expired: true,
-                timeSource: tp ? (tp.timeSource || 'local_pending_sync') : 'local_pending_sync'
-            }
-        });
-        return true;
-    } catch (e) { return false; }
-}
-
-function glbSanitizeTracePayload(payload) {
-    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return payload;
-    var out = {};
-    for (var k in payload) {
-        if (!Object.prototype.hasOwnProperty.call(payload, k)) continue;
-        if (k === 'href' && typeof payload[k] === 'string') {
-            try {
-                var u = new URL(payload[k], window.location.origin);
-                u.searchParams.delete('session_id');
-                out[k] = u.pathname + u.search + u.hash;
-            } catch (eH) { out[k] = payload[k]; }
-        } else { out[k] = payload[k]; }
-    }
-    return out;
-}
-
-function glbTraceExpiry(step, payload) {
-    try {
-        var trace = window.__GLB_TIME_DRIFT_TRACE__ || [];
-        trace.push({ t: Date.now(), step: step, payload: glbSanitizeTracePayload(payload) || null });
-        if (trace.length > 80) trace = trace.slice(trace.length - 80);
-        window.__GLB_TIME_DRIFT_TRACE__ = trace;
-        sessionStorage.setItem('GLB_TIME_DRIFT_TRACE', JSON.stringify(trace));
-    } catch (e) { /* ignore */ }
-}
-
-function forceRedirectToCore(reason) {
-    var target = 'https://nextbase-one-ha.github.io/nextbase-world/index.next.html';
-    console.log('REDIRECT_EXECUTE', target, 'reason=' + reason);
-    glbTraceExpiry('redirect_execute', { target: target, reason: reason, href: window.location.href });
-    try { window.location.replace(target); } catch (e0) { /* ignore */ }
-    setTimeout(function () {
-        try {
-            if (window.location.href.indexOf('/index.2.99.html') === -1) {
-                window.location.assign(target);
-            }
-        } catch (e1) { /* ignore */ }
-    }, 60);
-}
-
-(function primeBillingFromUrl() {
-    try {
-        var u = new URL(window.location.href);
-        var sid = (u.searchParams.get('session_id') || '').trim();
-        var subq = u.searchParams.get('subscribed');
-        var isTravelRedirect = u.searchParams.get('travel') === '1';
-        var current = parseBillingState();
-        glbTraceExpiry('prime:start', {
-            sid: !!sid,
-            isTravelRedirect: isTravelRedirect,
-            currentPlan: current && current.plan ? current.plan : null,
-            currentExp: current && current.travelPass ? Number(current.travelPass.expiresAt || 0) : 0
-        });
-        if (sid && isTravelRedirect) {
-            if (!(current && current.active === true && current.plan)) {
-                var startedAt = Date.now();
-                persistBillingState({
-                    plan: PLAN_TRAVEL_1499_30D,
-                    active: true,
-                    source: 'stripe_success',
-                    travelPass: {
-                        enabled: true,
-                        startedAt: startedAt,
-                        expiresAt: startedAt + MS_30D,
-                        expired: false,
-                        timeSource: 'local_pending_sync'
-                    }
-                });
-                glbTraceExpiry('prime:write_travel', { startedAt: startedAt });
-            } else {
-                glbTraceExpiry('prime:skip_existing_state', {
-                    plan: current.plan,
-                    exp: current.travelPass ? Number(current.travelPass.expiresAt || 0) : 0
-                });
-            }
-        } else if (sid) {
-            if (!(current && current.active === true)) {
-                persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'stripe_success', updatedAt: Date.now() });
-            }
-        } else if (subq === '1' || subq === 'true') {
-            if (!(current && current.active === true)) {
-                persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'url_subscribed', updatedAt: Date.now() });
-            }
-        }
-    } catch (e) { /* ignore */ }
-})();
-
-(function guardTravelRequiresActiveTravelPass() {
-    try {
-        var u = new URL(window.location.href);
-        if ((u.searchParams.get('nori') || '') === 'admin') return;
-        var before = parseBillingState();
-        glbTraceExpiry('guard:before_expire_check', {
-            plan: before && before.plan ? before.plan : null,
-            active: !!(before && before.active === true),
-            exp: before && before.travelPass ? Number(before.travelPass.expiresAt || 0) : 0,
-            now: Date.now()
-        });
-        if (expireTravelPassIfNeeded()) {
-            try { sessionStorage.setItem('GLB_FORCE_CORE_AFTER_TRAVEL_EXPIRE', '1'); } catch (e0) { /* ignore */ }
-            forceRedirectToCore('travel_expired');
-            return;
-        }
-        if (!glbCorePaidActive()) {
-            window.location.replace(new URL('index.html', window.location.href).href);
-            return;
-        }
-        if (!isTravelPassActive()) {
-            forceRedirectToCore('travel_inactive');
-            return;
-        }
-    } catch (e) { /* ignore */ }
-})();
-
-function compareVersion(a, b) {
-    var aa = String(a || '').split('.');
-    var bb = String(b || '').split('.');
-    var n = Math.max(aa.length, bb.length);
-    for (var i = 0; i < n; i++) {
-        var x = parseInt(aa[i] || '0', 10);
-        var y = parseInt(bb[i] || '0', 10);
-        if (x > y) return 1;
-        if (x < y) return -1;
-    }
-    return 0;
-}
-
-function setMaintenanceOverlay(on, message, forceReload) {
-    var ov = document.getElementById('maintenance-overlay');
-    var msg = document.getElementById('maintenance-message');
-    var btn = document.getElementById('maintenance-reload');
-    if (!ov || !msg || !btn) return;
-    GLB_MAINTENANCE_ON = !!on;
-    msg.textContent = message || MAINTENANCE_DEFAULT;
-    btn.style.display = forceReload ? '' : 'none';
-    ov.hidden = !on;
-    ov.setAttribute('aria-hidden', on ? 'false' : 'true');
-    ov.style.display = on ? 'flex' : 'none';
-    if (on) ov.classList.add('show');
-    else ov.classList.remove('show');
-}
-
-function applySystemStatus(status) {
-    if (!status) return;
-    var forceReload = status.min_app_version && compareVersion(status.min_app_version, APP_VERSION) > 0;
-    if (forceReload) {
-        setMaintenanceOverlay(true, 'A new version is available. Please reload the page.', true);
-        return;
-    }
-    if (status.maintenance_mode) {
-        setMaintenanceOverlay(true, status.maintenance_message || MAINTENANCE_DEFAULT, false);
-        return;
-    }
-    setMaintenanceOverlay(false, '', false);
-}
-
-function fetchSystemStatus(force) {
-    var now = Date.now();
-    if (!force && GLB_SYSTEM_STATUS_CACHE && (now - GLB_SYSTEM_STATUS_AT < GLB_SYSTEM_STATUS_TTL)) {
-        applySystemStatus(GLB_SYSTEM_STATUS_CACHE);
-        return Promise.resolve(GLB_SYSTEM_STATUS_CACHE);
-    }
-    return fetch(NEXTBASE_APP_ORIGIN + '/system-status', { method: 'GET', cache: 'no-store' })
-        .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-        .then(function (j) {
-            GLB_SYSTEM_STATUS_CACHE = j;
-            GLB_SYSTEM_STATUS_AT = Date.now();
-            applySystemStatus(j);
-            return j;
-        })
-        .catch(function () {
-            try { setMaintenanceOverlay(false, '', false); } catch (e0) { /* ignore */ }
-            return GLB_SYSTEM_STATUS_CACHE;
-        });
-}
-
-(function initSystemStatusWatcher() {
-    var reloadBtn = document.getElementById('maintenance-reload');
-    if (reloadBtn) reloadBtn.addEventListener('click', function () { location.reload(); });
-    fetchSystemStatus(true);
-    setInterval(function () { fetchSystemStatus(false); }, 30000);
-    window.addEventListener('pageshow', function () { fetchSystemStatus(true); });
-})();
-
-function cleanupUrlParams() {
-    try {
-        var url = new URL(window.location.href);
-        url.searchParams.delete('travel');
-        url.searchParams.delete('session_id');
-        url.searchParams.delete('subscribed');
-        history.replaceState({}, '', url.pathname + url.search + url.hash);
-    } catch (e) { /* ignore */ }
-}
-
-function showTravelStatus(message) {
-    var el = document.getElementById('travel-status');
-    if (!el) return;
-    if (!message) {
-        el.style.display = 'none';
-        el.textContent = '';
-        return;
-    }
-    el.textContent = message;
-    el.style.display = '';
-}
-
-function updateEntitlementState(data) {
-    if (data && data.ok) {
-        GLB_CORE_SUBSCRIBED = !!data.core_subscribed || glbCorePaidActive();
-        GLB_TRAVEL_ACTIVE = !!data.travel_active;
-        GLB_TRAVEL_EXPIRES_AT = data.travel_pass_expires_at ? String(data.travel_pass_expires_at) : null;
-    }
-    if (typeof refreshTravelRemainingLine === 'function') refreshTravelRemainingLine();
-    if (typeof updateQuota === 'function') updateQuota();
-}
-
-function applySafeFallbackUi() {
-    GLB_CORE_SUBSCRIBED = false;
-    GLB_TRAVEL_ACTIVE = false;
-    GLB_TRAVEL_EXPIRES_AT = null;
-    if (typeof refreshTravelRemainingLine === 'function') refreshTravelRemainingLine();
-    if (typeof updateQuota === 'function') updateQuota();
-}
-
-function refreshTravelRemainingLine() {
-    var el = document.getElementById('travel-remaining-line');
-    var expDisp = document.getElementById('travel-expiry-display');
-    if (!el) return;
-    if (!GLB_TRAVEL_ACTIVE || !GLB_TRAVEL_EXPIRES_AT) {
-        el.style.display = 'none';
-        el.textContent = '';
-        if (expDisp) { expDisp.style.display = 'none'; expDisp.textContent = ''; }
-        return;
-    }
-    var exp = new Date(GLB_TRAVEL_EXPIRES_AT);
-    if (isNaN(exp.getTime())) {
-        el.style.display = 'none';
-        if (expDisp) { expDisp.style.display = 'none'; expDisp.textContent = ''; }
-        return;
-    }
-    var msLeft = exp.getTime() - Date.now();
-    var days = Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
-    var loc = (CURRENT_LANG === 'ja') ? 'ja-JP' : (CURRENT_LANG === 'zh' ? 'zh-CN' : 'en-US');
-    var dateStr = exp.toLocaleDateString(loc, { year: 'numeric', month: 'short', day: 'numeric' });
-    el.textContent = T('travelDaysLeft').replace(/\{\{n\}\}/g, String(days)).replace(/\{\{date\}\}/g, dateStr);
-    el.style.display = '';
-    if (expDisp) {
-        expDisp.style.display = '';
-        expDisp.textContent = T('travelExpiresOn').replace(/\{\{date\}\}/g, dateStr);
-    }
-}
-
-async function syncEntitlements() {
-    var url = new URL(window.location.href);
-    var sessionId = (url.searchParams.get('session_id') || '').trim();
-    var customerId = (localStorage.getItem(LS_CUSTOMER_ID) || '').trim();
-    var pendingSessionId = (localStorage.getItem(LS_PENDING_SESSION_ID) || '').trim();
-    var apiUrl = '';
-    if (sessionId) {
-        try { localStorage.setItem(LS_PENDING_SESSION_ID, sessionId); } catch (e) { /* ignore */ }
-    }
-    if (customerId) {
-        apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?customer_id=' + encodeURIComponent(customerId);
-    } else if (sessionId) {
-        apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?session_id=' + encodeURIComponent(sessionId);
-    } else if (pendingSessionId) {
-        apiUrl = NEXTBASE_APP_ORIGIN + '/entitlements?session_id=' + encodeURIComponent(pendingSessionId);
-    } else {
-        return null;
-    }
-    var data;
-    try {
-        var res = await fetch(apiUrl, { cache: 'no-store' });
-        data = await res.json();
-    } catch (err) {
-        return null;
-    }
-    if (data && data.ok) {
-        if (data.customer_id) {
-            localStorage.setItem(LS_CUSTOMER_ID, data.customer_id);
-            try { localStorage.removeItem(LS_PENDING_SESSION_ID); } catch (e) { /* ignore */ }
-        }
-        if (data.core_subscribed && data.travel_active) {
-            var expMs = 0;
-            try { expMs = data.travel_pass_expires_at ? Date.parse(String(data.travel_pass_expires_at)) : 0; } catch (e0) { expMs = 0; }
-            if (expMs && isFinite(expMs)) {
-                persistBillingState({
-                    plan: PLAN_TRAVEL_1499_30D,
-                    active: true,
-                    source: 'entitlements_api',
-                    travelPass: {
-                        enabled: true,
-                        startedAt: expMs - MS_30D,
-                        expiresAt: expMs,
-                        expired: false,
-                        timeSource: 'entitlements_api'
-                    }
-                });
-            } else {
-                persistBillingState({ plan: PLAN_TRAVEL_1499_30D, active: true, source: 'entitlements_api', updatedAt: Date.now() });
-            }
-        } else if (data.core_subscribed) {
-            persistBillingState({ plan: PLAN_CORE_299, active: true, source: 'entitlements_api', updatedAt: Date.now() });
-        } else {
-            var st = parseBillingState();
-            var holdCheckout = st && st.active && (st.source === 'stripe_success' || st.source === 'url_subscribed');
-            if (holdCheckout) {
-                persistBillingState({ plan: st.plan || PLAN_CORE_299, active: true, source: st.source, updatedAt: Date.now(), travelPass: st.travelPass });
-            } else if (st && st.active && st.source === 'migration_legacy' && !(data.customer_id && data.ok)) {
-                persistBillingState({ plan: st.plan || PLAN_CORE_299, active: true, source: 'migration_legacy', updatedAt: Date.now(), travelPass: st.travelPass });
-            } else {
-                persistBillingState({ plan: null, active: false, source: 'entitlements_api', updatedAt: Date.now() });
-            }
-        }
-        updateEntitlementState(data);
-    }
-    return data;
-}
-
-async function syncEntitlementsWithCheckoutRetry() {
-    var loc = new URL(window.location.href);
-    var hasSessionInUrl = !!(loc.searchParams.get('session_id') || '').trim();
-    var maxTry = 5;
-    var delayMs = 1200;
-    var last = null;
-    for (var i = 0; i < maxTry; i++) {
-        try { last = await syncEntitlements(); } catch (e) { last = null; }
-        if (last && last.ok && (last.core_subscribed || last.travel_active)) {
-            return last;
-        }
-        if (!hasSessionInUrl) return last;
-        if (i < maxTry - 1) {
-            await new Promise(function (r) { setTimeout(r, delayMs); });
-        }
-    }
-    return last;
-}
-
-async function handleTravelActivationFlow() {
-    var url = new URL(window.location.href);
-    var isTravelRedirect = url.searchParams.get('travel') === '1';
-    var isCoreRedirect = url.searchParams.get('subscribed') === '1';
-    var hasSessionId = !!(url.searchParams.get('session_id') || '').trim();
-    if (hasSessionId) {
-        try { localStorage.setItem(LS_PENDING_SESSION_ID, (url.searchParams.get('session_id') || '').trim()); } catch (e) { /* ignore */ }
-    }
-    if (!isTravelRedirect && !isCoreRedirect) {
-        try {
-            var ent0 = await syncEntitlements();
-            if (ent0 === null && (localStorage.getItem(LS_CUSTOMER_ID) || '').trim()) {
-                applySafeFallbackUi();
-            }
-        } catch (e) {
-            applySafeFallbackUi();
-        }
-        return;
-    }
-    localStorage.setItem(LS_TRAVEL_PENDING, 'true');
-    showTravelStatus(isCoreRedirect ? 'Activating Core Access...' : 'Activating Travel Pass...');
-    var timeoutId = setTimeout(function () {
-        if (localStorage.getItem(LS_TRAVEL_PENDING) === 'true') {
-            localStorage.removeItem(LS_TRAVEL_PENDING);
-            showTravelStatus(isCoreRedirect ? 'Core access activation is taking longer than expected.' : 'Travel pass activation is taking longer than expected.');
-            cleanupUrlParams();
-        }
-    }, 60000);
-    try {
-        var ent = await syncEntitlementsWithCheckoutRetry();
-        if (ent && ent.ok && isCoreRedirect && ent.core_subscribed) {
-            localStorage.removeItem(LS_TRAVEL_PENDING);
-            showTravelStatus('Core Access Active');
-            cleanupUrlParams();
-        } else if (ent && ent.ok && ent.travel_active) {
-            localStorage.removeItem(LS_TRAVEL_PENDING);
-            showTravelStatus('Travel Pass Active');
-            cleanupUrlParams();
-        }
-    } catch (e) {
-        applySafeFallbackUi();
-    } finally {
-        clearTimeout(timeoutId);
-        if ((localStorage.getItem(LS_CUSTOMER_ID) || '').trim()) {
-            cleanupUrlParams();
-        }
-    }
-}
-
-const LS_QUOTA = 'glb_travel_demo_quota_v1';
-const FREE_LIMIT = 5;
-
-const LANGS = [
-  {c:'en',l:'English'},{c:'ja',l:'日本語'},{c:'zh',l:'中文'},
-  {c:'ko',l:'한국어'},{c:'es',l:'Español'},{c:'fr',l:'Français'},
-  {c:'de',l:'Deutsch'},{c:'it',l:'Italiano'},{c:'ru',l:'Русский'},
-  {c:'th',l:'ไทย'},{c:'vi',l:'Tiếng Việt'},{c:'hi',l:'हिन्दी'},{c:'pt',l:'Português'}
-];
-
-const ESSENTIALS = [
-  { en: 'Where is the toilet?', key: 'toilet' },
-  { en: 'How much is this?', key: 'price' },
-  { en: 'I need a doctor.', key: 'doctor' },
-  { en: 'Please call the police.', key: 'police' },
-  { en: 'Do you speak English?', key: 'english' },
-  { en: 'Thank you very much.', key: 'thanks' },
-  { en: 'I don\'t understand.', key: 'understand' },
-  { en: 'Please help me.', key: 'help' },
-  { en: 'Where is the hotel?', key: 'hotel' },
-  { en: 'I am allergic to...', key: 'allergy' },
-  { en: 'That was absolutely delicious!', key: 'delicious' },
-  { en: 'This place is beautiful.', key: 'beautiful' },
-  { en: 'You have been very kind. Thank you.', key: 'kind_thanks' },
-  { en: 'Can you recommend something local?', key: 'recommend_local' },
-  { en: 'Is tipping customary here?', key: 'tipping_customary' },
-  { en: 'Tipping is not expected here.', key: 'tipping_not_expected' },
-  { en: 'Rounding up the bill is enough.', key: 'rounding_up' },
-  { en: 'A small cash tip is appreciated.', key: 'small_cash_tip' },
-];
-
-var currentMode = null;
-var isFlipped = false;
-var isRecording = false;
-var recognition = null;
-var essentialCache = {};
-
-function glbTodayKey() {
-    var d = new Date();
-    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-}
-
-function getQuota() {
-    if (isTravelUiUnlimited()) return { day: glbTodayKey(), count: 0 };
-    try {
-        var today = glbTodayKey();
-        var raw = localStorage.getItem(LS_QUOTA);
-        if (!raw) return { day: today, count: 0 };
-        var j = JSON.parse(raw);
-        return j.day !== today ? { day: today, count: 0 } : j;
-    } catch(e) { return { day:'', count:0 }; }
-}
-
-function bumpQuota() {
-    if (isTravelUiUnlimited()) return;
-    try {
-        var q = getQuota();
-        q.count = (q.count||0) + 1;
-        localStorage.setItem(LS_QUOTA, JSON.stringify(q));
-    } catch(e) {}
-}
-
-function updateQuota() {
-    var el = document.getElementById('glb-quota');
-    if (!el) return;
-    if (isTravelUiUnlimited()) {
-        el.textContent = 'Travel Pass active — unlimited translations';
-        return;
-    }
-    var q = getQuota();
-    var left = Math.max(0, FREE_LIMIT - q.count);
-    el.textContent = left > 0
-        ? (left + ' free translation' + (left !== 1 ? 's' : '') + ' remaining today (demo cap)')
-        : 'Demo limit reached';
-}
-
-function fillSelect(sel) {
-    sel.innerHTML = '';
-    LANGS.forEach(function (l) {
-        var o = document.createElement('option');
-        o.value = l.c; o.textContent = l.l;
-        sel.appendChild(o);
-    });
-}
-
-function initLang() {
-    var from = document.getElementById('t-from');
-    var to = document.getElementById('t-to');
-    fillSelect(from); fillSelect(to);
-    var detectedLang = ((navigator.language || 'en').split('-')[0] || 'en');
-    var savedFrom = localStorage.getItem('glb_user_base_lang') || detectedLang;
-    var savedTo = localStorage.getItem('glb_user_target_lang');
-    from.value = LANGS.some(function (x) { return x.c === savedFrom; }) ? savedFrom : 'en';
-    to.value = savedTo || (from.value === 'en' ? 'ja' : 'en');
-    localStorage.setItem('glb_user_base_lang', from.value);
-    localStorage.setItem('glb_user_target_lang', to.value);
-    document.getElementById('t-swap').addEventListener('click', function () {
-        var tmp = from.value;
-        from.value = to.value;
-        to.value = tmp;
-        essentialCache = {};
-        if (currentMode === 'essentials') renderEssentials();
-    });
-    from.addEventListener('change', function () {
-        localStorage.setItem('glb_user_base_lang', from.value);
-    });
-    to.addEventListener('change', function () {
-        localStorage.setItem('glb_user_target_lang', to.value);
-        essentialCache = {};
-        if (currentMode === 'essentials') renderEssentials();
-    });
-}
-
-function setMode(mode) {
-    currentMode = mode;
-    ['speak','show','essentials'].forEach(function (m) {
-        document.getElementById('btn-' + m).classList.toggle('active', m === mode);
-        document.getElementById('panel-' + m).classList.toggle('visible', m === mode);
-    });
-    if (mode === 'essentials') renderEssentials();
-    if (mode === 'show') {
-        setTimeout(function () { document.getElementById('show-input').focus(); }, 100);
-    }
-}
-
-document.getElementById('flip-btn').addEventListener('click', function () {
-    isFlipped = !isFlipped;
-    var r = document.getElementById('glb-result');
-    r.classList.toggle('flipped', isFlipped);
-    document.getElementById('flip-btn').textContent = isFlipped ? 'Unflip' : 'Flip';
-});
-
-function setResult(text, isIdle) {
-    var el = document.getElementById('glb-result');
-    el.textContent = text || 'Be understood. Anywhere.';
-    el.classList.toggle('idle', !!isIdle);
-}
-
-
-const GLB_PERSONAL_DICT = {
-  _key: 'glb_personal_dict_v1',
-
-  getAll: function () {
-    try { return JSON.parse(localStorage.getItem(this._key)) || {}; }
-    catch (e) { return {}; }
-  },
-
-  makeKey: function (text, from, to) {
-    return [from, to, String(text || '').toLowerCase().trim()].join('|');
-  },
-
-  normalizeTokens: function (text) {
-    var alias = {
-      luggage: 'bag',
-      suitcase: 'bag',
-      gone: 'lost',
-      missing: 'lost',
-      restroom: 'toilet',
-      bathroom: 'toilet',
-      taxi: 'cab',
-      physician: 'doctor'
-    };
-    var stop = { i:1, my:1, is:1, am:1, a:1, an:1, the:1, to:1, please:1 };
-    return String(text || '')
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, ' ')
-      .split(/\s+/)
-      .filter(Boolean)
-      .map(function (w) { return alias[w] || w; })
-      .filter(function (w) { return !stop[w]; });
-  },
-
-  hasNegation: function (text) {
-    return /\b(no|not|never|dont|don't|cannot|can't|isn't|wasn't)\b/i.test(String(text || ''));
-  },
-
-  fuzzyMatch: function (text, from, to) {
-    try {
-      if (this.hasNegation(text)) return null;
-      var q = this.normalizeTokens(text);
-      if (q.length < 2) return null;
-
-      var dict = this.getAll();
-      var best = null;
-      var bestScore = 0;
-
-      Object.keys(dict).forEach(function (k) {
-        var parts = k.split('|');
-        if (parts.length < 3) return;
-        if (parts[0] !== from || parts[1] !== to) return;
-
-        var src = parts.slice(2).join('|');
-        var t = GLB_PERSONAL_DICT.normalizeTokens(src);
-        if (t.length < 2) return;
-
-        var qs = {};
-        var ts = {};
-        q.forEach(function (x) { qs[x] = 1; });
-        t.forEach(function (x) { ts[x] = 1; });
-
-        var inter = 0;
-        var union = {};
-        Object.keys(qs).forEach(function (x) { union[x] = 1; if (ts[x]) inter++; });
-        Object.keys(ts).forEach(function (x) { union[x] = 1; });
-
-        var score = inter / Math.max(1, Object.keys(union).length);
-        if (score > bestScore) {
-          bestScore = score;
-          best = dict[k];
-        }
-      });
-
-      return bestScore >= 0.82 ? best : null;
-    } catch (e) {
-      return null;
-    }
-  },
-
-  match: function (text, from, to) {
-    try {
-      var dict = this.getAll();
-      var exact = dict[this.makeKey(text, from, to)];
-      if (exact) return exact;
-      return this.fuzzyMatch(text, from, to);
-    } catch (e) {
-      return null;
-    }
-  },
-
-  save: function (text, translated, from, to) {
-    try {
-      if (!text || !translated) return;
-      if (String(text).length > 80) return;
-      if (String(translated).length > 160) return;
-      var dict = this.getAll();
-      dict[this.makeKey(text, from, to)] = String(translated);
-      localStorage.setItem(this._key, JSON.stringify(dict));
-    } catch (e) {}
-  },
-
-  clear: function () {
-    try { localStorage.removeItem(this._key); } catch (e) {}
-  }
-};
-
-async function translate(text, from, to) {
-    if (GLB_MAINTENANCE_ON) return null;
-    if (!isTravelUiUnlimited()) {
-        var q = getQuota();
-        if (q.count >= FREE_LIMIT) {
-            setResult('Today\'s free limit reached.');
-            return null;
-        }
-    }
-    var localHit = GLB_PERSONAL_DICT.match(text, from, to);
-    if (localHit) {
-        setResult(localHit);
-        bumpQuota();
-        updateQuota();
-        return localHit;
-    }
-
-    try {
-        setResult('Translating...');
-        var r = await fetch(NEXTBASE_APP + '/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(glbTranslatePayloadTravel(text, from, to, 'travel')),
-            cache: 'no-store'
-        });
-        if (r.status === 429) {
-            setResult('Cloud daily limit reached. Subscribe to GLB for unlimited translation.', true);
-            return null;
-        }
-        var raw = await r.text();
-        var out = raw;
-        try { var j = JSON.parse(raw); out = j.translatedText || raw; } catch(e) {}
-        setResult(out);
-        GLB_PERSONAL_DICT.save(text, out, from, to);
-        bumpQuota();
-        updateQuota();
-        return out;
-    } catch(e) {
-        setResult('Connection issue. Please try again.', true);
-        return null;
-    }
-}
-
-async function runTranslate() {
-    if (GLB_MAINTENANCE_ON) return;
-    var text = document.getElementById('show-input').value.trim();
-    if (!text) return;
-    var from = document.getElementById('t-from').value;
-    var to = document.getElementById('t-to').value;
-    if (from === to) { setResult(text); return; }
-    await translate(text, from, to);
-}
-
-document.getElementById('show-input').addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') runTranslate();
-});
-
-function toggleMic() {
-    if (GLB_MAINTENANCE_ON) return;
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        setResult('Voice input is not available in this browser.', true);
-        return;
-    }
-    if (isRecording) { stopMic(); return; }
-    startMic();
-}
-
-function startMic() {
-    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SR();
-    var from = document.getElementById('t-from').value;
-    recognition.lang = from;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.onresult = async function (e) {
-        var spoken = e.results[0][0].transcript;
-        var to = document.getElementById('t-to').value;
-        await translate(spoken, from, to);
-        stopMic();
-    };
-    recognition.onerror = function () {
-        setResult('I could not hear clearly. Please try again.', true);
-        stopMic();
-    };
-    recognition.onend = function () { stopMic(); };
-    recognition.start();
-    isRecording = true;
-    var btn = document.getElementById('mic-btn');
-    btn.classList.add('recording');
-    btn.textContent = '⏹ Listening…';
-    setResult('Listening…', true);
-}
-
-function stopMic() {
-    if (recognition) { try { recognition.stop(); } catch(e) {} }
-    isRecording = false;
-    var btn = document.getElementById('mic-btn');
-    btn.classList.remove('recording');
-    btn.innerHTML = '🎤 &nbsp; Be understood. Anywhere.';
-}
-
-async function renderEssentials() {
-    if (GLB_MAINTENANCE_ON) return;
-    var container = document.getElementById('glb-cards');
-    var to = document.getElementById('t-to').value;
-    container.innerHTML = '';
-
-    ESSENTIALS.forEach(function (phrase) {
-        var card = document.createElement('div');
-        card.className = 'glb-card';
-
-        var enLine = document.createElement('div');
-        enLine.className = 'glb-card-en';
-        enLine.textContent = phrase.en;
-
-        var transLine = document.createElement('div');
-        transLine.className = 'glb-card-translated';
-
-        var cacheKey = phrase.key + '_' + to;
-        transLine.textContent = essentialCache[cacheKey] || 'Tap to translate';
-
-        card.appendChild(enLine);
-        card.appendChild(transLine);
-
-        card.addEventListener('click', async function () {
-            if (essentialCache[cacheKey]) {
-                setResult(essentialCache[cacheKey]);
-                return;
-            }
-
-            if (!isTravelUiUnlimited()) {
-                var q = getQuota();
-                if (q.count >= FREE_LIMIT) {
-                    setResult("Today's free limit reached.", true);
-                    return;
-                }
-            }
-
-            transLine.textContent = 'Translating...';
-            try {
-                var r = await fetch(NEXTBASE_APP + '/translate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(glbTranslatePayloadTravel(phrase.en, 'en', to, 'essentials')),
-                    cache: 'no-store'
-                });
-
-                if (r.status === 429) {
-                    transLine.textContent = phrase.en;
-                    setResult('Cloud daily limit reached. Subscribe to GLB for unlimited translation.', true);
-                    return;
-                }
-
-                var raw = await r.text();
-                var out = raw;
-                try { var j = JSON.parse(raw); out = j.translatedText || raw; } catch(e) {}
-                essentialCache[cacheKey] = out;
-                transLine.textContent = out;
-                setResult(out);
-                bumpQuota();
-                updateQuota();
-            } catch(e) {
-                transLine.textContent = phrase.en;
-                setResult('Connection issue. Please try again.', true);
-            }
-        });
-
-        container.appendChild(card);
-    });
-}
-
-document.getElementById('btn-speak').addEventListener('click', function () { setMode('speak'); });
-document.getElementById('btn-show').addEventListener('click', function () { setMode('show'); });
-document.getElementById('btn-essentials').addEventListener('click', function () { setMode('essentials'); });
-document.getElementById('mic-btn').addEventListener('click', toggleMic);
-document.getElementById('t-btn').addEventListener('click', runTranslate);
-initLang();
-setMode('speak');
-updateQuota();
-refreshTravelRemainingLine();
-handleTravelActivationFlow();
-
-
-
-
-(function enhanceQuotaCopy() {
-    if (typeof updateQuota !== 'function') return;
-    var originalUpdateQuota = updateQuota;
-    updateQuota = function () {
-        originalUpdateQuota();
-        var q = getQuota();
-        var el = document.getElementById('glb-quota');
-        var prompt = document.getElementById('upgrade-prompt');
-        if (!el || !prompt) return;
-        if (isTravelUiUnlimited()) {
-            el.textContent = 'Unlimited Access Active';
-            prompt.style.display = 'none';
-            return;
-        }
-        var left = Math.max(0, FREE_LIMIT - q.count);
-        el.textContent = left + ' chances left today. Stay understood anywhere.';
-        prompt.style.display = left < 3 ? 'inline' : 'none';
-        if (left === 0) {
-            el.textContent = "Travel Pass is required for more translations.";
-            prompt.textContent = 'Open Travel Pass';
-            prompt.style.display = 'inline';
-        }
-    };
-})();
-
-
-
-
-
-(function applyTravelUiLanguageAndBind(){
-  function getBaseLang() {
-    try {
-      return (localStorage.getItem('glb_user_base_lang') || navigator.language || 'en').split('-')[0];
-    } catch (e) {
-      return 'en';
-    }
-  }
-
-  function setText(sel, text, html) {
-    var el = document.querySelector(sel);
-    if (!el) return;
-    if (html) el.innerHTML = text;
-    else el.textContent = text;
-  }
-
-  function applyLang() {
-    var lang = getBaseLang();
-
-    if (lang === 'ja') {
-      setText('.stage-label', '言葉に詰まったら');
-      setText('#glb-result', 'どこでも伝わる。');
-      setText('.subline', 'AIが旅行シーンを判別します。<br>空港・タクシー・ホテル・レストラン・緊急時', true);
-      setText('#btn-speak .mode-label', '声');
-      setText('#btn-show .mode-label', '入力');
-      setText('#btn-essentials .mode-label', '定番');
-      setText('#mic-btn', '🎤 話す');
-      setText('#t-btn', 'GLB');
-      var input = document.getElementById('show-input');
-      if (input) input.placeholder = '伝えたい言葉を入力';
-    } else {
-      setText('#t-btn', 'GLB');
-    }
-  }
-
-  function bindSafe() {
-    var speak = document.getElementById('btn-speak');
-    var show = document.getElementById('btn-show');
-    var essentials = document.getElementById('btn-essentials');
-    var mic = document.getElementById('mic-btn');
-    var tbtn = document.getElementById('t-btn');
-    var flip = document.getElementById('flip-btn');
-
-    if (speak) speak.onclick = function () { if (typeof setMode === 'function') setMode('speak'); };
-    if (show) show.onclick = function () { if (typeof setMode === 'function') setMode('show'); };
-    if (essentials) essentials.onclick = function () { if (typeof setMode === 'function') setMode('essentials'); };
-    if (mic) mic.onclick = function () { if (typeof toggleMic === 'function') toggleMic(); };
-    if (tbtn) tbtn.onclick = function () { if (typeof runTranslate === 'function') runTranslate(); };
-    if (flip) flip.onclick = function () {
-      try {
-        isFlipped = !isFlipped;
-        var r = document.getElementById('glb-result');
-        if (r) r.classList.toggle('flipped', isFlipped);
-        flip.textContent = isFlipped ? 'Unflip' : 'Flip';
-      } catch (e) {}
-    };
-  }
-
-  function boot() {
-    applyLang();
-    bindSafe();
-    try { if (typeof updateQuota === 'function') updateQuota(); } catch (e) {}
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
-
-  window.addEventListener('pageshow', boot);
-})();
-
-</script>
-
+  </script>
 </body>
 </html>
