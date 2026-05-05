@@ -686,6 +686,24 @@ body::after{
   z-index:0;
 }
 
+
+/* GLB_GLOBAL_BG_OVERRIDE */
+body{
+  background-color:#000 !important;
+  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important;
+  background-size:cover !important;
+  background-position:center 30% !important;
+  background-attachment:fixed !important;
+}
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
+  pointer-events:none;
+  z-index:0;
+}
+
 </style>
 </head>
 <body>
