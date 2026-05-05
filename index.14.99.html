@@ -113,40 +113,21 @@
     .hide { display: none; }
     @media (min-width: 480px) { #app { max-width: 480px; margin: 0 auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); } }
   
-/* GLB_GLOBAL_BG_OVERRIDE */
-body{
-  background-color:#000 !important;
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
-  pointer-events:none;
-  z-index:0;
-}
 
+        /* Scenic full-page background (HTTPS + hero_299; no expired links / ::after veil) */
+        body {
+            min-height: 100svh;
+            background-color: #04040a !important;
+            background-image:
+                radial-gradient(circle at 50% 28%, rgba(0, 0, 0, 0.25) 0%, rgba(4, 4, 10, 0.88) 62%, rgba(4, 4, 10, 1) 100%),
+                linear-gradient(180deg, rgba(4, 4, 10, 0.45) 0%, rgba(4, 4, 10, 0.75) 100%),
+                url('hero_299.jpg'),
+                url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80') !important;
+            background-size: cover, cover, cover, cover !important;
+            background-position: center 30% !important;
+            background-attachment: fixed !important;
+        }
 
-/* GLB_GLOBAL_BG_ALL_PAGES */
-body{
-  background-color:#000 !important;
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
-  pointer-events:none;
-  z-index:0;
-}
 
 </style>
 </head>

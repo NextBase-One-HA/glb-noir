@@ -17,14 +17,23 @@
     *{box-sizing:border-box}
     body{
       margin:0;
-      background:var(--bg);
+      min-height:100svh;
       color:var(--text);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans JP",Arial,sans-serif;
       line-height:1.75;
+      background-color:#04040a;
+      background-image:
+        radial-gradient(circle at 50% 28%, rgba(0, 0, 0, 0.25) 0%, rgba(4, 4, 10, 0.88) 62%, rgba(4, 4, 10, 1) 100%),
+        linear-gradient(180deg, rgba(4, 4, 10, 0.5) 0%, rgba(4, 4, 10, 0.78) 100%),
+        url('hero_299.jpg'),
+        url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80');
+      background-size:cover,cover,cover,cover;
+      background-position:center 30%;
+      background-attachment:fixed;
     }
     a{color:var(--gold);text-decoration:none;font-weight:500;} /* リンクを少し太くして視認性向上 */
     a:hover{opacity:.85;text-decoration:underline;} /* ホバー時にアンダーラインで強調 */
-    .wrap{max-width:920px;margin:0 auto;padding:28px 16px 60px}
+    .wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:28px 16px 60px}
     header{border-bottom:1px solid var(--line);padding:10px 0 18px;margin-bottom:18px}
     .brand{color:var(--gold);font-weight:900;letter-spacing:.25em;font-size:20px;text-transform:uppercase;} /* ブランド名をより力強く、大文字に */
     .sub{color:var(--gold);font-size:12px;margin-top:8px;font-weight:500;} /* サブタイトルもゴールドに */
@@ -39,25 +48,7 @@
     footer{border-top:1px solid var(--line);margin-top:20px;padding-top:14px;color:var(--muted);font-size:12px;text-align:center;} /* フッターを中央寄せに */
     .glb-lang-reset{font-size:11px;background:transparent;border:1px solid var(--line);color:var(--muted);padding:8px 16px;border-radius:999px;cursor:pointer;font-family:inherit;}
     .glb-lang-reset:hover{color:var(--gold);border-color:rgba(255,215,0,0.45);}
-  
-/* GLB_GLOBAL_BG_ALL_PAGES */
-body{
-  background-color:#000 !important;
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
-  pointer-events:none;
-  z-index:0;
-}
-
-</style>
+  </style>
 </head>
 
 <body>

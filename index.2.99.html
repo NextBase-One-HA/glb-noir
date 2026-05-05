@@ -49,8 +49,20 @@
             --card: #1a1a1a;
             --noir-red: #ff0000;
         }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 0; padding-bottom: env(safe-area-inset-bottom, 0); text-align: center; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: rgba(255, 230, 100, 0.15); }
-        .cockpit { padding: 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(600px, 100%); margin: 0 auto; box-sizing: border-box; }
+        body {
+            color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 0; padding-bottom: env(safe-area-inset-bottom, 0); text-align: center; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: rgba(255, 230, 100, 0.15);
+            min-height: 100svh;
+            background-color: #04040a;
+            background-image:
+                radial-gradient(circle at 50% 28%, rgba(0, 0, 0, 0.25) 0%, rgba(4, 4, 10, 0.88) 62%, rgba(4, 4, 10, 1) 100%),
+                linear-gradient(180deg, rgba(4, 4, 10, 0.45) 0%, rgba(4, 4, 10, 0.75) 100%),
+                url('hero_299.jpg'),
+                url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80');
+            background-size: cover, cover, cover, cover;
+            background-position: center 30%;
+            background-attachment: fixed;
+        }
+        .cockpit { position: relative; z-index: 1; padding: 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); max-width: min(600px, 100%); margin: 0 auto; box-sizing: border-box; }
         .header { margin-bottom: 22px; padding: 0 6px; }
         .gold-text { color: var(--gold); letter-spacing: 4px; font-weight: bold; }
         @keyframes glb-neon-title {
@@ -450,7 +462,7 @@
             text-shadow: 0 0 10px var(--gold-glow-mid);
         }
         @media (max-width: 480px) {
-            .cockpit { padding: 16px 14px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+            .cockpit { position: relative; z-index: 1; padding: 16px 14px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
             .glb-billboard { margin-top: 8px; }
             h1.gold-text.app-brand-title {
                 font-size: clamp(1.05rem, 5.8vw, 1.55rem);
@@ -580,48 +592,12 @@
             font-size: 12px;
         }
         .readalong-play:disabled { opacity: 0.35; cursor: not-allowed; }
-    
-/* GLB_GLOBAL_BG_OVERRIDE */
-body{
-  background-color:#000 !important;
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
-  pointer-events:none;
-  z-index:0;
-}
-
-
-/* GLB_GLOBAL_BG_ALL_PAGES */
-body{
-  background-color:#000 !important;
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
-  pointer-events:none;
-  z-index:0;
-}
-
-</style>
+    </style>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
 body{font-family:'DM Sans',-apple-system,sans-serif!important}
 #glb-result-stage{position:relative!important;overflow:hidden!important}
-.glb-stage-hero-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(to bottom,rgba(5,5,10,.5) 0%,rgba(5,5,10,.72) 55%,rgba(10,10,10,1) 100%),url('hero_299.jpg') center 35%/cover no-repeat;filter:saturate(1.1) contrast(1.05)}
+.glb-stage-hero-bg{position:absolute;inset:0;z-index:0;background-image:linear-gradient(to bottom,rgba(5,5,10,.5) 0%,rgba(5,5,10,.72) 55%,rgba(10,10,10,1) 100%),url('hero_299.jpg'),url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80');background-size:cover,cover,cover;background-position:center 35%;background-repeat:no-repeat;filter:saturate(1.1) contrast(1.05)}
 .glb-result-inner{position:relative;z-index:1}
 .glb-stage-copy{position:absolute;top:12px;left:0;right:0;text-align:center;z-index:2;pointer-events:none}
 .glb-stage-copy-main{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(12px,3.2vw,17px);color:rgba(255,255,255,.48);letter-spacing:.02em}

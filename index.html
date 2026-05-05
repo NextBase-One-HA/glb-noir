@@ -24,7 +24,18 @@
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--white);font-family:var(--f-sans);font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100svh;}
+body{
+  color:var(--white);font-family:var(--f-sans);font-weight:300;overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100svh;
+  background-color:#04040a;
+  background-image:
+    radial-gradient(circle at 50% 28%, rgba(0, 0, 0, 0.22) 0%, rgba(4, 4, 10, 0.88) 62%, rgba(4, 4, 10, 1) 100%),
+    linear-gradient(180deg, rgba(4, 4, 10, 0.42) 0%, rgba(4, 4, 10, 0.72) 100%),
+    url('hero_299.jpg'),
+    url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80');
+  background-size:cover,cover,cover,cover;
+  background-position:center 30%;
+  background-attachment:fixed;
+}
 
 /* grain */
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5;}
@@ -337,7 +348,7 @@ transition:border-color .2s,color .2s;
   <a href="index.next.html" class="cta-primary" id="ip-cta1">Try free</a>
   <a href="javascript:void(0)" onclick="openStripeModal(event)" class="cta-ghost" id="ip-cta2">GLB $2.99</a>
 </div>
-<p class="ip-hint" id="ip-hint">No credit card · Works instantly · Cancel anytime</p>
+<p class="ip-hint" id="ip-hint">Works instantly · Cancel anytime</p>
 
   </div>
 
@@ -347,7 +358,6 @@ transition:border-color .2s,color .2s;
       <a href="privacy.html">Privacy</a>
       <a href="legal.html">Legal</a>
       <a href="support.html">Support</a>
-      <a href="index.premium.html">Travel Pass</a>
     </p>
     <p>© 2026 NEXT BASE (GLB). All Rights Reserved. Patent Pending</p>
   </div>
@@ -440,7 +450,7 @@ const I18N={
     step2t:'Speak or type',step2d:'GLB detects your scene — airport, taxi, hotel, restaurant — and surfaces the right translation instantly.',
     step3t:'Show the screen',step3d:'Translation appears on screen. Turn it toward the other person. Zero delay. Zero confusion.',
     planName:'GLB',planDesc:'Unlimited translation · 13 languages · Cancel anytime · Join 30-day rooms',
-    cta1:'Try free',cta2:'GLB $2.99',hint:'No credit card · Works instantly · Cancel anytime',
+    cta1:'Try free',cta2:'GLB $2.99',hint:'Works instantly · Cancel anytime',
     modalTitle:'Change language',
     smTitle:'Secure checkout',smPeriod:'/ month · cancel anytime',
     smNote:'You will be redirected to Stripe secure payment.',smTax:'* Tax may be added at checkout depending on your country.',
@@ -462,7 +472,7 @@ const I18N={
     step2t:'話すか入力する',step2d:'GLBが現在のシーン（空港・タクシー・ホテル・レストラン）を検出し、最適な翻訳を即座に表示します。',
     step3t:'画面を向ける',step3d:'翻訳が画面に表示されたら、相手に向けるだけ。遅延ゼロ。混乱ゼロ。',
     planName:'GLB',planDesc:'翻訳無制限 · 13言語 · いつでも解約可 · 30日ルームに参加可',
-    cta1:'無料で試す',cta2:'GLB $2.99',hint:'クレジットカード不要 · すぐ使える · いつでも解約',
+    cta1:'無料で試す',cta2:'GLB $2.99',hint:'すぐ使える · いつでも解約',
     modalTitle:'言語を変更',
     smTitle:'Stripeで決済',smPeriod:'/ 月 · いつでも解約可能',
     smNote:'Stripeのセキュアな決済ページに移動します。',smTax:'※ お住まいの国によって、税金が加算される場合があります。',
@@ -484,7 +494,7 @@ const I18N={
     step2t:'说话或输入',step2d:'GLB检测您的场景——机场、出租车、酒店、餐厅——并立即提供翻译。',
     step3t:'展示屏幕',step3d:'翻译显示在屏幕上。转向对方。零延迟。零混淆。',
     planName:'GLB',planDesc:'无限翻译 · 13种语言 · 随时取消 · 可加入30天房间',
-    cta1:'免费试用',cta2:'GLB $2.99',hint:'无需信用卡 · 立即使用 · 随时取消',
+    cta1:'免费试用',cta2:'GLB $2.99',hint:'立即使用 · 随时取消',
     modalTitle:'更改语言',
     smTitle:'安全结账',smPeriod:'/ 月 · 随时取消',
     smNote:'您将被重定向到Stripe安全支付页面。',smTax:'※ 结账时可能会根据您所在国家加收税款。',
@@ -506,7 +516,7 @@ const I18N={
     step2t:'말하거나 입력',step2d:'GLB가 공항, 택시, 호텔, 레스토랑 등 상황을 감지해 즉시 번역을 제공합니다.',
     step3t:'화면 보여주기',step3d:'번역이 화면에 표시되면 상대방에게 돌려주세요. 지연 없음. 혼란 없음.',
     planName:'GLB',planDesc:'무제한 번역 · 13개 언어 · 언제든 취소 · 30일 룸 참여 가능',
-    cta1:'무료 체험',cta2:'GLB $2.99',hint:'신용카드 불필요 · 즉시 사용 · 언제든 취소',
+    cta1:'무료 체험',cta2:'GLB $2.99',hint:'즉시 사용 · 언제든 취소',
     modalTitle:'언어 변경',
     smTitle:'안전한 결제',smPeriod:'/ 월 · 언제든 취소',
     smNote:'Stripe 보안 결제 페이지로 이동합니다.',smTax:'※ 국가에 따라 세금이 추가될 수 있습니다.',
@@ -528,7 +538,7 @@ const I18N={
     step2t:'Habla o escribe',step2d:'GLB detecta el contexto — aeropuerto, taxi, hotel, restaurante — y muestra la traducción al instante.',
     step3t:'Muestra la pantalla',step3d:'La traducción aparece en pantalla. Gírala hacia la otra persona. Sin demora. Sin confusión.',
     planName:'GLB',planDesc:'Traducción ilimitada · 13 idiomas · Cancela cuando quieras · Únete a salas de 30 días',
-    cta1:'Probar gratis',cta2:'GLB $2.99',hint:'Sin tarjeta · Listo al instante · Cancela cuando quieras',
+    cta1:'Probar gratis',cta2:'GLB $2.99',hint:'Listo al instante · Cancela cuando quieras',
     modalTitle:'Cambiar idioma',
     smTitle:'Pago seguro',smPeriod:'/ mes · cancela cuando quieras',
     smNote:'Serás redirigido al pago seguro de Stripe.',smTax:'* Pueden aplicarse impuestos según tu país.',

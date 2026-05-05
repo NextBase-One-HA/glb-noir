@@ -11,8 +11,18 @@
   <title>Support — GLOBAL LANGUAGE BREAKER</title>
   <style>
     :root { --bg:#0a0a0a; --text:#eaeaea; --muted:#888; --gold:#ffe566; --line:#2a2a2a; }
-    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; font-size:15px; }
-    .wrap { max-width:720px; margin:0 auto; padding:28px 20px 64px; }
+    body { margin:0; min-height:100svh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--text); line-height:1.6; font-size:15px;
+      background-color:#04040a;
+      background-image:
+        radial-gradient(circle at 50% 28%, rgba(0, 0, 0, 0.25) 0%, rgba(4, 4, 10, 0.88) 62%, rgba(4, 4, 10, 1) 100%),
+        linear-gradient(180deg, rgba(4, 4, 10, 0.5) 0%, rgba(4, 4, 10, 0.78) 100%),
+        url('hero_299.jpg'),
+        url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80');
+      background-size:cover,cover,cover,cover;
+      background-position:center 30%;
+      background-attachment:fixed;
+    }
+    .wrap { position:relative; z-index:1; max-width:720px; margin:0 auto; padding:28px 20px 64px; }
     a { color:var(--gold); }
     h1 { font-size:1.35rem; letter-spacing:.06em; color:var(--gold); margin:0 0 8px; }
     .sub { color:var(--muted); font-size:13px; margin-bottom:28px; }
@@ -28,25 +38,7 @@
     .status-line { font-size:13px; color:var(--muted); margin:6px 0 0; }
     .glb-lang-reset { font-size:11px; background:transparent; border:1px solid var(--line); color:var(--muted); padding:8px 16px; border-radius:999px; cursor:pointer; font-family:inherit; }
     .glb-lang-reset:hover { color:var(--gold); border-color:rgba(255,229,102,0.45); }
-  
-/* GLB_GLOBAL_BG_ALL_PAGES */
-body{
-  background-color:#000 !important;
-  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important;
-  background-size:cover !important;
-  background-position:center 30% !important;
-  background-attachment:fixed !important;
-}
-body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
-  pointer-events:none;
-  z-index:0;
-}
-
-</style>
+  </style>
 </head>
 <body>
   <div class="wrap">
