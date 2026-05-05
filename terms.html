@@ -24,7 +24,25 @@
     .note { font-size:13px; color:var(--muted); border-top:1px solid var(--line); padding-top:20px; margin-top:32px; }
     .glb-lang-reset { font-size:11px; background:transparent; border:1px solid var(--line); color:var(--muted); padding:8px 16px; border-radius:999px; cursor:pointer; font-family:inherit; }
     .glb-lang-reset:hover { color:var(--gold); border-color:rgba(255,229,102,0.45); }
-  </style>
+  
+/* GLB_GLOBAL_BG_ALL_PAGES */
+body{
+  background-color:#000 !important;
+  background-image:url('https://lh3.googleusercontent.com/gg/AEir0wJ6fqIIVPDZlQT9-8qa-SXAPEG5p5B7upycWDCaONoCtQeSiIQACOUhgFNBIFL8KvQw4lQkp4A4V0InBM2ShPi6Mk6EvqcAuNE4z1cZiAZvoAnJtPcE9K9-_v_Cmlip5W-rwtnUibsczPyjrHwISCqptkKnFZqPRh9Eq_LEt_xLbXg2aiSe2aw4jOXmXPHeLzdFLmwAceE-zPCxlhOEqYCyM7iqpOcvwqYnGx97uTp7cxZoiFz0G5pBnivjQ_LP-2m7AJFXtEjQGMI4Y9Y38sf1vF3KAfAVIoc') !important;
+  background-size:cover !important;
+  background-position:center 30% !important;
+  background-attachment:fixed !important;
+}
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle at center,rgba(0,0,0,.82) 0%,rgba(0,0,0,.95) 100%);
+  pointer-events:none;
+  z-index:0;
+}
+
+</style>
 </head>
 <body>
   <div class="wrap">
