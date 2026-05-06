@@ -17,6 +17,7 @@ def handle_translate(req: dict) -> dict:
     text = req.get("text", "")
     target = req.get("target", "")
     caller_id = req.get("caller_id", "prod")
+    profile = req.get("translation_profile", "") or req.get("profile", "")
 
     # --- Cost Optimizer (API bypass) ---
     cached = local_translate(text, target)
@@ -28,6 +29,16 @@ def handle_translate(req: dict) -> dict:
             "provider_status": 200,
             "translatedText": cached,
             "optimizer": "local_cache",
+        }
+
+    # --- MT-only profile: NEVER call Gemini / LLM ---
+    if profile == "core_mt_no_ai":
+        return {
+            "ok": False,
+            "model": "mt-only",
+            "key_source": "MT_ONLY",
+            "provider_status": 503,
+            "translatedText": "",
         }
 
     api_key = resolve_api_key_for_call(caller_id)

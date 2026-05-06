@@ -339,6 +339,21 @@ body{
 
   <div class="panel show" id="panel-create">
 
+<div id="room-coming-soon-banner" style="
+  background: rgba(243,198,35,0.08);
+  border: 1px solid rgba(243,198,35,0.22);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: #f3c623;
+  line-height: 1.6;
+">
+  Translation Rooms are launching soon.<br>
+  <span style="color:#9494b8;">Travel translation is available now.</span>
+</div>
+
 <div class="create-hero">
   <p class="create-eyebrow">Travel Pass</p>
   <h1 class="create-title">Your <em>30-day</em><br>translation room.</h1>
@@ -481,21 +496,14 @@ function switchMode(mode) {
 var _generatedCode = null;
 
 function generateCode() {
-  var code = String(Math.floor(100000 + Math.random() * 900000));
-  _generatedCode = code;
-
   var display = document.getElementById('code-display');
-  display.textContent = code;
-  display.classList.remove('empty');
-
-  var expiry = document.getElementById('code-expiry');
-  var d = new Date();
-  d.setDate(d.getDate() + 30);
-  expiry.textContent = 'Expires ' + d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-
-  document.getElementById('btn-copy').style.display = '';
-  document.getElementById('share-row').style.display = '';
-  document.getElementById('btn-generate').textContent = 'New Code';
+  display.textContent = 'Coming Soon';
+  display.classList.add('empty');
+  document.getElementById('code-expiry').textContent =
+      'Translation Rooms launching soon. Travel translation works now.';
+  var btn = document.getElementById('btn-generate');
+  btn.textContent = 'Coming Soon';
+  btn.disabled = true;
 }
 
 function copyCode() {
@@ -523,21 +531,13 @@ function shareCode() {
 }
 
 function joinRoom() {
-  var input = document.getElementById('code-input');
-  var code = (input.value || '').trim();
-  if (code.length !== 6 || !/^\d{6}$/.test(code)) {
-    input.style.color = '#f87171';
-    setTimeout(function () { input.style.color = ''; }, 1200);
-    return;
-  }
-  // Backend connection will be wired here later
   var btn = document.getElementById('btn-join');
-  btn.textContent = 'Connecting…';
+  btn.textContent = 'Coming Soon';
   btn.disabled = true;
-  setTimeout(function () {
+  setTimeout(function() {
     btn.textContent = 'Join Room';
     btn.disabled = false;
-  }, 1200);
+  }, 3000);
 }
 
 document.getElementById('code-input').addEventListener('input', function () {

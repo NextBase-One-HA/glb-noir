@@ -2778,6 +2778,23 @@ body{font-family:'DM Sans',-apple-system,sans-serif!important}
 
                 function finishOk(line, apiJson) {
                     var done = glbFinalizeOut(line);
+                    if (source === 'ja' && target === 'en' &&
+                        /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(done)) {
+                        var fb = resolveDeterministicTranslation(text, source, target);
+                        if (fb != null && fb !== '') {
+                            done = glbFinalizeOut(fb);
+                        } else {
+                            setResultText(T('translationUnavailable'), '#c99', '0');
+                            return;
+                        }
+                    }
+                    console.log('[GLB_MT_ONLY]', {
+                        sourceLang: source,
+                        targetLang: target,
+                        originalText: text,
+                        translatedText: done,
+                        profile: 'core_mt_no_ai'
+                    });
                     setResultText(done, '#eaeaea', '0');
                     writeTxCache(text, source, target, done);
                     recordGlbTranslateUse();

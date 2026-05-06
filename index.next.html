@@ -1155,7 +1155,8 @@
                 source: source,
                 target: target,
                 caller_id: callerId || 'prod',
-                client_id: glbEnsureClientId()
+                client_id: glbEnsureClientId(),
+                translation_profile: 'core_mt_no_ai'
             };
             try {
                 var cid = (localStorage.getItem(LS_CUSTOMER_ID) || '').trim();
@@ -2747,8 +2748,9 @@
             var btn = document.getElementById('tr-run');
             if (!btn || !out) return;
 
-            function glbFinalizeOut(s) {
-                return (typeof glbTomoriPostRewrite === 'function') ? glbTomoriPostRewrite(s) : s;
+            function glbFinalizeOut(s) { return String(s || '').trim(); }
+            function containsCjk(s) {
+                return /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(String(s || ''));
             }
 
             function parseResponse(x) {
@@ -2856,6 +2858,22 @@
 
                 function finishOk(line, apiJson) {
                     var done = glbFinalizeOut(line);
+                    if (source === 'ja' && target === 'en' && containsCjk(done)) {
+                        var fb = tryLocalRoute(text, source, target);
+                        if (fb != null && fb !== '') {
+                            done = glbFinalizeOut(fb);
+                        } else {
+                            setResultText(T('translationUnavailable'), '#c99', '0');
+                            return;
+                        }
+                    }
+                    console.log('[GLB_MT_ONLY]', {
+                        sourceLang: source,
+                        targetLang: target,
+                        originalText: text,
+                        translatedText: done,
+                        profile: 'core_mt_no_ai'
+                    });
                     setResultText(done, '#eaeaea', '0');
                     writeTxCache(text, source, target, done);
                     recordGlbTranslateUse();
