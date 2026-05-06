@@ -194,16 +194,31 @@
             font-size: 54px !important;
             line-height: 1.2;
         }
+        .free-quota-stack {
+            text-align: center;
+            margin: 10px 8px 0;
+            max-width: 100%;
+        }
         .free-quota-line {
             font-size: 11px;
             color: #aaa;
             text-align: center;
-            margin: 10px 8px 0;
+            margin: 0;
             line-height: 1.5;
             max-width: 100%;
             word-break: break-word;
         }
         .free-quota-line.is-warn { color: #ffe08a; text-shadow: 0 0 10px var(--gold-glow-mid); }
+        .free-quota-sub {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+            white-space: pre-line;
+        }
+        #tr-run:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
         .flipped-mode {
             transform: rotate(180deg) !important;
             transition: transform 0.3s ease;
@@ -783,7 +798,10 @@
         </div>
         <div class="tr-run-wrap">
             <button type="button" id="tr-run" class="btn glb-main-btn">GLB</button>
-            <p class="free-quota-line" id="t-free-quota" role="status"></p>
+            <div class="free-quota-stack">
+                <p class="free-quota-line" id="t-free-quota" role="status"></p>
+                <p class="free-quota-line free-quota-sub" id="t-free-quota-sub" role="status" aria-live="polite"></p>
+            </div>
         </div>
     </div>
 
@@ -1826,6 +1844,8 @@
         var CURRENT_LANG = 'en';
         var GLB_FREE_DAILY = 5;
         var LS_GLB_QUOTA = 'glb_translate_quota_v1';
+        /** Quota line UI: sync with server denial / temp unavailable (Phase 1.5 P0). */
+        var GLB_QUOTA_UI = { lineMode: 'normal', serverNextLine: '' };
 
         /** false = ブラウザに 150k 辞書を配らない（サーバ ROUTES_CSV_PATH で照合）。パクり対策。開発時のみ localStorage glb_dev_csv=1 で従来のクライアント読込。 */
         var GLB_CLIENT_DICTIONARY_PUBLIC = (function () {
@@ -1960,14 +1980,14 @@
                 apiChecking: '',
                 apiOk: '',
                 apiNoResponse: '',
-                sending: 'Translating…',
+                sending: 'Translating...',
                 sendingPivot: '',
                 btnMic: 'Mic',
                 btnClear: 'Clear',
                 btnSpeakSrc: 'Speak source',
                 btnSpeakTgt: 'Read translation',
                 failHttp: 'Could not finish this translation yet. Please try once more.',
-                netErr: 'Network is unstable right now. Please try again.',
+                netErr: 'Network is unstable. Your text is still in the box.',
                 title: 'GLOBAL LANGUAGE BREAKER',
                 btnFlip: 'Flip',
                 btnQuickSpeak: 'Speak',
@@ -1976,6 +1996,15 @@
                 freeQuotaUnlimited: 'Unlimited (subscriber)',
                 freeLeft: '{{n}} left today',
                 freeLimitExceeded: 'Daily limit reached. Try again tomorrow.',
+                freePremiumHint: 'Premium: no daily limit',
+                freeTempUnavailable: 'Temporarily unavailable',
+                nextAvailableAt: 'Next available: {{t}}',
+                nextAvailableChecking: 'Checking next available time…',
+                inputPreservedHint: 'Your text is still in the box.',
+                failServer: 'We are getting things ready. Please try again in a moment.',
+                failEntitlement: 'Checking purchase status. Please reload the page.',
+                quotaExceededLead: 'You have used today’s free translations.',
+                translationUnavailable: 'Translation is not available for this pair right now.',
                 upgradePrompt429: 'Cloud free limit reached. Open GLB (2.99/mo) for unlimited server translation — or try again tomorrow.',
                 langDetailsSummary: '{{from}} → {{to}} · tap to change languages',
                 resultLangLabel: 'Translation ({{lang}})',
@@ -2025,7 +2054,7 @@
                 btnSpeakSrc: '原文を読む',
                 btnSpeakTgt: '訳を読む',
                 failHttp: '翻訳を完了できませんでした。もう一度お試しください。',
-                netErr: '通信が不安定です。時間をおいて再度お試しください。',
+                netErr: '通信が不安定です。入力内容は保持されています。',
                 title: 'GLOBAL LANGUAGE BREAKER',
                 btnFlip: '反転',
                 btnQuickSpeak: '読み上げ',
@@ -2034,6 +2063,15 @@
                 freeQuotaUnlimited: '購読中（無制限）',
                 freeLeft: '本日 残り {{n}}',
                 freeLimitExceeded: '本日の無料回数に達しました。明日またお試しください。',
+                freePremiumHint: 'Premiumで制限なし',
+                freeTempUnavailable: '一時利用不可',
+                nextAvailableAt: '次回利用可能: {{t}}',
+                nextAvailableChecking: '次回利用可能時刻を確認中です',
+                inputPreservedHint: '入力内容は保持されています',
+                failServer: 'ただいま準備中です。時間を置いてお試しください。',
+                failEntitlement: '購入情報を確認中です。再読み込みしてください。',
+                quotaExceededLead: '本日の無料枠はご利用いただけません。',
+                translationUnavailable: '現在この組み合わせでは翻訳できません。',
                 langDetailsSummary: '{{from}} → {{to}} · タップで言語を変更',
                 resultLangLabel: '表示は{{lang}}の訳です',
                 ttsError: '読み上げを開始できませんでした（音量・マナーモードを確認してください）'
@@ -2253,21 +2291,112 @@
             } catch (e) { /* ignore */ }
         }
 
+        function glbClearQuotaUi() {
+            GLB_QUOTA_UI.lineMode = 'normal';
+            GLB_QUOTA_UI.serverNextLine = '';
+        }
+
+        function forceQuotaExhaustedLocally() {
+            if (isGlbUnlimited()) return;
+            var tk = glbTodayKey();
+            try {
+                localStorage.setItem(LS_GLB_QUOTA, JSON.stringify({ day: tk, count: GLB_FREE_DAILY }));
+            } catch (e) { /* ignore */ }
+        }
+
+        function glbResolveNextAvailableMs(j, hdrRetry) {
+            if (hdrRetry != null && String(hdrRetry).trim() !== '') {
+                var hr = parseInt(String(hdrRetry).trim(), 10);
+                if (!isNaN(hr) && hr >= 0) return Date.now() + hr * 1000;
+            }
+            if (!j || typeof j !== 'object') return null;
+            var r = j.retryAfter != null ? j.retryAfter : j.retry_after;
+            if (typeof r === 'number' && r >= 0) return Date.now() + r * 1000;
+            if (typeof r === 'string' && /^\d+$/.test(r.trim())) return Date.now() + parseInt(r.trim(), 10) * 1000;
+            var iso = j.resetAt || j.reset_at || j.nextAvailableAt || j.next_available_at;
+            if (iso != null) {
+                var ms = Date.parse(String(iso));
+                if (!isNaN(ms)) return ms;
+            }
+            return null;
+        }
+
+        function glbFormatLocalTimeMs(ms) {
+            try {
+                return new Intl.DateTimeFormat(navigator.language || 'en', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(ms));
+            } catch (e) {
+                return String(new Date(ms));
+            }
+        }
+
+        function glbNextAvailableLine(j, hdrRetry) {
+            var ms = glbResolveNextAvailableMs(j, hdrRetry);
+            if (ms != null) return T('nextAvailableAt').replace(/\{\{t\}\}/g, glbFormatLocalTimeMs(ms));
+            return T('nextAvailableChecking');
+        }
+
+        function glbJsonLooksQuota(j) {
+            if (!j) return false;
+            if (j.error === 'FREE_LIMIT_REACHED') return true;
+            var rc = String(j.reasonCode || '').toUpperCase();
+            return rc === 'FREE_QUOTA_EXCEEDED' || rc.indexOf('QUOTA') >= 0 || rc === 'RATE_LIMIT' || rc.indexOf('RATE') >= 0;
+        }
+
+        function glbJsonLooksEntitlement(j, httpStatus) {
+            if (httpStatus === 403 || httpStatus === 401) return true;
+            var rc = String(j && j.reasonCode || '').toUpperCase();
+            return /ENTITLEMENT|SUBSCRIPTION|BILLING|PURCHASE|PAYMENT|FORBIDDEN|LICENSE|UNAUTHORIZED/.test(rc);
+        }
+
+        function glbQuotaResultMessage(j, hdrRetry) {
+            return T('quotaExceededLead') + '\n' + glbNextAvailableLine(j, hdrRetry);
+        }
+
+        function glbSetTranslateWorking(on) {
+            var b = document.getElementById('tr-run');
+            if (!b) return;
+            b.disabled = !!on;
+            b.textContent = on ? T('sending') : T('sendBtn');
+            if (on) {
+                try {
+                    if (navigator.vibrate) navigator.vibrate(10);
+                } catch (e) { /* ignore */ }
+            }
+        }
+
         function refreshFreeQuotaDisplay() {
             var el = document.getElementById('t-free-quota');
+            var sub = document.getElementById('t-free-quota-sub');
             if (!el) return;
             if (isGlbUnlimited()) {
                 el.textContent = T('freeQuotaUnlimited');
                 el.classList.remove('is-warn');
                 el.style.display = 'none';
+                if (sub) {
+                    sub.textContent = '';
+                    sub.style.display = 'none';
+                }
                 enforcePaidUiLock();
                 return;
             }
             el.style.display = '';
+            if (sub) sub.style.display = '';
+            if (GLB_QUOTA_UI.lineMode === 'temp_unavailable') {
+                el.textContent = T('freeTempUnavailable');
+                el.classList.add('is-warn');
+                if (sub) sub.textContent = GLB_QUOTA_UI.serverNextLine || T('nextAvailableChecking');
+                return;
+            }
             var q = getGlbQuotaState();
             var left = Math.max(0, GLB_FREE_DAILY - q.count);
             el.textContent = T('freeLeft').replace(/\{\{n\}\}/g, String(left));
             el.classList.toggle('is-warn', left === 0);
+            if (sub) {
+                var rows = [];
+                if (GLB_QUOTA_UI.serverNextLine) rows.push(GLB_QUOTA_UI.serverNextLine);
+                rows.push(T('freePremiumHint'));
+                sub.textContent = rows.join('\n');
+            }
         }
 
         var GLB_LANG_SHORT = {
@@ -2419,8 +2548,16 @@
 
             var trt = document.getElementById('tr-text');
             var trb = document.getElementById('tr-run');
+            var outBusy = document.getElementById('glb-result-text');
             if (trt) trt.placeholder = T('phNormal');
-            if (trb) trb.textContent = T('sendBtn');
+            if (trb) {
+                if (trb.disabled && outBusy && outBusy.dataset.busy === '1') {
+                    trb.textContent = T('sending');
+                } else {
+                    trb.disabled = false;
+                    trb.textContent = T('sendBtn');
+                }
+            }
             var bMic = document.getElementById('glb-mic-btn');
             var bClr = document.getElementById('glb-clear-btn');
             var bSrc = document.getElementById('glb-speak-src-btn');
@@ -2754,21 +2891,35 @@
             }
 
             function parseResponse(x) {
+                var hdrRetry = x && x.retryAfter;
                 if (x.status === 429) {
                     try {
                         var j429 = JSON.parse(x.body);
+                        if (hdrRetry && j429 && j429.retryAfter == null && j429.retry_after == null) {
+                            j429 = Object.assign({}, j429, { retryAfter: hdrRetry });
+                        }
                         return { ok: false, status: 429, json: j429, body: x.body };
                     } catch (e429) {
-                        return { ok: false, status: 429, body: x.body, json: null };
+                        return { ok: false, status: 429, body: x.body, json: hdrRetry ? { retryAfter: hdrRetry } : null };
                     }
                 }
                 if (x.status >= 200 && x.status < 300) {
                     try {
                         var j = JSON.parse(x.body);
+                        if (hdrRetry && j && j.retryAfter == null && j.retry_after == null) {
+                            j = Object.assign({}, j, { retryAfter: hdrRetry });
+                        }
+                        var ps = j.provider_status != null ? j.provider_status : j.providerStatus;
+                        if (ps === 503 || ps === '503') {
+                            return { ok: false, json: j, text: '', raw: x.body, providerDown: true, status: x.status };
+                        }
                         if (j.ok === false) {
-                            return { ok: false, json: j, text: '', raw: x.body };
+                            return { ok: false, json: j, text: '', raw: x.body, status: x.status };
                         }
                         var line = j.translatedText != null ? String(j.translatedText) : '';
+                        if (!String(line).trim()) {
+                            return { ok: false, json: j, text: '', raw: x.body, emptyOutput: true, status: x.status };
+                        }
                         return { ok: true, text: safeOutput(line), json: j };
                     } catch (e) {
                         return { ok: true, text: safeOutput(x.body), json: null };
@@ -2786,17 +2937,75 @@
                     cache: 'no-store'
                 }).then(function (r) {
                     return r.text().then(function (t) {
-                        return { status: r.status, body: t };
+                        return { status: r.status, body: t, retryAfter: r.headers.get('retry-after') };
                     });
                 });
             }
 
-            function applyError(x) {
-                setResultText(T('failHttp'), '#c99', '0');
+            function applyError(x, p) {
+                var st = (p && p.status != null) ? p.status : (x && x.status);
+                var j = p && p.json;
+                if (st === 401 || st === 403) {
+                    setResultText(T('failEntitlement'), '#c99', '0');
+                } else if (st >= 500) {
+                    GLB_QUOTA_UI.lineMode = 'temp_unavailable';
+                    GLB_QUOTA_UI.serverNextLine = glbNextAvailableLine(j, x && x.retryAfter);
+                    refreshFreeQuotaDisplay();
+                    setResultText(T('failServer') + '\n' + T('inputPreservedHint'), '#c99', '0');
+                } else {
+                    setResultText(T('failHttp') + '\n' + T('inputPreservedHint'), '#c99', '0');
+                }
                 GLB_SESSION_EVENTS.translateFail += 1;
                 GLB_SESSION_EVENTS.apiFail += 1;
-                glbTrackOpsEvent('translation_failure', { stage: 'http', status: (x && x.status) || 0 });
-                glbTrackOpsEvent('api_failure', { stage: 'http', status: (x && x.status) || 0 });
+                glbTrackOpsEvent('translation_failure', { stage: 'http', status: st || 0 });
+                glbTrackOpsEvent('api_failure', { stage: 'http', status: st || 0 });
+            }
+
+            function applyReasonFailure(p, x, stage, srcLog, tgtLog) {
+                var j = p && p.json;
+                var st = (p && p.status != null) ? p.status : (x && x.status);
+                if (glbJsonLooksEntitlement(j, st)) {
+                    setResultText(T('failEntitlement'), '#c99', '0');
+                } else if (glbJsonLooksQuota(j)) {
+                    forceQuotaExhaustedLocally();
+                    GLB_QUOTA_UI.lineMode = 'normal';
+                    GLB_QUOTA_UI.serverNextLine = glbNextAvailableLine(j, x && x.retryAfter);
+                    refreshFreeQuotaDisplay();
+                    setResultText(glbQuotaResultMessage(j, x && x.retryAfter), '#c99', '0');
+                } else {
+                    var ps = j && (j.provider_status != null ? j.provider_status : j.providerStatus);
+                    if (ps === 503 || ps === '503') {
+                        GLB_QUOTA_UI.lineMode = 'temp_unavailable';
+                        GLB_QUOTA_UI.serverNextLine = glbNextAvailableLine(j, x && x.retryAfter);
+                        refreshFreeQuotaDisplay();
+                        setResultText(T('failServer') + '\n' + T('inputPreservedHint'), '#c99', '0');
+                    } else {
+                        setResultText(T('failHttp') + '\n' + T('inputPreservedHint'), '#c99', '0');
+                    }
+                }
+                if (j) glbLogClientAudit(j, srcLog, tgtLog, false, false);
+                GLB_SESSION_EVENTS.translateFail += 1;
+                glbTrackOpsEvent('translation_failure', { stage: stage || 'direct_reason', reason_code: j && j.reasonCode ? String(j.reasonCode) : '' });
+            }
+
+            function applyProviderOrEmptyFailure(p, x, stage, srcLog, tgtLog) {
+                GLB_QUOTA_UI.lineMode = 'temp_unavailable';
+                GLB_QUOTA_UI.serverNextLine = glbNextAvailableLine(p && p.json, x && x.retryAfter);
+                refreshFreeQuotaDisplay();
+                setResultText(T('failServer') + '\n' + T('inputPreservedHint'), '#c99', '0');
+                if (p && p.json) glbLogClientAudit(p.json, srcLog, tgtLog, false, false);
+                GLB_SESSION_EVENTS.translateFail += 1;
+                glbTrackOpsEvent('translation_failure', { stage: stage || 'provider', reason_code: (p && p.json && p.json.reasonCode) ? String(p.json.reasonCode) : 'empty_or_provider' });
+            }
+
+            function apply429Quota(p, x, stage) {
+                forceQuotaExhaustedLocally();
+                GLB_QUOTA_UI.lineMode = 'normal';
+                GLB_QUOTA_UI.serverNextLine = glbNextAvailableLine(p && p.json, x && x.retryAfter);
+                refreshFreeQuotaDisplay();
+                setResultText(glbQuotaResultMessage(p && p.json, x && x.retryAfter), '#c99', '0');
+                GLB_SESSION_EVENTS.translateFail += 1;
+                glbTrackOpsEvent('translation_failure', { stage: stage || 'quota_cloud', status: 429 });
             }
 
             btn.addEventListener('click', function () {
@@ -2857,6 +3066,8 @@
                 var pivot = (source !== 'en' && target !== 'en');
 
                 function finishOk(line, apiJson) {
+                    glbClearQuotaUi();
+                    refreshFreeQuotaDisplay();
                     var done = glbFinalizeOut(line);
                     if (source === 'ja' && target === 'en' && containsCjk(done)) {
                         var fb = tryLocalRoute(text, source, target);
@@ -2864,6 +3075,11 @@
                             done = glbFinalizeOut(fb);
                         } else {
                             setResultText(T('translationUnavailable'), '#c99', '0');
+                            GLB_QUOTA_UI.lineMode = 'temp_unavailable';
+                            GLB_QUOTA_UI.serverNextLine = T('nextAvailableChecking');
+                            refreshFreeQuotaDisplay();
+                            GLB_SESSION_EVENTS.translateFail += 1;
+                            glbTrackOpsEvent('translation_failure', { stage: 'cjk_verify_failed' });
                             return;
                         }
                     }
@@ -2884,24 +3100,24 @@
                     glbTrackOpsEvent('translation_success', { pivot: pivot, route: apiJson && apiJson.routeType ? apiJson.routeType : '' });
                 }
 
+                glbSetTranslateWorking(true);
                 setResultText(T('sending'), '#eaeaea', '1');
 
                 if (!pivot) {
                     fetchTranslate(text, source, target)
                         .then(function (x) {
                             var p = parseResponse(x);
-                            if (p.status === 429 && p.json && (p.json.error === 'FREE_LIMIT_REACHED' || p.json.reasonCode === 'FREE_QUOTA_EXCEEDED')) {
-                                setResultText(T('upgradePrompt429'), '#c99', '0');
-                                glbTrackOpsEvent('translation_failure', { stage: 'quota_cloud', status: 429 });
+                            if (p.status === 429) {
+                                apply429Quota(p, x, 'quota_cloud');
+                                return;
+                            }
+                            if (p.providerDown || p.emptyOutput) {
+                                applyProviderOrEmptyFailure(p, x, 'direct_provider', source, target);
                                 return;
                             }
                             if (p.ok) finishOk(p.text, p.json);
-                            else if (p.json && p.json.reasonCode) {
-                                setResultText(String(p.json.reasonCode), '#c99', '0');
-                                glbLogClientAudit(p.json, source, target, false, false);
-                                GLB_SESSION_EVENTS.translateFail += 1;
-                                glbTrackOpsEvent('translation_failure', { stage: 'direct_reason', reason_code: String(p.json.reasonCode) });
-                            } else applyError(x);
+                            else if (p.json) applyReasonFailure(p, x, 'direct_reason', source, target);
+                            else applyError(x, p);
                         })
                         .catch(function (err) {
                             setResultText(T('netErr'), '#c99', '0');
@@ -2909,6 +3125,9 @@
                             GLB_SESSION_EVENTS.apiFail += 1;
                             glbTrackOpsEvent('translation_failure', { stage: 'direct_network' });
                             glbTrackOpsEvent('api_failure', { stage: 'direct_network' });
+                        })
+                        .finally(function () {
+                            glbSetTranslateWorking(false);
                         });
                     return;
                 }
@@ -2916,18 +3135,17 @@
                 fetchTranslate(text, source, 'en')
                     .then(function (x1) {
                         var p1 = parseResponse(x1);
-                        if (p1.status === 429 && p1.json && (p1.json.error === 'FREE_LIMIT_REACHED' || p1.json.reasonCode === 'FREE_QUOTA_EXCEEDED')) {
-                            setResultText(T('upgradePrompt429'), '#c99', '0');
-                            glbTrackOpsEvent('translation_failure', { stage: 'quota_cloud', status: 429 });
+                        if (p1.status === 429) {
+                            apply429Quota(p1, x1, 'quota_cloud');
+                            return null;
+                        }
+                        if (p1.providerDown || p1.emptyOutput) {
+                            applyProviderOrEmptyFailure(p1, x1, 'pivot_first_provider', source, 'en');
                             return null;
                         }
                         if (!p1.ok) {
-                            if (p1.json && p1.json.reasonCode) {
-                                setResultText(String(p1.json.reasonCode), '#c99', '0');
-                                glbLogClientAudit(p1.json, source, 'en', false, false);
-                                GLB_SESSION_EVENTS.translateFail += 1;
-                                glbTrackOpsEvent('translation_failure', { stage: 'pivot_first', reason_code: String(p1.json.reasonCode) });
-                            } else applyError(x1);
+                            if (p1.json) applyReasonFailure(p1, x1, 'pivot_first', source, 'en');
+                            else applyError(x1, p1);
                             return null;
                         }
                         if (p1.json) glbLogClientAudit(p1.json, source, 'en', false, false);
@@ -2937,18 +3155,17 @@
                     .then(function (x2) {
                         if (x2 == null) return;
                         var p2 = parseResponse(x2);
-                        if (p2.status === 429 && p2.json && (p2.json.error === 'FREE_LIMIT_REACHED' || p2.json.reasonCode === 'FREE_QUOTA_EXCEEDED')) {
-                            setResultText(T('upgradePrompt429'), '#c99', '0');
-                            glbTrackOpsEvent('translation_failure', { stage: 'quota_cloud', status: 429 });
+                        if (p2.status === 429) {
+                            apply429Quota(p2, x2, 'quota_cloud');
+                            return;
+                        }
+                        if (p2.providerDown || p2.emptyOutput) {
+                            applyProviderOrEmptyFailure(p2, x2, 'pivot_second_provider', 'en', target);
                             return;
                         }
                         if (p2.ok) finishOk(p2.text, p2.json);
-                        else if (p2.json && p2.json.reasonCode) {
-                            setResultText(String(p2.json.reasonCode), '#c99', '0');
-                            glbLogClientAudit(p2.json, 'en', target, false, false);
-                            GLB_SESSION_EVENTS.translateFail += 1;
-                            glbTrackOpsEvent('translation_failure', { stage: 'pivot_second', reason_code: String(p2.json.reasonCode) });
-                        } else applyError(x2);
+                        else if (p2.json) applyReasonFailure(p2, x2, 'pivot_second', 'en', target);
+                        else applyError(x2, p2);
                     })
                     .catch(function (err) {
                         setResultText(T('netErr'), '#c99', '0');
@@ -2956,6 +3173,9 @@
                         GLB_SESSION_EVENTS.apiFail += 1;
                         glbTrackOpsEvent('translation_failure', { stage: 'pivot_network' });
                         glbTrackOpsEvent('api_failure', { stage: 'pivot_network' });
+                    })
+                    .finally(function () {
+                        glbSetTranslateWorking(false);
                     });
             });
         })();
