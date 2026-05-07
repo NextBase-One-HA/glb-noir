@@ -2027,6 +2027,9 @@
                 failServer: 'We’re getting things ready.',
                 failEntitlement: 'Checking your access… please reload the page.',
                 quotaExceededLead: 'You’ve used today’s free translations.',
+                quotaExhaustedHead: 'Today\'s free limit has been reached.',
+                quotaResetEstimateLocalNote: 'Estimate: free translations reset at 12:00 AM in your local time.',
+                quotaAvailableInAbout: 'Available again in about {{h}}h {{m}}m.',
                 translationUnavailable: 'Connecting for this pair… please try again shortly.',
                 subscribeTrustLead: '5 free text runs every day — resets daily. No card needed for the free tier.',
                 upgradePrompt429: 'Cloud free limit reached. Open GLB (2.99/mo) for unlimited server translation — or try again tomorrow.',
@@ -2092,10 +2095,14 @@
                 nextAvailableAt: '再試行の目安: {{t}}（お使いの端末の時刻）',
                 nextAvailableChecking: '再開の目安を確認しています…',
                 availableAgainSoon: 'まもなく再試行できます。',
-                inputPreservedHint: '入力内容はそのまま守られています',
+                inputPreservedHint: '入力内容は保持されています',
                 failServer: 'ただいま準備しています。少しだけお待ちください。',
                 failEntitlement: '利用権限を確認しています。ページを再読み込みしてください。',
                 quotaExceededLead: '本日の無料枠を使い切りました。',
+                quotaExhaustedHeadJa: '本日の無料枠は終了しました。',
+                quotaResetEstimateJa: '目安: あなたの地域時間で毎日 0:00 にリセットされます。',
+                quotaAvailableInAboutJa: '次回利用まで: 約{{h}}時間{{m}}分',
+                quotaInputPreservedJa: '入力内容は保持されています',
                 translationUnavailable: 'この言語の組み合わせに接続しています…しばらくしてからお試しください。',
                 subscribeTrustLead: '文字翻訳は1日5回まで無料（毎日リセット）。無料枠にカードは不要です。',
                 langDetailsSummary: '{{from}} → {{to}} · タップで言語を変更',
@@ -2370,6 +2377,59 @@
             return null;
         }
 
+        function glbTimeUntilMs(targetMs) {
+            var diff = Math.max(0, targetMs - Date.now());
+            var h = Math.floor(diff / 3600000);
+            var m = Math.floor((diff % 3600000) / 60000);
+            return { h: h, m: m };
+        }
+
+        function getTimeUntilMidnight() {
+            var now = new Date();
+            var midnight = new Date(now);
+            midnight.setHours(24, 0, 0, 0);
+            return glbTimeUntilMs(midnight.getTime());
+        }
+
+        function glbQuotaCountdownHm(j, hdrRetry) {
+            var ms = glbResolveNextAvailableMs(j, hdrRetry);
+            if (ms != null) return glbTimeUntilMs(ms);
+            return getTimeUntilMidnight();
+        }
+
+        function glbFormatQuotaExceededFull(j, hdrRetry) {
+            var hm = glbQuotaCountdownHm(j, hdrRetry);
+            var hStr = String(hm.h);
+            var mStr = String(hm.m);
+            var loc = (typeof CURRENT_LANG !== 'undefined' && CURRENT_LANG === 'ja') ? 'ja' : 'en';
+            if (loc === 'ja') {
+                return [
+                    T('quotaExhaustedHeadJa'),
+                    T('quotaResetEstimateJa'),
+                    T('quotaAvailableInAboutJa').replace(/\{\{h\}\}/g, hStr).replace(/\{\{m\}\}/g, mStr),
+                    T('quotaInputPreservedJa')
+                ].join('\n');
+            }
+            return [
+                T('quotaExhaustedHead'),
+                T('quotaResetEstimateLocalNote'),
+                T('quotaAvailableInAbout').replace(/\{\{h\}\}/g, hStr).replace(/\{\{m\}\}/g, mStr),
+                T('inputPreservedHint')
+            ].join('\n');
+        }
+
+        function glbQuotaFreeSubCaption(j, hdrRetry) {
+            var hm = glbQuotaCountdownHm(j, hdrRetry);
+            var hStr = String(hm.h);
+            var mStr = String(hm.m);
+            var loc = (typeof CURRENT_LANG !== 'undefined' && CURRENT_LANG === 'ja') ? 'ja' : 'en';
+            var lineCountdown = (loc === 'ja')
+                ? T('quotaAvailableInAboutJa').replace(/\{\{h\}\}/g, hStr).replace(/\{\{m\}\}/g, mStr)
+                : T('quotaAvailableInAbout').replace(/\{\{h\}\}/g, hStr).replace(/\{\{m\}\}/g, mStr);
+            var lineEst = (loc === 'ja') ? T('quotaResetEstimateJa') : T('quotaResetEstimateLocalNote');
+            return lineEst + '\n' + lineCountdown;
+        }
+
         function glbFormatLocalTimeMs(ms) {
             try {
                 return new Intl.DateTimeFormat(navigator.language || 'en', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(ms));
@@ -2398,7 +2458,7 @@
         }
 
         function glbQuotaResultMessage(j, hdrRetry) {
-            return T('quotaExceededLead') + '\n' + glbNextAvailableLine(j, hdrRetry) + '\n' + T('inputPreservedHint');
+            return glbFormatQuotaExceededFull(j, hdrRetry);
         }
 
         function glbSetTranslateWorking(on) {
@@ -3056,7 +3116,7 @@
                 } else if (glbJsonLooksQuota(j)) {
                     forceQuotaExhaustedLocally();
                     GLB_QUOTA_UI.lineMode = 'normal';
-                    GLB_QUOTA_UI.serverNextLine = glbNextAvailableLine(j, x && x.retryAfter);
+                    GLB_QUOTA_UI.serverNextLine = glbQuotaFreeSubCaption(j, x && x.retryAfter);
                     refreshFreeQuotaDisplay();
                     setResultText(glbQuotaResultMessage(j, x && x.retryAfter), null, '0', 'wait');
                 } else {
@@ -3088,7 +3148,7 @@
             function apply429Quota(p, x, stage) {
                 forceQuotaExhaustedLocally();
                 GLB_QUOTA_UI.lineMode = 'normal';
-                GLB_QUOTA_UI.serverNextLine = glbNextAvailableLine(p && p.json, x && x.retryAfter);
+                GLB_QUOTA_UI.serverNextLine = glbQuotaFreeSubCaption(p && p.json, x && x.retryAfter);
                 refreshFreeQuotaDisplay();
                 setResultText(glbQuotaResultMessage(p && p.json, x && x.retryAfter), null, '0', 'wait');
                 GLB_SESSION_EVENTS.translateFail += 1;
@@ -3145,7 +3205,7 @@
                 }
 
                 if (!canGlbTranslate()) {
-                    setResultText(T('freeLimitExceeded') + '\n' + T('inputPreservedHint'), null, '0', 'wait');
+                    setResultText(glbFormatQuotaExceededFull(null, null), null, '0', 'wait');
                     refreshFreeQuotaDisplay();
                     return;
                 }
