@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import FastAPI, Request
 from .router_core import handle_translate
 
@@ -12,10 +13,11 @@ def health():
 @app.post("/translate")
 async def translate(req: Request):
     data = await req.json()
-    return handle_translate(data)
+    # Offload synchronous routing/HTTP work to a thread so the event loop is not blocked.
+    return await asyncio.to_thread(handle_translate, data)
 
 
 @app.post("/gateway")
 async def gateway(req: Request):
     data = await req.json()
-    return handle_translate(data)
+    return await asyncio.to_thread(handle_translate, data)
