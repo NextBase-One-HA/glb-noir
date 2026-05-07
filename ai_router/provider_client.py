@@ -1,4 +1,5 @@
 import requests
+from requests.exceptions import Timeout, RequestException
 
 
 def call_gemini(api_key: str, model: str, text: str) -> dict:
@@ -15,5 +16,10 @@ def call_gemini(api_key: str, model: str, text: str) -> dict:
         ]
     }
 
-    r = requests.post(url, headers=headers, params=params, json=body, timeout=10)
-    return {"status": r.status_code, "body": r.text}
+    try:
+        r = requests.post(url, headers=headers, params=params, json=body, timeout=10)
+        return {"status": r.status_code, "body": r.text}
+    except Timeout:
+        return {"status": 504, "body": "provider_timeout"}
+    except RequestException as e:
+        return {"status": 502, "body": str(e)[:200]}
