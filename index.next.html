@@ -114,6 +114,18 @@
         }
         .glb-lang-details > summary::-webkit-details-marker { display: none; }
         .glb-lang-details-body { padding: 0 12px 12px; }
+        .tz-notice-banner {
+            margin: 10px 0 12px;
+            padding: 9px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 220, 120, 0.24);
+            background: rgba(255, 220, 120, 0.08);
+            color: #d9ceb8;
+            font-size: 11px;
+            line-height: 1.45;
+            text-align: left;
+            cursor: pointer;
+        }
         .glb-result-inner {
             display: flex;
             flex-direction: column;
@@ -785,6 +797,7 @@
         <p style="font-size: 10px; color: #666; margin: 0 0 10px; line-height: 1.45;" id="t-lang-flow-hint"></p>
         </div>
         </details>
+        <div id="tz-notice-banner" class="tz-notice-banner" style="display:none;" role="status" aria-live="polite"></div>
         <div class="glb-mic-wrap">
             <button type="button" id="glb-mic-btn" aria-label="Mic">Mic</button>
         </div>
@@ -2030,6 +2043,8 @@
                 quotaExhaustedHead: 'Today\'s free limit has been reached.',
                 quotaResetEstimateLocalNote: 'Estimate: free translations reset at 12:00 AM in your local time.',
                 quotaAvailableInAbout: 'Available again in about {{h}}h {{m}}m.',
+                quotaTimezoneLine: '※ Timezone: {{tz}}',
+                tzNoticeLine: 'Free quota resets at 12:00 AM in your local time ({{tz}}).',
                 translationUnavailable: 'Connecting for this pair… please try again shortly.',
                 subscribeTrustLead: '5 free text runs every day — resets daily. No card needed for the free tier.',
                 upgradePrompt429: 'Cloud free limit reached. Open GLB (2.99/mo) for unlimited server translation — or try again tomorrow.',
@@ -2100,9 +2115,11 @@
                 failEntitlement: '利用権限を確認しています。ページを再読み込みしてください。',
                 quotaExceededLead: '本日の無料枠を使い切りました。',
                 quotaExhaustedHeadJa: '本日の無料枠は終了しました。',
-                quotaResetEstimateJa: '目安: あなたの地域時間で毎日 0:00 にリセットされます。',
+                quotaResetEstimateJa: '無料翻訳は毎日 0:00（あなたの地域時間）にリセットされます。',
                 quotaAvailableInAboutJa: '次回利用まで: 約{{h}}時間{{m}}分',
+                quotaTimezoneLineJa: '※ タイムゾーン: {{tz}}',
                 quotaInputPreservedJa: '入力内容は保持されています',
+                tzNoticeLineJa: '無料枠のリセット時間はあなたの端末時間（{{tz}}）の毎日 0:00 です。',
                 translationUnavailable: 'この言語の組み合わせに接続しています…しばらくしてからお試しください。',
                 subscribeTrustLead: '文字翻訳は1日5回まで無料（毎日リセット）。無料枠にカードは不要です。',
                 langDetailsSummary: '{{from}} → {{to}} · タップで言語を変更',
@@ -2391,6 +2408,14 @@
             return glbTimeUntilMs(midnight.getTime());
         }
 
+        function getTimezoneLabel() {
+            try {
+                return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+            } catch (e) {
+                return 'Local';
+            }
+        }
+
         function glbQuotaCountdownHm(j, hdrRetry) {
             var ms = glbResolveNextAvailableMs(j, hdrRetry);
             if (ms != null) return glbTimeUntilMs(ms);
@@ -2401,12 +2426,14 @@
             var hm = glbQuotaCountdownHm(j, hdrRetry);
             var hStr = String(hm.h);
             var mStr = String(hm.m);
+            var tz = getTimezoneLabel();
             var loc = (typeof CURRENT_LANG !== 'undefined' && CURRENT_LANG === 'ja') ? 'ja' : 'en';
             if (loc === 'ja') {
                 return [
                     T('quotaExhaustedHeadJa'),
                     T('quotaResetEstimateJa'),
                     T('quotaAvailableInAboutJa').replace(/\{\{h\}\}/g, hStr).replace(/\{\{m\}\}/g, mStr),
+                    T('quotaTimezoneLineJa').replace(/\{\{tz\}\}/g, tz),
                     T('quotaInputPreservedJa')
                 ].join('\n');
             }
@@ -2414,6 +2441,7 @@
                 T('quotaExhaustedHead'),
                 T('quotaResetEstimateLocalNote'),
                 T('quotaAvailableInAbout').replace(/\{\{h\}\}/g, hStr).replace(/\{\{m\}\}/g, mStr),
+                T('quotaTimezoneLine').replace(/\{\{tz\}\}/g, tz),
                 T('inputPreservedHint')
             ].join('\n');
         }
@@ -2422,12 +2450,16 @@
             var hm = glbQuotaCountdownHm(j, hdrRetry);
             var hStr = String(hm.h);
             var mStr = String(hm.m);
+            var tz = getTimezoneLabel();
             var loc = (typeof CURRENT_LANG !== 'undefined' && CURRENT_LANG === 'ja') ? 'ja' : 'en';
             var lineCountdown = (loc === 'ja')
                 ? T('quotaAvailableInAboutJa').replace(/\{\{h\}\}/g, hStr).replace(/\{\{m\}\}/g, mStr)
                 : T('quotaAvailableInAbout').replace(/\{\{h\}\}/g, hStr).replace(/\{\{m\}\}/g, mStr);
             var lineEst = (loc === 'ja') ? T('quotaResetEstimateJa') : T('quotaResetEstimateLocalNote');
-            return lineEst + '\n' + lineCountdown;
+            var lineTz = (loc === 'ja')
+                ? T('quotaTimezoneLineJa').replace(/\{\{tz\}\}/g, tz)
+                : T('quotaTimezoneLine').replace(/\{\{tz\}\}/g, tz);
+            return lineEst + '\n' + lineCountdown + '\n' + lineTz;
         }
 
         function glbFormatLocalTimeMs(ms) {
@@ -2622,6 +2654,32 @@
             });
         }
 
+        function glbTimezoneNoticeText() {
+            var tz = getTimezoneLabel();
+            if (typeof CURRENT_LANG !== 'undefined' && CURRENT_LANG === 'ja') {
+                return T('tzNoticeLineJa').replace(/\{\{tz\}\}/g, tz);
+            }
+            return T('tzNoticeLine').replace(/\{\{tz\}\}/g, tz);
+        }
+
+        function glbShowTimezoneNoticeOnce() {
+            var key = 'tz_notice_shown';
+            var banner = document.getElementById('tz-notice-banner');
+            if (!banner) return;
+            try {
+                if (localStorage.getItem(key)) {
+                    banner.style.display = 'none';
+                    return;
+                }
+                localStorage.setItem(key, '1');
+            } catch (e) { /* ignore */ }
+            banner.textContent = glbTimezoneNoticeText();
+            banner.style.display = '';
+            var hide = function () { banner.style.display = 'none'; };
+            banner.addEventListener('click', hide, { once: true });
+            setTimeout(hide, 5000);
+        }
+
         function applyUiLang() {
             var sel = document.getElementById('ui-lang');
             CURRENT_LANG = (sel && sel.value) ? sel.value : getStoredUiLang();
@@ -2692,6 +2750,8 @@
             updateTravelOfferLabels();
             var tsh = document.getElementById('t-travel-stripe-hint');
             if (tsh) tsh.textContent = T('stripeHint');
+            var tzb = document.getElementById('tz-notice-banner');
+            if (tzb && tzb.style.display !== 'none') tzb.textContent = glbTimezoneNoticeText();
 
             var trt = document.getElementById('tr-text');
             var trb = document.getElementById('tr-run');
@@ -2754,6 +2814,7 @@
             refreshSubscriptionUi();
             updateLangDetailsSummary();
             updateResultLangCaption();
+            glbShowTimezoneNoticeOnce();
         }
 
         (function bindManualApprovalOnly() {
